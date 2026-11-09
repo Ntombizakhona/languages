@@ -14,9 +14,11 @@ inclusion: always
 - Plain HTML, CSS, and JavaScript. No frameworks and no build step: GitHub Pages
   serves the files exactly as they are in the repository.
 - Small libraries are fine if they're pinned to an exact version and saved in vendor/.
-- Relative links (css/style.css, not /css/style.css), so the site still works
-  if it ever moves into a subfolder. Exception: 404.html, which GitHub Pages
-  serves for any missing path.
+- The site is published at https://ntombizakhona.github.io/languages/ (the
+  languages repository). The root address is reserved for a future site.
+- Relative links (css/style.css, not /css/style.css), so the site works under
+  /languages/. Exception: 404.html, which GitHub Pages serves for missing paths
+  at any depth, so its links start with /languages/.
 - Accessible: semantic HTML, alt text on every image, visible keyboard focus,
   and text contrast of at least 4.5:1.
 - Check every change at 375 px (phone) and 1280 px (laptop) wide.

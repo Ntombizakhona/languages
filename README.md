@@ -2,7 +2,7 @@
 
 My portfolio and blog: 13 articles on the languages of the cloud, from English and HTML to Kubernetes, Terraform, and agentic IDEs. Browsing feels like Instagram; reading feels like WordPress.
 
-**Live site:** https://ntombizakhona.github.io
+**Live site:** https://ntombizakhona.github.io/languages/
 
 <!-- To add a screenshot, save it as images/screenshot.png and remove the comment marks around the next line. -->
 <!-- ![Home page: profile header, story circles, and a masonry grid of articles](images/screenshot.png) -->
@@ -77,6 +77,8 @@ Articles that aren't on Medium yet stay as Markdown in `posts/`.
 ## Deployment
 
 Every push to `main` publishes the site with GitHub Pages (**Settings → Pages**: deploy from the `main` branch, `/ (root)` folder). The empty `.nojekyll` file tells Pages to publish the files without processing them.
+
+The repository is named `languages`, so GitHub serves it as a project site at `ntombizakhona.github.io/languages/`. The root address, `ntombizakhona.github.io`, is reserved for a future site. Links in `404.html` start with `/languages/`, because GitHub shows that page for missing paths at any depth.
 
 ## Built With
 
