@@ -1,0 +1,397 @@
+<!-- Imported from https://medium.com/@ntombizakhona/agentic-ides-9c49fe3e3cc4 by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Agentic IDEs</h1>
+<h2>The Final Frontier Of Cloud Engineering</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/1024/1*gCMUobMcndzJfA33O1ml1Q.png" alt="" loading="lazy"><figcaption>Agentic IDEs — The Final Frontier</figcaption></figure><p>You’ve learned 12 languages, <em>but there’s a thirteenth ghost!</em></p><p>You can write frontend code, backend APIs, SQL queries, Kubernetes manifests, and Terraform configurations. You can deploy to the cloud, manage infrastructure as code, and orchestrate containers at scale.</p><p>But, <strong>what if you didn’t have to do all of that manually…ever again?</strong></p><p><strong>Think about it:</strong></p><ul><li>Writing boilerplate Kubernetes YAML? → An AI agent could generate it from a description</li><li>Debugging a Python traceback? → An agent could read the error, find the file, and fix it</li><li>Setting up Terraform for a new environment? → Describe what you need, agent builds it</li><li>Wiring up a new API endpoint? → Agent scaffolds the route, service, model, and tests</li></ul><p><strong>This is the age of Agentic IDEs.</strong></p><p>Not autocomplete.</p><p>Not suggestions in a grey font.</p><p>We’re talking about AI agents that live inside your development environment, understand your entire codebase, use tools autonomously, and execute multi-step tasks on your behalf.</p><p>This is the thirteenth ghost. The invisible force that ties all twelve languages together and amplifies everything you’ve learned.</p><h2>Topics</h2><ol><li>From Text Editors To Agentic IDEs</li><li>The Anatomy of An Agentic IDE</li><li>Kiro</li><li>The 12 Languages Through The Agentic Lens</li><li>Practical Agentic Workflows</li><li>The Agentic IDE Landscape</li><li>The Future Of Development</li><li>Use An Agentic IDE to Improve Your Portfolio</li><li>Configure Kiro to Build Your Cloud Infrastructure</li><li>(Re) Build Your Portfolio Site with Kiro on GitHub Pages</li><li>The Ultimate Clean Up</li><li>The Compound Effect</li><li>Bonus: Kiroween 2026!</li></ol><h2>1 | From Text Editors to Agentic IDEs</h2><h3>The Evolution</h3><p>During the <strong>1970s to the 1990s, the era of Text Editors</strong> dominated software development. Using basic tools like Vim, Emacs, and Notepad, developers simply typed out their code with no assistance, operating under a “good luck” mentality with zero automation.</p><blockquote><strong><em>You type.</em></strong></blockquote><blockquote><strong><em>That’s it.</em></strong></blockquote><blockquote><strong><em>Good luck!</em></strong></blockquote><p>By the <strong>2000s, Integrated Development Environments (IDEs)</strong> like Eclipse, IntelliJ, and Visual Studio emerged. These platforms truly understood a language’s grammar, introducing game-changing features such as syntax highlighting, robust debugging, and refactoring tools.</p><blockquote><strong><em>The IDE understands your language’s grammar</em></strong></blockquote><p>The timeline advanced between <strong>2015 and 2020 with the rise of Smart Autocomplete</strong> utilities like IntelliSense, TabNine, and Kite. While these tools could predict the next few tokens a developer was about to type, their capabilities were still fundamentally limited to just filling in the blanks.</p><blockquote><strong><em>Predicts the next few tokens you’ll type, still just filling in blanks</em></strong></blockquote><p>From <strong>2021 to 2023, AI Code Assistants</strong> like GitHub Copilot and Amazon CodeWhisperer took center stage. They achieved the impressive feat of generating entire functions straight from natural language comments, though they remained strictly reactive systems that waited for human input.</p><blockquote><strong><em>Generates whole functions from comments.</em></strong></blockquote><blockquote><strong><em>Impressive, but reactive: waits for you to type</em></strong></blockquote><p>From <strong>2024 to the present day, Agentic IDEs</strong> like Kiro, Cursor, AntiGravity, and Claude Code have completely redefined the landscape. These platforms embed active AI agents that understand an entire codebase, use local tools like the file system and terminal, and execute multi-step plans autonomously.</p><p>They can read documentation to learn patterns, create, test, and deploy code, and dynamically respond to system events. This final shift marks a transition away from autocomplete, effectively placing a fully functioning junior developer directly inside the IDE.</p><pre><code>✓ Understand your ENTIRE codebase                                     
+✓ Use tools (file system, terminal, browser, APIs)                    
+✓ Execute multi-step plans autonomously                               
+✓ Read documentation and learn your patterns                          
+✓ Create, edit, test, and deploy code                                 
+✓ Respond to events (file saves, errors, deployments)</code></pre><h3>What Makes An IDE Agentic?</h3><p>In modern software development, the word “agent” carries a very specific meaning. An AI agent is far more than a simple chatbot, representing a shift from a tool that merely suggests code to one that actively executes it.</p><p>While chatbots, AI assistants, and agentic IDEs can all answer general programming questions, their capabilities diverge sharply when it comes to taking action.</p><p>Standard chatbots are highly restricted, as they cannot generate code snippets, read or edit your files, run terminal commands, or use external tools.</p><p>They also lack the ability to handle multi-step planning, react to system events, follow project-specific guidelines, or execute structured feature development.</p><p>AI assistants offer a slight step forward by generating code snippets and reading a limited portion of your files, but they still cannot directly edit files, interact with the terminal, or utilize external APIs and browsers.</p><p>Furthermore, like chatbots, they are entirely incapable of autonomous planning, event reaction, project-specific rule adherence, or structured feature development.</p><p>In contrast, an agentic IDE possesses the full spectrum of these advanced capabilities. It maintains an understanding of your entire codebase, allows the AI to directly edit files, and grants it the power to run terminal commands.</p><p>By leveraging protocols like the Model Context Protocol (MCP), an agentic IDE can connect to external tools like APIs and web browsers. It operates with a high degree of <strong>autonomy</strong>, utilising multi-step planning, reacting dynamically to system events via hooks, and adhering closely to project-specific steering rules.</p><p>Finally, it can manage structured feature development from the ground up based on your exact specifications. Ultimately, the defining difference is that an agentic IDE does not just suggest code: <em>it acts.</em></p><h2>2 | The Anatomy of an Agentic IDE</h2><h3>Core Components</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    AGENTIC IDE ARCHITECTURE                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────┐       │
+│   │                     THE AGENT                               │       │
+│   │                                                             │       │
+│   │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐     │       │
+│   │  │  LLM     │  │ Context  │  │  Tools   │  │ Memory   │     │       │
+│   │  │  Brain   │  │ Window   │  │          │  │          │     │       │
+│   │  │          │  │          │  │ • Files  │  │ • Chat   │     │       │
+│   │  │ Reasons  │  │ Sees     │  │ • Shell  │  │   history│     │       │
+│   │  │ about    │  │ relevant │  │ • Search │  │ • Project│     │       │
+│   │  │ code     │  │ code     │  │ • Web    │  │   context│     │       │
+│   │  │          │  │          │  │ • MCP    │  │ • Specs  │     │       │
+│   │  └──────────┘  └──────────┘  └──────────┘  └──────────┘     │       │
+│   └─────────────────────────────────────────────────────────────┘       │
+│                              │                                          │
+│                              ▼                                          │
+│   ┌─────────────────────────────────────────────────────────────┐       │
+│   │                   YOUR PROJECT                              │       │
+│   │                                                             │       │
+│   │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐           │       │
+│   │  │ .py  │  │ .tf  │  │ .yaml│  │ .html│  │ .sql │           │       │
+│   │  │files │  │files │  │files │  │files │  │files │           │       │
+│   │  └──────┘  └──────┘  └──────┘  └──────┘  └──────┘           │       │
+│   │                                                             │       │
+│   │  The agent reads, writes, and understands ALL of these      │       │
+│   └─────────────────────────────────────────────────────────────┘       │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><p>The underlying structure of an <strong>agentic IDE architecture relies on a continuous loop between a central agent and your project environment</strong>.</p><p>At the core of the system sits the agent, which is powered by four primary pillars working in tandem: an LLM brain, a context window, an array of functional tools, and a dedicated memory bank.</p><p>The LLM brain serves as the reasoning engine that actively analyzes and thinks about the code. It is fed directly by the context window, which acts as the system’s eyes to ensure the agent always sees the most relevant portions of the codebase.</p><p>To execute its decisions, the agent utilises a rich suite of built-in tools. These tools grant it the power to manipulate files, interact directly with the shell, execute searches, browse the web, and connect to external systems via the Model Context Protocol (MCP).</p><p>Supporting this execution is the agent’s memory bank, which keeps track of active chat histories, overarching project context, and precise system specifications.</p><p>This sophisticated agent architecture is focused entirely downward onto your project.</p><p>Rather than being restricted to specific languages or configurations, the agent natively interacts with a diverse ecosystem of project components, including Python scripts (.py), Terraform infrastructure files (.tf), configuration files (.yaml), front-end mockups (.html), and database schemas (.sql).</p><p>Ultimately, the agent operates with a holistic view of this workspace, maintaining the unique ability to read, write, and deeply understand all of these files simultaneously to manage your development workflow.</p><h2>3 | Kiro</h2><p>Let’s look at how an agentic IDE like Kiro works in practice. Kiro is built by Amazon and represents the agentic IDE philosophy: an AI partner that understands your project deeply and can act on it.</p><h3>Specs (Structured Feature Development)</h3><p>Instead of jumping straight into code, Kiro uses Specs to formalize the design process:</p><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    THE SPEC WORKFLOW                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   1. REQUIREMENTS                                                       │
+│      "I need a contact form that saves to the database"                 │
+│      → Agent generates user stories and acceptance criteria             │
+│                                                                         │
+│   2. DESIGN                                                             │
+│      → Agent proposes architecture, API endpoints, database schema      │
+│      → You review and refine                                            │
+│                                                                         │
+│   3. IMPLEMENTATION TASKS                                               │
+│      → Agent breaks the work into ordered tasks                         │
+│      → Each task is a concrete, testable unit of work                   │
+│                                                                         │
+│   4. EXECUTION                                                          │
+│      → Agent works through tasks one by one                             │
+│      → You review each step, provide feedback                           │
+│                                                                         │
+│   This is how professional software teams work,                         │
+│   now with an AI partner at every step.                                 │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><blockquote><strong><em>This is where your </em></strong><a href="post.html?slug=01-english"><strong><em>English</em></strong></a><strong><em> skills pay massive dividends. The clearer you describe what you want, the better the spec, the better the code.</em></strong></blockquote><h3>Steering (Teaching the Agent Your Standards)</h3><p>Every team has conventions. Steering files let you encode them:</p><pre><code>&lt;!-- .kiro/steering/coding-standards.md --&gt;
+## Our Coding Standards
+
+- Use Python 3.12+ with type hints on all functions
+- Follow PEP 8 naming conventions
+- All API endpoints must return JSON with a consistent envelope:
+  { "status": "success|error", "data": ..., "message": "..." }
+- Database queries must use parameterized statements (no string concatenation)
+- All Terraform resources must include Name, Environment, and ManagedBy tags
+- Kubernetes manifests must include resource limits and health checks</code></pre><blockquote><strong><em>The agent reads these before every interaction. It’s like onboarding a new team member except they actually remember everything.</em></strong></blockquote><h3>Hooks (Event-Driven Automation)</h3><p>Hooks run a shell command, or send Kiro a prompt, when something happens: you save a file, the agent is about to use a tool, or a spec task finishes.</p><p>Since Kiro IDE 1.0, hooks live in JSON files in .kiro/hooks/, and the same file works in the IDE and the CLI:</p><pre><code>{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Validate Terraform on save",
+      "trigger": "PostFileSave",
+      "matcher": "\\.tf$",
+      "action": { "type": "command", "command": "terraform -chdir=terraform validate" }
+    },
+    {
+      "name": "Check Kubernetes manifests",
+      "trigger": "PostFileSave",
+      "matcher": "k8s.*\\.ya?ml$",
+      "action": { "type": "agent", "prompt": "Check that the saved Kubernetes manifest sets resource limits and health checks." }
+    }
+  ]
+}</code></pre><ul><li><strong>trigger</strong> is the event. Others include PreToolUse, which runs before the agent uses a tool and can block it, and PostTaskExec, which runs after a spec task finishes.</li><li><strong>matcher</strong> is a regular expression. For file events, Kiro tests it against the file's path. \\.tf$ is the expression \.tf$, "ends in .tf", with its backslash doubled, as JSON requires.</li><li><strong>action</strong> is either a command, which runs in a shell, or an agent prompt, which Kiro acts on.</li></ul><blockquote><strong><em>Think of hooks as GitHub Actions, but inside your IDE, running as you work. You rarely write hook files by hand, though. Describe the hook in Kiro's Agent Hooks panel and Kiro generates the file.</em></strong></blockquote><h3>MCP (Extending the Agent’s Reach)</h3><p>The Model Context Protocol (MCP) lets agentic IDEs connect to external tools and services:</p><pre><code>                    MCP: EXTENDING THE AGENT                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Agent                                                                 │
+│     │                                                                   │
+│     ├── MCP Server: AWS Documentation                                   │
+│     │   → Agent can search and read AWS docs in real-time               │
+│     │                                                                   │
+│     ├── MCP Server: Database                                            │
+│     │   → Agent can query your database schema directly                 │
+│     │                                                                   │
+│     ├── MCP Server: Kubernetes                                          │
+│     │   → Agent can check pod status, read logs                         │
+│     │                                                                   │
+│     ├── MCP Server: GitHub                                              │
+│     │   → Agent can create PRs, read issues                             │
+│     │                                                                   │
+│     └── MCP Server: Your Custom API                                     │
+│         → Agent can interact with your own services                     │
+│                                                                         │
+│   MCP is an open standard. Anyone can build servers for it.             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>Beyond the IDE</h3><p>Kiro has grown well beyond the IDE features above. These all work from the same rules and repositories:</p><ol><li><strong>Kiro IDE: </strong>Hands-on, code-heavy building, as in this post</li><li><strong>Kiro CLI: </strong>The agent in your terminal, for scripts, CI/CD, and DevOps automation</li><li><strong>Kiro Web: </strong>Longer, more autonomous sessions in the browser, including specs, on GitHub or GitLab repositories</li><li><strong>Kiro Mobile: </strong>Keeps your cloud sessions moving from your phone</li><li><strong>Kiro Crew: </strong>An open-source personal agent that runs on your own hardware, remembers across sessions, and takes requests from its dashboard, the CLI, Slack, or Discord</li><li><strong>Powers: </strong>Packages of MCP servers, steering, and best practices that Kiro loads when a task needs them, from partners such as Figma, Postman, Stripe, Supabase, and Netlify</li><li><strong>Custom agents: </strong>Specialized agents with their own instructions and tools that you can switch between</li><li><strong>Property-based testing: </strong>Tests your code with many generated inputs to check that it matches the properties in your spec</li><li><strong>Checkpoints: </strong>Rewind changes the agent made</li></ol><blockquote><strong><em>Kiro ships often, AI advances and evolves rapidly afterall.</em></strong></blockquote><blockquote><strong><em>The </em></strong><a href="https://kiro.dev/blog/"><strong><em>Kiro blog</em></strong></a><strong><em> and </em></strong><a href="https://kiro.dev/changelog/"><strong><em>changelog</em></strong></a><strong><em> show what’s new, and </em></strong><a href="https://kiro.dev/blog/one-year/"><strong><em>One year of Kiro</em></strong></a><strong><em> recaps how it got here.</em></strong></blockquote><h2>4 | The 12 Languages Through The Agentic Lens</h2><p>Here’s the beautiful thing: every language you’ve learned in this series becomes more powerful with an agentic IDE. The agent doesn’t replace your knowledge. <strong>It amplifies it.</strong></p><pre><code>        
+               HOW AGENTIC IDEs AMPLIFY YOUR 12 LANGUAGES                 
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   01 English      → Your prompts ARE the code now. Clarity = quality    │
+│   02 Mathematics  → Agent handles computation, you handle logic         │
+│   03 HTML         → "Add a responsive nav with accessibility" → done    │
+│   04 CSS          → "Make it dark mode with smooth transitions" → done  │
+│   05 JavaScript   → "Add form validation with error messages" → done    │
+│   06 Python       → "Create a Flask endpoint for /api/users" → done     │
+│   07 Git          → Agent commits, branches, creates PRs for you        │
+│   08 Linux        → Agent runs shell commands, reads logs               │
+│   09 SQL          → "Add a migration for the new users table" → done    │
+│   10 Kubernetes   → "Scale the backend to 5 replicas" → YAML generated  │
+│   11 Java         → "Add a health check endpoint" → done                │
+│   12 Terraform    → "Add a staging environment" → HCL generated         │ 
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><blockquote><strong><em>But you still need to understand what the agent produces.</em></strong></blockquote><blockquote><strong><em>You’re the architect.</em></strong></blockquote><blockquote><strong><em>The agent is the builder.</em></strong></blockquote><h3>⚠️The Critical Point: You Still Need the Knowledge</h3><p>This is worth emphasising repeatedly.</p><p>Agentic IDEs don’t make learning obsolete. They make it more important:</p><ul><li>You need to <strong>review</strong> generated <a href="post.html?slug=12-terraform"><em>Terraform</em></a> to catch security issues</li><li>You need to <strong>understand</strong> <a href="post.html?slug=10-kubernetes"><em>Kubernetes</em></a> manifests to debug production problems</li><li>You need to <strong>read</strong> <a href="post.html?slug=09-sql"><em>SQL</em></a> queries to verify they’re performant</li><li>You need to <strong>evaluate</strong> <a href="post.html?slug=06-python"><em>Python</em></a> code to ensure it handles edge cases</li><li>You need <a href="post.html?slug=01-english"><em>English</em></a><strong> fluency</strong> to write prompts that produce quality output</li></ul><p>The agent is a force multiplier. But zero times anything is still zero.</p><h2>5 | Practical Agentic Workflows</h2><h3>Workflow 1: Feature Development with Specs</h3><pre><code>YOU: "I need to add a blog section to my portfolio. It should pull posts
+     from the database, support markdown rendering, and have pagination."
+
+AGENT (Spec - Requirements):
+  → User Story: As a visitor, I can browse blog posts with pagination
+  → User Story: As an admin, I can create posts in markdown
+  → Acceptance Criteria: Posts display with rendered markdown
+  → Acceptance Criteria: Pagination shows 10 posts per page
+
+AGENT (Spec - Design):
+  → Database: blog_posts table (id, title, slug, content, published_at)
+  → API: GET /api/posts?page=1&amp;limit=10
+  → API: GET /api/posts/:slug
+  → Frontend: /blog route with post list and detail views
+
+AGENT (Spec - Tasks):
+  → Task 1: Create database migration for blog_posts table
+  → Task 2: Add Flask API endpoints for posts
+  → Task 3: Create blog list page with pagination
+  → Task 4: Create blog detail page with markdown rendering
+  → Task 5: Add navigation link to blog section
+
+YOU: "Looks good, execute the tasks."
+
+AGENT: *creates files, writes code, runs tests, commits*</code></pre><h3>Workflow 2: Debugging with Context</h3><pre><code>YOU: "The /api/contacts endpoint is returning a 500 error"
+AGENT:
+  → Reads app.py, finds the contacts route
+  → Reads the error logs from the terminal
+  → Identifies: database connection string is wrong in production config
+  → Reads config.py, finds the environment variable reference
+  → Checks .env file, spots the typo
+  → Fixes the typo
+  → Runs the test suite to verify
+  → "Fixed. The DATABASE_URL had a typo in the hostname."</code></pre><h3>Workflow 3: Infrastructure Changes</h3><pre><code>YOU: "We need a Redis cache for the portfolio API. Add it to our
+     Terraform and Kubernetes configs."
+AGENT:
+  → Adds aws_elasticache_cluster resource to Terraform
+  → Adds security group rules for Redis port 6379
+  → Creates Kubernetes ConfigMap with Redis connection string
+  → Updates the backend deployment to include Redis env vars
+  → Updates Python requirements.txt with redis package
+  → Adds caching logic to the Flask API
+  → "Done. Run terraform apply to create the Redis cluster,
+     then kubectl apply to update the deployment."</code></pre><h2>6 | The Agentic IDE Landscape</h2><h3>Current Players In The Game</h3><blockquote><strong><em>This is a representative list, not an exhaustive one. With AI, what is today, might not be tomorrow, and whatever is coming is on the way…</em></strong></blockquote><p>It is currently November 2026, the category includes full IDEs, extensions, terminal agents, cloud agents, and command centers that coordinate several agents. Product names below link to official sources.</p><h3><a href="https://kiro.dev/docs/"><strong>Kiro</strong></a></h3><p>is Amazon Web Services’ spec-driven development platform. It runs in the IDE, CLI, Web, mobile, and Crew, with steering, hooks, specs, and powers shared across those surfaces.</p><h3><a href="https://cursor.com/blog/cursor-3"><strong>Cursor</strong></a></h3><p>built by Anysphere, has expanded from its VS Code-based editor into an agent-first desktop workspace connected to its CLI, web and mobile clients, and cloud agents. Its current focus is parallel work across repositories and smooth handoffs between local and cloud sessions.</p><h3><a href="https://antigravity.google/"><strong>Google Antigravity</strong></a></h3><p>combines an agentic IDE with an app, CLI, editor extensions, and SDK. Its Manager Surface coordinates multiple agents in parallel, while artifacts and browser-based verification help you review work performed across the editor, terminal, and browser.</p><h3><a href="https://devin.ai/blog/windsurf-is-now-devin-desktop"><strong>Devin Desktop</strong></a></h3><p>is Cognition’s successor to Windsurf, which changed names on June 2, 2026. It retains a full desktop IDE but makes the Agent Command Center its main surface, connects to Devin Cloud, CLI, and Review, and supports third-party agents through the Agent Client Protocol. Devin Local has succeeded Cascade as its primary local agent.</p><h3><a href="https://www.anthropic.com/product/claude-code"><strong>Claude Code</strong></a></h3><p>is Anthropic’s coding agent for terminals, IDEs, the desktop app, and the browser. It is designed for substantial, long-running codebase work and can divide tasks among subagents or agent teams while you review its progress.</p><h3><a href="https://github.com/features/copilot"><strong>GitHub Copilot</strong></a></h3><p>now reaches beyond autocomplete across GitHub, major IDEs, the CLI, its own app, mobile devices, and cloud sessions. Its strongest distinction is its GitHub-native workflow, which connects issues, coding agents, code review, pull requests, and sessions that continue across devices.</p><h3><a href="https://openai.com/codex/"><strong>OpenAI Codex</strong></a></h3><p>works through its app, IDE extension, CLI, cloud service, and code-review integrations. It lets developers delegate work to several agents in parallel and move between local and cloud execution through one connected workflow.</p><h3><a href="https://www.jetbrains.com/help/ai-assistant/junie-agent.html"><strong>JetBrains Junie</strong></a></h3><p>is integrated with JetBrains IDEs and their code intelligence. It can plan before editing, pursue an autonomous goal, run tests and commands, and use a live debugger to inspect a running program rather than reasoning only from source files.</p><h3><a href="https://docs.replit.com/features/agent/overview"><strong>Replit Agent</strong></a></h3><p>runs in Replit’s browser-based cloud workspace. It focuses on taking an idea through planning, visual design, coding, data setup, testing, and deployment without requiring the user to assemble separate infrastructure tools.</p><h2>7 | The Future of Development</h2><h3>What’s Changing</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    THE SHIFT IN SOFTWARE DEVELOPMENT                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   BEFORE (You do everything):                                           │
+│   ────────────────────────────                                          │
+│   Think → Design → Code → Test → Debug → Deploy → Monitor               │
+│   100% manual effort at every step                                      │
+│                                                                         │
+│   NOW (Agent-assisted):                                                 │
+│   ────────────────────                                                  │
+│   Think → Describe → Review → Guide → Approve → Monitor                 │
+│                                                                         │
+│   You focus on:              Agent handles:                             │
+│   • What to build            • How to build it                          │
+│   • Architecture decisions   • Boilerplate and scaffolding              │
+│   • Code review              • First drafts of code                     │
+│   • Quality standards        • Repetitive tasks                         │
+│   • Business logic           • Syntax and patterns                      │
+│   • Security review          • Documentation                            │
+│                                                                         │
+│   Your role shifts from WRITER to ARCHITECT + REVIEWER.                 │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>⚠️ What’s NOT Changing</h3><ul><li><strong>You still need </strong>to understand what good code looks like</li><li><strong>You still need</strong> to know your cloud services and their trade-offs</li><li><strong>You still need</strong> to think about security, performance, and cost</li><li><strong>You still need</strong> to debug when things go wrong in production at 3:17 AM</li><li><strong>You still need</strong> to communicate with <em>humans </em>on your team</li><li><strong>You still need</strong> to make architectural decisions the agent can’t</li></ul><p><em>The developers who thrive in the agentic era won’t be the ones who memorised the most syntax. They’ll be the ones who understand systems deeply, communicate clearly, and know how to direct an AI agent effectively.</em></p><h2>🏗️ Let’s Build</h2><h2>8 | Use an Agentic IDE on Your Portfolio</h2><p>This is the hands-on section. But it’s <em>obviously </em>different from every other post in the series. Instead of writing code line by line, you’re going to <strong>direct an agent to do it.</strong></p><h3>Exercise 1: Set Up Steering for Your Portfolio</h3><p>Create a .kiro/steering/portfolio-standards.md file:</p><pre><code>  
+- Backend: Python 3.11 with Flask, matching backend/Dockerfile
+- Frontend: Vanilla HTML/CSS/JavaScript (no frameworks)
+- Database: MySQL 8.0
+- Infrastructure: Terraform on AWS (EC2), following infrastructure.md
+- Orchestration: Kubernetes (Minikube or Docker Desktop)
+- API responses keep the existing format: { "success": true, "data": ..., "message": "..." },
+  and errors use { "success": false, "error": "..." }. The frontend depends on it.
+- All database queries use parameterized statements
+- All Kubernetes deployments include resource limits and health checks
+- All Terraform resources include a Name tag; Project and ManagedBy come from default_tags
+- Commit messages follow: [Action] [What] [Why] format</code></pre><blockquote><strong><em>Steering has to describe the code as it really is. If it says one thing and the code does another, Kiro may “fix” working code to match the steering, for example by changing an API format your frontend relies on.</em></strong></blockquote><h3>Exercise 2: Create a Spec for a New Feature</h3><p>Open your agentic IDE and describe a feature:</p><pre><code>"I want to add a 'Learning Progress' page to my portfolio that shows
+my progress through all 13 languages in this blog series. It should:
+- Pull skill data from the database
+- Show a visual progress bar for each language
+- Group skills by category (communication, frontend, backend, devops, cloud, AI)
+- Include the blog post link for each language
+- Be responsive and match the existing portfolio design"</code></pre><blockquote><strong><em>Let the agent generate the spec, review it, refine it, then let it execute.</em></strong></blockquote><h3>Exercise 3: Create a Hook</h3><p>Set up a hook that validates your Terraform every time you save a .tf file. Section 9, Step 4 shows how to create it in the Agent Hooks panel and which settings to check.</p><h3>Exercise 4: Prompt Engineering for Development</h3><p>Practice these prompts with your agentic IDE.</p><p><strong>💡Notice how the quality of your English directly impacts the quality of the output:</strong></p><p><strong>Vague prompt</strong> (poor results):</p><pre><code>"Add a page to my portfolio"</code></pre><p><strong>Specific prompt</strong> (good results):</p><pre><code>"Add an 'About Me' page to the portfolio frontend that includes:
+- A professional bio section with my name and role
+- A timeline of my learning journey through the 13 languages
+- Links to my GitHub and LinkedIn profiles
+- A downloadable PDF resume link
+- Responsive design matching the existing styles.css
+- Navigation link added to the existing header"</code></pre><p><strong>Expert prompt</strong> (great results):</p><pre><code>"Add an 'About Me' page to the portfolio. Reference the existing
+index.html for layout patterns and styles.css for design tokens.
+The page should be accessible (semantic HTML, ARIA labels where needed,
+keyboard navigable). Add the route to the Flask backend if needed for
+any dynamic content. Update the navigation in all existing HTML pages
+to include the new link."</code></pre><p>English skills from are the foundation of effective agentic development.</p><h2>9 | Configure Kiro to Build Your Cloud Infrastructure</h2><p>You wrote every line of <a href="post.html?slug=12-terraform">Terraform</a> yourself.</p><p>Now you’ll set Kiro up to write and change it for you, safely. An agent that can use your terminal and your AWS credentials can create real infrastructure, and delete it, so the setup matters as much as the prompts.</p><ol><li><strong>Steering</strong> loads your infrastructure rules into every conversation.</li><li><strong>MCP servers</strong> give Kiro access to current AWS and Terraform documentation, so it does not have to work from memory.</li><li><strong>Hooks</strong> run automatic checks, such as terraform validate, whenever you save a .tf file.</li><li><strong>Specs</strong> give you a plan to review before Kiro writes any code.</li><li><strong>Supervised mode and command approval</strong> let you approve every file change and every command.</li></ol><h3>Prerequisites</h3><ul><li><strong>Terraform and the AWS CLI</strong>, set up as in the <a href="post.html?slug=12-terraform">Terraform</a> post.</li></ul><blockquote><strong><em>💡Kiro’s terminal uses the credentials you saved with </em></strong><strong><em>aws configure, so Kiro can do anything your IAM user can do.</em></strong></blockquote><blockquote><strong><em>That's why that user only has EC2 and S3 permissions.</em></strong></blockquote><blockquote><em>⚠️ </em><strong><em>Never give an agent an administrator account.</em></strong></blockquote><ul><li><strong>uv</strong>, a Python tool that downloads and runs many MCP servers:</li></ul><pre><code>winget install --id=astral-sh.uv -e</code></pre><ul><li><strong>Docker Desktop</strong>, running, for the Terraform documentation</li><li><strong>A clean Git working tree.</strong> Run git status and commit anything pending. Afterwards, git diff shows everything Kiro changed, and git restore &lt;file&gt; puts a file back.</li></ul><p>Open your LanguagesPortfolio folder in Kiro with <strong>File → Open Folder</strong>.</p><h3>Step 1: Write Your Infrastructure Rules (Steering)</h3><p>Create .kiro/steering/infrastructure.md inside LanguagesPortfolio:</p><pre><code>---
+inclusion: always
+---
+# Infrastructure rules
+
+- Terraform code lives in terraform/. AWS region: us-west-2.
+- Use Terraform &gt;= 1.11 and the AWS provider ~&gt; 6.0. Check resource arguments
+  in the current provider documentation before writing them.
+- Every resource gets a Name tag. Project and ManagedBy come from default_tags.
+- Stay inside the AWS Free Tier where possible. Ask me before adding anything
+  that bills by the hour, such as NAT gateways, load balancers, EKS, or RDS.
+- SSH (port 22) is only open to var.ssh_allowed_cidr, never 0.0.0.0/0.
+  Port 5000 stays closed: Nginx forwards /api/ to Flask inside the server.
+- Never put credentials, tokens, or passwords in .tf files, user data, or chat.
+- After editing .tf files, run terraform -chdir=terraform fmt and
+  terraform -chdir=terraform validate.
+- Never run terraform apply or terraform destroy. Run terraform plan, summarize
+  what it will create, change, and destroy, and wait for me to apply it.
+- Never commit terraform.tfstate, terraform.tfvars, or the .terraform folder.</code></pre><blockquote><strong><em>The front matter between the </em></strong><strong><em>--- lines controls when Kiro loads the file. Set </em></strong><strong><em>inclusion to </em></strong><strong><em>always to load the file in every conversation in this workspace.</em></strong></blockquote><blockquote><strong><em>Use </em></strong><strong><em>fileMatch to load it when Kiro reads files matching </em></strong><strong><em>fileMatchPattern, such as </em></strong><strong><em>terraform/**.</em></strong></blockquote><blockquote><strong><em>Use </em></strong><strong><em>manual to load it only when you add it to a chat with </em></strong><strong><em>#.</em></strong></blockquote><blockquote><strong><em>Use </em></strong><strong><em>auto to let Kiro load it when your request matches the file's </em></strong><strong><em>description.</em></strong></blockquote><p>Safety rules should always apply, so this file uses <strong>always</strong>.</p><p>Write rules the way you'd brief a new teammate: specific, checkable, and with a reason when the reason isn't obvious.</p><p>The most important line is the one about apply and destroy. Kiro proposes changes, You decide what happens to your AWS account.</p><h3>Step 2: Connect Documentation Servers (MCP)</h3><p>A language model learns from a snapshot of the internet, so it can suggest settings that have since changed.</p><p>MCP servers give Kiro tools to look things up while it works.</p><p>Create .kiro/settings/mcp.json inside LanguagesPortfolio:</p><pre><code>{
+  "mcpServers": {
+    "aws-docs": {
+      "command": "uvx",
+      "args": ["awslabs.aws-documentation-mcp-server@latest"],
+      "env": { "FASTMCP_LOG_LEVEL": "ERROR" },
+      "disabled": false
+    },
+    "terraform": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"],
+      "disabled": false
+    }
+  }
+}</code></pre><ul><li><strong>aws-docs</strong>, from AWS Labs, searches and reads the AWS documentation.</li><li><strong>terraform</strong>, from HashiCorp, looks up providers, resources, and modules in the Terraform Registry.</li></ul><p>Both only read public documentation. Neither receives your AWS credentials, and neither can change your account. Kiro connects to them when you save the file, and the first start takes a minute while uv and Docker download them. Open the Kiro panel and check that both show as connected in the MCP servers view.</p><p>This file only applies to this project. Servers you want in every project go in your user-level file, ~/.kiro/settings/mcp.json. If you later add a server that needs AWS access, set AWS_PROFILE in its env to a profile name.</p><p>Never put the keys themselves in an MCP config, because these files often end up in Git.</p><h3>Step 3: Keep Yourself in the Loop</h3><p>Kiro has two autonomy modes, and you switch between them in the chat panel:</p><ul><li><strong>Autopilot</strong>, the default: Kiro edits files without stopping, and you review the result afterwards.</li><li><strong>Supervised</strong>: after each turn that edits files, Kiro stops and shows every change as a separate hunk that you accept or reject.</li></ul><p>Use <strong>Supervised</strong> for infrastructure. A wrong line in a web page breaks a layout. A wrong line in Terraform can delete a server or open a port to the whole internet.</p><p>Kiro also asks before it runs a terminal command, so read each command before you allow it. Kiro can trust a command so it stops asking. Only do that for read-only commands such as terraform validate or terraform plan, never for terraform apply or terraform destroy.</p><h3>Step 4: Validate on Every Save (Hook)</h3><p>Open the Kiro panel, find <strong>Agent Hooks</strong>, and click <strong>+</strong>. You can also press Ctrl+Shift+P and run <strong>Open Kiro Hook UI</strong>. Describe the hook in plain English:</p><pre><code>When I save a .tf file in the terraform folder, run terraform validate in that folder.</code></pre><p>Kiro turns the description into a hook and saves it in .kiro/hooks/, so it's versioned with your code. Check the settings it chose:</p><ul><li><strong>Trigger:</strong> a file is saved</li><li><strong>Files:</strong> terraform/**/*.tf</li><li><strong>Action:</strong> run the command terraform -chdir=terraform validate</li></ul><p>-chdir=terraform runs Terraform in the terraform folder, even though hooks start in the project root. Choose an action that runs a command, not one that asks Kiro to act. A command just runs. An agent action starts a Kiro session, and spends credits, every time you save.</p><p>Test it: change var.instance_type to var.instance_typo in main.tf and save. The hook should report Reference to undeclared input variable. Change it back and save again.</p><h3>Step 5: Build Infrastructure from a Spec</h3><p>In Post 12, terraform apply gave you an empty server, and you deployed the portfolio over SSH. Have Kiro close that gap, so one apply produces a working website.</p><p>Start a <strong>Spec</strong> session in the Kiro chat and describe the feature:</p><pre><code>Change the Terraform in terraform/ so a new server deploys the portfolio by itself
+on first boot.
+
+- cloud-init clones my public GitHub repository, then builds and starts the backend
+  and frontend containers exactly as in Post 12, Section 7: a Docker network named
+  portfolio, the backend container named backend-service, the frontend published on
+  port 80, and both with --restart unless-stopped.
+- The repository URL is a Terraform variable named repo_url, with
+  https://github.com/YOUR-USERNAME/languagesportfolio.git as its default.
+- Don't change the security group rules, the instance size, or the outputs.
+- No secrets in user data</code></pre><p>Kiro writes three documents in .kiro/specs/ and stops after each one for your review:</p><ol><li><strong>requirements.md:</strong> user stories with acceptance criteria, written as WHEN ... THE SYSTEM SHALL ... statements. Check that every bullet from your prompt became a criterion.</li><li><strong>design.md:</strong> how Kiro will do it, probably by passing repo_url into cloud-init.yaml with Terraform's templatefile() function. Check that port 5000 stays closed and that nothing secret goes into user data. Anyone who can view the instance in the EC2 console can read its user data.</li><li><strong>tasks.md:</strong> a checklist of small steps. Click <strong>Start task</strong> next to each one, and review the changes before you accept them.</li></ol><p>If something is wrong, say so in the chat, for example “the frontend must start after the backend”. Kiro updates the document before it writes any code. Fixing a sentence in a design is cheaper than fixing a broken server.</p><h3>Step 6: Review the Plan, Then Apply It Yourself</h3><p>When the tasks are done, Kiro runs terraform validate and terraform plan and summarises the plan, as your steering file asks. Read the plan yourself as well. It should replace only the server:</p><pre><code># aws_instance.portfolio must be replaced
+-/+ resource "aws_instance" "portfolio" {
+      ~ user_data = "..." -&gt; "..." # forces replacement
+    }
+
+Plan: 1 to add, 0 to change, 1 to destroy.</code></pre><p>The server is replaced because its user data changed and the new server gets a new IP address. If the plan touches the security group or the key pair, ask Kiro why before you go any further.</p><p>The new server builds from GitHub, so first make sure GitHub has your latest backend and frontend folders. Then apply the plan yourself:</p><pre><code># In LanguagesPortfolio\terraform
+terraform apply</code></pre><p>Give cloud-init about five minutes to install Docker and build both images, then open the site:</p><pre><code>Start-Process (terraform output -raw website_url)</code></pre><p>No SSH this time. The server and the application both come from code now, and Kiro wrote the new parts while you made the decisions.</p><p>If the site doesn’t load, give Kiro context with # and ask, for example: #Terminal The site isn't up. Find out why using read-only commands.</p><blockquote><strong><em>Kiro can read the server's cloud-init log over SSH and explain what failed. Other context keys work the same way: </em></strong><strong><em>#File, </em></strong><strong><em>#Folder, </em></strong><strong><em>#Problems, and </em></strong><strong><em>#Git Diff. Before you commit, try </em></strong><strong><em>#Git Diff Review these changes for security problems.</em></strong></blockquote><h2>10 | (Re) Build Your Portfolio Site with Kiro, Free on GitHub Pages</h2><p>Your EC2 server costs money for every hour it runs. Your portfolio needs a permanent home that costs nothing. <strong>GitHub Pages</strong> hosts static websites straight from a GitHub repository, free for public repositories, with HTTPS included.</p><p>Static means GitHub only serves files: HTML, CSS, JavaScript, and images. No Python, Java, or database runs behind the site. Your articles live in Markdown files and a JSON file, and JavaScript in the visitor’s browser does the rest.</p><blockquote><strong><em>💡 This is also where the portfolio becomes yours. Kiro can build whatever you can describe, so your taste is the most important input. Here’s how I built mine.</em></strong></blockquote><h3>What You’ll Build</h3><p>The file names depend on what Kiro designs, but the result looks roughly like this:</p><pre><code>YOUR-USERNAME.github.io/      ← new public repository
+├── index.html                ← profile header + masonry grid of articles
+├── post.html                 ← one article, rendered from Markdown
+├── about.html, 404.html
+├── css/, js/, images/
+├── articles.json             ← title, date, tags, cover, and link for each article
+├── posts/                    ← your articles as Markdown
+├── .nojekyll
+├── README.md                 ← what the site is and how to change it
+└── .kiro/steering/design.md  ← your design rules</code></pre><p>A repository named exactly YOUR-USERNAME.github.io becomes your <strong>user site</strong>, served at https://YOUR-USERNAME.github.io.</p><p>Use your GitHub username in lowercase. Keep this repository separate from LanguagesPortfolio: everything in a Pages repository is public, so it should only hold the website.</p><h3>Step 1: Create the Repository and Gather Your Content</h3><p>On GitHub, click <strong>New repository</strong>. Name it YOUR-USERNAME.github.io, make it <strong>Public</strong>, and leave it empty, with no README or license. Then, on your laptop:</p><pre><code>cd $HOME\Downloads
+New-Item -ItemType Directory -Path YOUR-USERNAME.github.io
+cd YOUR-USERNAME.github.io
+git init -b main
+New-Item -ItemType Directory -Path posts, images</code></pre><p>The site needs three kinds of content:</p><ol><li><strong>Articles:</strong> each article as a Markdown file in posts/, named after the post, such as posts/07-git.md.</li><li><strong>Images:</strong> your profile photo as images/profile.jpg, plus any cover images. Only use images you own or have the rights to.</li><li><strong>Links:</strong> a links.txt file with the URL of each published article, one per line.</li></ol><p>Kiro can do the copying. Open the folder in Kiro with <strong>File → Open Folder</strong> and ask, for example:</p><blockquote><em>⚠️ This is mine. Write </em><strong><em>yours</em></strong></blockquote><pre><code>Copy each README.md from the folders in C:\path\to\blog-posts into posts\, named after
+its folder, such as posts\07-git.md. Copy any .png in those folders to images\covers\,
+also named after the folder, such as images\covers\09-sql.png.</code></pre><h3>Step 2: Describe Your Taste (Steering)</h3><p>Design preferences belong in a steering file, so every later request, such as “add a projects page”, keeps the same look. Create .kiro/steering/design.md.</p><blockquote><em>⚠️ This is mine. Write </em><strong><em>yours</em></strong></blockquote><pre><code>---
+inclusion: always
+---
+# Design rules
+
+- The look: Instagram meets WordPress. Instagram for browsing: a profile header
+  and an image-led grid. WordPress for reading: a comfortable article layout,
+  categories, tags, and search.
+- Light theme by default, with a dark mode toggle that remembers the choice.
+- A clean sans-serif font for the interface and a serif font for article text.
+- Plain HTML, CSS, and JavaScript. No frameworks and no build step: GitHub Pages
+  serves the files exactly as they are in the repository.
+- Small libraries are fine if they're pinned to an exact version and saved in vendor/.
+- Relative links (css/style.css, not /css/style.css), so the site still works
+  if it ever moves into a subfolder.
+- Accessible: semantic HTML, alt text on every image, visible keyboard focus,
+  and text contrast of at least 4.5:1.
+- Check every change at 375 px (phone) and 1280 px (laptop) wide.</code></pre><p>Not sure what you like?</p><p>Take screenshots of three or four sites whose look you admire, drag them into the Kiro chat, and ask: “Describe the visual style these sites share as a list of design rules.” Kiro can read images. Edit its answer into your own design.md.</p><h3>Step 3: Ask Kiro to Build It (Spec)</h3><p>Start a <strong>Spec</strong> session and describe the site.</p><blockquote><em>⚠️ This is my prompt. Write </em><strong><em>yours</em></strong></blockquote><pre><code>Build my portfolio website for GitHub Pages in this folder.
+
+Home page, Instagram-style:
+- A profile header: round photo (images/profile.jpg), my name, a one-line bio,
+  counts for articles, languages, and projects, and buttons for Medium, GitHub,
+  and LinkedIn.
+- A row of story-style circles, one per language in my Cloud Languages series.
+  Clicking one filters the grid to that language's articles.
+- My articles as a masonry grid: cards of different heights, 1 column on phones,
+  2 on tablets, 3 to 4 on laptops. Each card shows its cover image, or a colourful
+  gradient tile with the language name when there's no cover. On hover, show the
+  title, reading time, and tags over the image, the way Instagram shows likes.
+
+Reading, WordPress-style:
+- Clicking a card opens post.html, which renders that article's Markdown from
+  posts/ with the title, date, reading time, tags, a table of contents, previous
+  and next links, and a "Read on Medium" link.
+- A sidebar on wide screens, moving below the article on phones: about me,
+  categories, tags, recent posts, and a search box that filters by title and tag.
+
+Data: build articles.json from the files in posts/ and the links in links.txt.
+Ask me for anything you can't find, such as publication dates. Don't invent them.
+Also add an About page, a 404 page, a favicon, and Open Graph tags so links
+shared on LinkedIn show a preview.</code></pre><p>Copy the structure, not the words: what the home page shows, what happens when someone clicks, and where the data comes from.</p><p>A Pinterest-style board, a magazine layout, or a one-page résumé all work the same way.</p><p>The line “Don’t invent them” matters: without it, an agent may fill gaps with plausible-looking dates.</p><p>Kiro turns the prompt into requirements, a design, and tasks, following design.md. In the design, check two decisions:</p><ul><li><strong>How the masonry grid works.</strong> The usual approach is CSS columns: columns: 4 260px on the grid and break-inside: avoid on each card. It works in every browser, but cards fill each column from top to bottom, so your newest articles run down the left side instead of across the top. If you want left-to-right order, ask for a small JavaScript layout instead.</li><li><strong>How Markdown becomes HTML.</strong> A small library such as marked converts Markdown in the browser. Ask Kiro to sanitize the result with a library such as DOMPurify, so HTML inside a post can’t run scripts on your site.</li></ul><h3>Step 4: Preview and Polish</h3><p>The site loads articles.json with fetch(), and browsers block that for pages opened straight from disk. Serve the folder with Python's built-in web server instead:</p><pre><code># In YOUR-USERNAME.github.io
+python -m http.server 8000</code></pre><p>Open <a href="http://localhost:8000/">http://localhost:8000</a>. To see the phone layout, press F12, then Ctrl+Shift+M for the device toolbar. Press Ctrl+C in the terminal to stop the server.</p><p>Polish the site in a normal vibe chat. The fastest feedback is a screenshot: press Win+Shift+S, drag the screenshot into the chat, and say what to change:</p><pre><code>This is my home page on a phone. The story circles are cut off on the right.
+Make that row scroll sideways like Instagram's, and give the cards rounder corners.</code></pre><p>Small, specific requests with a screenshot get better results than “make it prettier”.</p><p>Commit each version you like with git add . and git commit, so you can always go back.</p><h3>Step 5: Write a Good README</h3><p>README.md is the first thing people see when they open your repository on GitHub, often before they visit the site. Recruiters read it to judge how you explain your work.</p><p>A good README answers four questions on the first screen: what is this, where can I see it, how does it work, and how do I run or change it.</p><p><strong>Section:</strong> What it says</p><ul><li><strong>Title and one sentence:</strong> What the project is, in plain words</li><li><strong>Live link and screenshot:</strong> Proof that it works, without cloning anything</li><li><strong>Features:</strong> What it does, as a short list</li><li><strong>How it works:</strong> The main files and how data moves through them</li><li><strong>Run it locally:</strong> Commands someone can copy and paste</li><li><strong>Update it:</strong> How to add an article or change the profile</li><li><strong>Credits:</strong>Tools, libraries, and image sources</li></ul><p>A few habits make a README better:</p><ol><li><strong>Lead with what the project is, not how you built it.</strong> “My portfolio and blog: 13 articles on the languages of the cloud” tells a reader more than “This project uses HTML, CSS, and JavaScript”.</li><li><strong>Make commands copyable.</strong> Put each command in a code block, exactly as you’d type it.</li><li><strong>Show it.</strong> Save a screenshot as images/screenshot.png and link it with a relative path, ![Home page](images/screenshot.png), so it shows on GitHub and on your laptop.</li><li><strong>Keep it current.</strong> Update the README in the same commit as the change it describes.</li></ol><p>Kiro can write the first draft, because it can read every file in the repository:</p><pre><code>Write README.md for this repository. Start with one sentence on what the site is
+and the live link https://YOUR-USERNAME.github.io, then cover the features, how it
+works (a table of the main files), how to run it locally, how to add an article,
+and how it deploys. Only describe what's in the repository. Keep it under 80 lines.</code></pre><p>“Only describe what’s in the repository” stops Kiro from listing features you haven’t built. Then edit the draft into your own voice: it’s your project’s front door.</p><h3>Step 6: Publish It</h3><p>Add an empty .nojekyll file first. GitHub Pages normally runs every site through Jekyll, a site generator that leaves out files and folders whose names start with _.</p><p>This file tells Pages to publish your files exactly as they are.</p><pre><code># In YOUR-USERNAME.github.io
+New-Item .nojekyll
+git add .
+git status        # website files only, nothing secret
+git commit -m "First version of my portfolio site"
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-USERNAME.github.io.git
+git push -u origin main</code></pre><p>On GitHub, open the repository’s <strong>Settings → Pages</strong>. Under <strong>Build and deployment</strong>, set <strong>Source</strong> to <strong>Deploy from a branch</strong>, the branch to main, and the folder to / (root), then click <strong>Save</strong>. The <strong>Actions</strong> tab shows a run called "pages build and deployment". When it finishes, usually within a couple of minutes, your site is live at https://YOUR-USERNAME.github.io. Every later git push to main updates it.</p><p>Free comes with a few conditions: on a free GitHub plan the repository must be public, a published site can be at most 1 GB, and Pages isn’t meant for running an online shop. You can add a custom domain later on the same settings page.</p><h3>Optional: Add New Articles Automatically</h3><p>When you publish more articles, ask Kiro:</p><pre><code>Add a GitHub Actions workflow that runs once a day, reads my Medium RSS feed
+(https://medium.com/feed/@YOUR-MEDIUM-USERNAME), and adds new articles to
+articles.json. Commit only when something changed.</code></pre><p>The workflow runs on GitHub’s servers. That matters because JavaScript on another website can’t read Medium’s feed, so your visitors’ browsers couldn’t fetch it. The feed only lists your 10 most recent posts, which is enough to catch new ones. If Medium blocks the workflow’s requests, keep adding articles to articles.json by hand.</p><h3>⛔ End of Building Tutorial⛔</h3><h2>11 | The Ultimate Clean-Up</h2><p>Over 13 posts you created servers, clusters, container images, keys, and accounts. Some of them bill by the hour whether you use them or not. Others are keys that open your accounts.</p><p>Finishing a project properly means removing what you no longer need, in an order that doesn’t leave anything behind.</p><p><strong>Keep:</strong> your GitHub repositories, your new GitHub Pages site, your articles, and your Terraform code. The code lets you rebuild everything in minutes whenever you want it back.</p><h3>Step 1: Take Inventory with Kiro (Read-Only)</h3><p>Before you delete anything, find out what’s still there. In a vibe chat in your LanguagesPortfolio workspace, ask:</p><pre><code>List every AWS resource from my Cloud Languages series that could still cost money,
+in every region. Use read-only commands only: AWS CLI commands that describe, list,
+or get, plus terraform state list in terraform/. Don't create, change, or delete
+anything. Check EC2 instances, EBS volumes and snapshots, Elastic IPs, security
+groups, key pairs, load balancers, NAT gateways, EKS clusters, RDS databases,
+and S3 buckets. Show the results as a table: region, type, ID, name or tags,
+and how to delete it.</code></pre><p>Approve each command only if it really is read-only, such as aws ec2 describe-instances or aws s3 ls.</p><p>Keep the table: it's your checklist for the steps below, and the deleting is yours to do.</p><h3>Step 2: Destroy What Terraform Built</h3><pre><code># In LanguagesPortfolio\terraform
+terraform destroy
+terraform state list      # prints nothing once everything is gone</code></pre><p>Read the plan before you type yes. For the Post 12 server it says Plan: 0 to add, 0 to change, 7 to destroy. If you built more with Kiro, the number is higher, but every item should be yours. If you split environments into separate folders (Post 12, Section 11), run destroy in each one.</p><p>Moved your state to S3 in Post 12, Section 9? Delete the bucket only after destroy succeeds, because the bucket holds the state. In the S3 console, select the bucket, click <strong>Empty</strong> to remove every version of every file, then click <strong>Delete</strong>.</p><h3>Step 3: Delete What You Built by Hand</h3><p>Terraform only knows about what it created. The Post 8 server came from the AWS console, so delete it there. Each region is separate: check the region selector at the top of the console, or open <strong>EC2 Global View</strong> to see every region at once.</p><ol><li><strong>Instances:</strong> select the Post 8 instance, then <strong>Instance state → Terminate instance</strong>. Terminated instances stay visible for about an hour. That’s normal.</li><li><strong>Elastic IPs:</strong> release any you allocated. AWS charges for public IPv4 addresses, including unused ones.</li><li><strong>Volumes:</strong> delete any whose state is <strong>Available</strong>. They’re disks that no instance uses.</li><li><strong>Snapshots</strong> and <strong>AMIs:</strong> delete any you made.</li><li><strong>Key pairs:</strong> delete portfolio-key.</li><li><strong>Security groups:</strong> delete the group created with the Post 8 instance, often named launch-wizard-1. You can't delete a VPC's default group, and you don't need to.</li></ol><p>If you created an RDS database for Post 9, open the RDS console, select it, and choose <strong>Actions → Delete</strong>. Only take a final snapshot if you want to keep the data, because snapshots are billed too.</p><h3>Step 4: Kubernetes</h3><pre><code>kubectl delete namespace languages-portfolio   # every object in it, including the MySQL data
+minikube delete                                # Minikube only: removes the whole local cluster</code></pre><p>Deleting the namespace removes the Deployments, Services, Jobs, Secrets, and the MySQL volume claim from Posts 10 and 11 in one step. On Docker Desktop, you can also turn Kubernetes off under <strong>Settings → Kubernetes</strong>.</p><p>If you created a cloud cluster in Post 10, delete it now. Managed clusters bill by the hour, and they’re usually the most expensive thing in this series:</p><pre><code>eksctl delete cluster --name portfolio-cluster --region YOUR-REGION     # AWS EKS
+gcloud container clusters delete portfolio-cluster --zone us-central1-a  # Google GKE
+az group delete --name portfolio-rg</code></pre><h3>Step 5: Docker on Your Laptop</h3><pre><code>docker ps -a                                  # list containers
+docker rm -f frontend backend-service         # remove any you ran locally
+docker network rm portfolio
+
+# Preview, then remove, every image with "portfolio" in its name
+docker image ls --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -like "*portfolio*" }
+docker image ls --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -like "*portfolio*" } | ForEach-Object { docker image rm $_ }
+docker builder prune      # build cache, often several GB
+docker system df          # what Docker still uses</code></pre><p>Base images such as python, nginx, mysql, and eclipse-temurin don't match that filter. Remove them with docker image rm if no other project uses them. docker system prune -a --volumes removes every unused container, image, network, and volume on your machine, including other projects' data, so only use it if this series is all you've used Docker for.</p><h3>Step 6: Keys, Tokens, and Access</h3><p>Deleting resources stops the bills. Deleting keys closes the doors.</p><ul><li><strong>AWS access keys:</strong> in IAM, open the user Terraform used, go to <strong>Security credentials</strong>, then deactivate and delete its access key. If you created the user only for this series, delete the user. Then remove the key from your laptop: delete its profile from $HOME\.aws\credentials, or the whole $HOME\.aws folder if AWS was only for this series.</li><li><strong>The old Pages deployment:</strong> LanguagesPortfolio/.github/workflows/deploy.yml publishes the entire repository, including the k8s folder, to GitHub Pages on every push. Your new site replaces it, so delete the workflow file and push, then delete the repository's gh-pages branch to take that copy offline.</li><li><strong>Passwords that reached Git:</strong> if k8s/secrets.yaml, or any file with a real password, was ever pushed, deleting the file isn't enough, because Git history keeps it. Change that password wherever it's used.</li><li><strong>GitHub tokens:</strong> delete any personal access tokens you created for cloning, under <strong>Settings → Developer settings → Personal access tokens</strong>.</li><li><strong>SSH keys:</strong> remove each server from your known hosts, then delete the keys, including the Post 8 portfolio-key.pem wherever you saved it:</li></ul><pre><code>ssh-keygen -R YOUR-SERVER-IP
+  Remove-Item "$HOME\.ssh\portfolio-key", "$HOME\.ssh\portfolio-key.pub"</code></pre><ul><li><strong>Kiro:</strong> remove MCP servers you no longer use from .kiro/settings/mcp.json, and review the commands you've trusted in Kiro's settings.</li></ul><h3>Step 7: Local Files</h3><p>Only after terraform destroy has succeeded:</p><pre><code># In LanguagesPortfolio
+Remove-Item -Recurse -Force terraform\.terraform -ErrorAction SilentlyContinue   # provider download, hundreds of MB
+Remove-Item terraform\terraform.tfstate* -ErrorAction SilentlyContinue            # state can hold sensitive values
+Remove-Item -Recurse -Force backend\venv, java\insights\target, java\health-check\classes -ErrorAction SilentlyContinue
+Remove-Item java\health-check\*.jar -ErrorAction SilentlyContinue</code></pre><p>Keep the .tf files, cloud-init.yaml, and .terraform.lock.hcl. With them, terraform init and terraform apply rebuild the server whenever you want it back. terraform.tfvars only holds your IP address, so you can keep it too.</p><h3>Step 8: Check the Bill</h3><p>Billing data lags behind, so check now and again in two days:</p><ol><li><strong>Billing and Cost Management → Bills:</strong> this month’s charges by service. They should stop growing.</li><li><strong>Resource Groups &amp; Tag Editor → Tag Editor:</strong> choose <strong>All regions</strong> and <strong>All supported resource types</strong>, add the tag Project with the value languages-portfolio, and click <strong>Search resources</strong>. Nothing should come back, because everything Terraform created carried that tag.</li><li><strong>EC2 Global View:</strong> no instances, volumes, or Elastic IPs in any region.</li><li><strong>AWS Budgets:</strong> keep a small monthly budget alert, so anything you missed emails you before it gets expensive.</li></ol><p>If you used Google Cloud or Azure , check their billing pages the same way. Closing a cloud account is optional. Deleting the resources is what stops the charges.</p><p>When every check comes back clean, you’re done. Nothing is billing you, no forgotten key opens your accounts, and your portfolio lives on at https://YOUR-USERNAME.github.io, for free.</p><h2>12 | The Compound Effect</h2><h3>Your Complete Cloud Toolkit</h3><p>Look at what you’ve built across 13 blog posts!</p><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    YOUR COMPLETE CLOUD TOOLKIT                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   COMMUNICATION LAYER                                                   │
+│   ┌──────────────────────────────────────────────────────────┐          │
+│   │  01 English        → How you think, communicate, prompt  │          │
+│   │  02 Mathematics    → How you reason and solve problems   │          │
+│   └──────────────────────────────────────────────────────────┘          │
+│                                                                         │
+│   APPLICATION LAYER                                                     │
+│   ┌──────────────────────────────────────────────────────────┐          │
+│   │  03 HTML           → Structure                           │          │
+│   │  04 CSS            → Presentation                        │          │
+│   │  05 JavaScript     → Interactivity                       │          │
+│   │  06 Python         → Backend logic                       │          │
+│   │  11 Java           → Enterprise systems                  │          │
+│   └──────────────────────────────────────────────────────────┘          │
+│                                                                         │
+│   DATA LAYER                                                            │
+│   ┌──────────────────────────────────────────────────────────┐          │
+│   │  09 SQL            → Data storage and retrieval          │          │
+│   └──────────────────────────────────────────────────────────┘          │
+│                                                                         │
+│   INFRASTRUCTURE LAYER                                                  │
+│   ┌──────────────────────────────────────────────────────────┐          │
+│   │  07 Git            → Version control and collaboration   │          │
+│   │  08 Linux          → The cloud operating system          │          │
+│   │  10 Kubernetes     → Container orchestration             │          │
+│   │  12 Terraform      → Infrastructure as Code              │          │
+│   └──────────────────────────────────────────────────────────┘          │
+│                                                                         │
+│   MULTIPLIER LAYER                                                      │
+│   ┌──────────────────────────────────────────────────────────┐          │
+│   │  13 Agentic IDEs   → AI that amplifies ALL of the above  │          │
+│   └──────────────────────────────────────────────────────────┘          │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><blockquote><strong><em>Each language builds on the ones before it. And the thirteenth ghost the agentic IDE doesn’t add to the stack. It multiplies it.</em></strong></blockquote><h2>13 | Bonus: Kiroween 2026,</h2><h3>⚠️ For Readers in Real Time</h3><blockquote><strong><em>Reading this before Friday, December 4, 2026 at 2:00 PM Pacific Time? Then you can enter Kiroween 2026, Kiro’s annual Halloween-themed hackathon on </em></strong><a href="https://kiroween.devpost.com/"><strong><em>Devpost</em></strong></a><strong><em>. It has more than $100,000 in prizes, and first place wins $30,000. The judges score how well you use Kiro, and this post has given you plenty to use: steering, specs, hooks, MCP, and a good README.</em></strong></blockquote><h3>The Rules That Matter Most</h3><ul><li><strong>Start something new.</strong> Only projects built during the submission period, October 30 to December 4, 2026, are eligible. A portfolio you finished before October 30 doesn’t count, and neither do Kiroween 2025 projects.</li><li><strong>Build it with Kiro:</strong> the IDE, CLI, Web, or Kiro Crew.</li><li><strong>Work alone or in a team</strong> of up to three people.</li><li><strong>Claim free credits.</strong> Request 4,000 free Kiro credits on the hackathon’s Resources tab by December 1 at 12:00 PM PT.</li></ul><blockquote><strong><em>Reading this after December 4, 2026? Kiroween returns every Halloween…well, until it doesn’t.</em></strong></blockquote><h2>Finally, Final Conclusion of the Cloud Languages Series</h2><p>When we started this series with English, I told you that the first language of the cloud is human language. Now, thirteen posts later, that statement is more true than ever.</p><p>Agentic IDEs are the convergence point. They’re where your ability to think clearly <strong>(English)</strong>, reason logically <strong>(Mathematics)</strong>, structure information <strong>(HTML)</strong>, present it well <strong>(CSS)</strong>, make it interactive <strong>(JavaScript)</strong>, automate it <strong>(Python)</strong>, version it <strong>(Git)</strong>, deploy it <strong>(Linux)</strong>, store it <strong>(SQL)</strong>, orchestrate it <strong>(Kubernetes)</strong>, scale it <strong>(Java)</strong>, codify it <strong>(Terraform)…</strong> all comes together through natural language interaction with an AI agent.</p><blockquote><strong><em>The thirteenth ghost isn’t something you learn like the other twelve. It’s something you experience. It’s the invisible layer that connects everything.</em></strong></blockquote><p><em>The developers who will define the next decade of cloud computing aren’t just the ones who can write code. They’re the ones who can think clearly, communicate precisely, understand systems deeply, and direct AI agents effectively.</em></p><p>You now have all twelve languages, and the thirteenth ghost. The cloud is yours. <strong>Goodbye!</strong></p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*2NAKSL4ph13jaJciJvqcBA.png" alt="" loading="lazy"><figcaption>Agentic IDEs — The Final Frontier</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>✅ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>✅ <strong>09 — SQL:</strong> Cloud Data Management</p><p>✅ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>✅ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>✅ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>✅ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><h2>Additional Resources</h2><h3><a href="https://kiro.dev/docs/">Kiro Documentation</a></h3><blockquote>Kiro is an AI-powered development environment that helps you build software from prototype to production.</blockquote><blockquote>One <a href="https://kiro.dev/docs/how-kiro-works/">unified agent harness</a> powers every surface (IDE, CLI, Web, and Mobile) so your configuration, specs, and steering work everywhere.</blockquote><h3><a href="https://kiro.dev/docs/hooks/">Hooks</a></h3><blockquote>Hooks run shell commands or agent prompts automatically when specific events happen in your session — the agent modifies a file, invokes a tool, or completes a task. You define the trigger and the action; Kiro handles the execution.</blockquote><h3><a href="https://kiro.dev/blog/">Kiro Blog</a></h3><blockquote>News, tutorials, updates from the Kiro team — find it all here.</blockquote><h3><a href="https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro">What Is The Model Context Protocol?</a></h3><blockquote>MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems.</blockquote><blockquote>Using MCP, AI applications like Claude or ChatGPT can connect to data sources (e.g. local files, databases), tools (e.g. search engines, calculators) and workflows (e.g. specialized prompts) — enabling them to access key information and perform tasks.Think of MCP like a USB-C port for AI applications.</blockquote><blockquote>Just as USB-C provides a standardized way to connect electronic devices, MCP provides a standardized way to connect AI applications to external systems.</blockquote><h3><a href="https://docs.github.com/en/pages">GitHub Pages documentation</a></h3><blockquote>GitHub Pages turns any GitHub repository into a live website — no separate hosting required.</blockquote>

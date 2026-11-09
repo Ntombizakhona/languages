@@ -1,0 +1,966 @@
+<!-- Imported from https://ntombizakhona.medium.com/linux-in-the-cloud-1274f654f972 by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Linux in the Cloud</h1>
+<h2>The Operating System</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/800/1*ToOVk6wPCbdwfuD0FIpbwA.png" alt="" loading="lazy"></figure><p>You’ve built your application with <a href="post.html?slug=03-html">HTML</a>, <a href="post.html?slug=04-css">CSS</a>, <a href="post.html?slug=05-javascript">JavaScript</a>, and <a href="post.html?slug=06-python">Python</a>. You’ve learned <a href="post.html?slug=07-git">Git</a> to track and deploy your code.</p><p>But…<strong>Linux</strong> runs nearly everything.</p><p>Consider this:</p><ul><li><strong>Your AWS EC2 instance?</strong> → Running Linux</li><li><strong>The Docker containers you deploy?</strong> → Built on Linux</li><li><strong>Kubernetes clusters? </strong>→ Linux nodes</li><li><strong>Cloud databases like RDS?</strong> → Running on Linux servers</li><li><strong>Even serverless functions?</strong> → Execute in Linux environments</li></ul><p>Over 90% of the world’s cloud infrastructure runs on Linux.</p><p>If you want to work in cloud computing, you don’t just need to know Linux. you need to be <em>comfortable</em> in it.</p><hr><h2>Topics</h2><ol><li>Linux fundamentals and the command line</li><li>File systems, permissions, and security</li><li>Process and service management</li><li>Package management across distributions</li><li>Networking and firewall configuration</li><li>Docker containers and orchestration</li><li>Shell scripting for automation</li><li>Deploying a complete cloud application</li></ol><hr><h2>1 | Why Linux Dominates the Cloud</h2><h3>The Cloud Runs on Linux</h3><p>Linux isn’t just popular in the cloud, it’s the standard:</p><pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                    CLOUD INFRASTRUCTURE                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   │
+│   │    AWS          │   │    Azure        │   │    GCP          │   │
+│   │                 │   │                 │   │                 │   │
+│   │  Amazon Linux   │   │  Ubuntu         │   │  Container-     │   │
+│   │  Ubuntu         │   │  CentOS         │   │  Optimized OS   │   │
+│   │  RHEL           │   │  RHEL           │   │  Ubuntu         │   │
+│   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘   │
+│            │                     │                     │            │
+│            └─────────────────────┼─────────────────────┘            │
+│                                  ▼                                  │
+│                        ┌─────────────────┐                          │
+│                        │     LINUX       │                          │
+│                        │                 │                          │
+│                        │  The Foundation │                          │
+│                        └─────────────────┘                          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘</code></pre><h3>Why Cloud Providers Choose Linux</h3><p>Cloud providers overwhelmingly choose Linux for several compelling reasons.</p><p><strong>It’s free and open source:</strong> With no licensing costs at scale, organizations save enormous amounts of money as their infrastructure grows.</p><p><strong>It’s highly customizable:</strong> Linux can be stripped down to bare essentials or specialized for specific workloads, giving engineers complete control over their environment.</p><p><strong>It’s stable and reliable:</strong> Linux servers routinely run for years without requiring a reboot, making it ideal for production systems that need maximum uptime.</p><p><strong>Security patches come quickly:</strong> The transparent, open-source codebase means vulnerabilities are identified and fixed rapidly by a global community of developers.</p><p><strong>Performance is exceptional:</strong> Linux uses system resources efficiently, squeezing maximum value from cloud infrastructure.</p><p><strong>Everything is scriptable:</strong> The command line interface makes automation straightforward, enabling infrastructure as code practices.</p><p><strong>Containers are native:</strong> Docker and Kubernetes were built specifically for Linux, making it the natural choice for modern containerized applications.</p><h3>Linux Distributions in the Cloud</h3><p>Not all Linux is the same. Different distributions (distros) are optimized for different purposes:</p><pre><code>┌──────────────────────────────────────────────────────────────────┐
+│                     LINUX DISTRIBUTIONS                          │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Debian-Based                    Red Hat-Based                   │
+│  ──────────────                  ──────────────                  │
+│  ┌─────────────┐                ┌─────────────┐                  │
+│  │   Ubuntu    │                │    RHEL     │                  │
+│  │  Popular,   │                │  Enterprise │                  │
+│  │  Beginner   │                │  Support    │                  │
+│  │  Friendly   │                │             │                  │
+│  └─────────────┘                └─────────────┘                  │
+│        │                              │                          │
+│        ▼                              ▼                          │
+│  ┌─────────────┐                ┌─────────────┐                  │
+│  │   Debian    │                │   CentOS    │                  │
+│  │   Stable,   │                │  Free RHEL  │                  │
+│  │   Minimal   │                │   Clone     │                  │
+│  └─────────────┘                └─────────────┘                  │
+│                                       │                          │
+│                                       ▼                          │
+│                                 ┌─────────────┐                  │
+│  Cloud-Specific                 │  Fedora     │                  │
+│  ──────────────                 │  Cutting    │                  │
+│  ┌─────────────┐                │   Edge      │                  │
+│  │   Amazon    │                └─────────────┘                  │
+│  │   Linux     │                                                 │
+│  └─────────────┘                                                 │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘</code></pre><p>Which should you learn?</p><ul><li><strong>Ubuntu:</strong> Best for beginners, excellent documentation</li><li><strong>Amazon Linux: </strong>Optimized for AWS (similar to RHEL)</li><li><strong>CentOS Linux: </strong>Enterprise-style, free RHEL alternative</li></ul><hr><h2>2 | Getting Started with Linux</h2><h3>Setting Up Your Linux Environment</h3><p>Option A: <strong>Cloud Instance </strong>(Recommended)</p><pre><code># Launch an AWS EC2 instance with Ubuntu 22.04 LTS
+# Connect via SSH
+ssh -i your-key.pem ubuntu@your-instance-ip</code></pre><p>Option B: <strong>Windows Subsystem for Linux</strong> (WSL2)</p><pre><code># Install WSL2 on Windows
+wsl --install -d Ubuntu-22.04
+
+# After restart, open Ubuntu from Start menu</code></pre><p>Option C: <strong>Local Virtual Machine</strong></p><ul><li>Download <a href="https://www.virtualbox.org/">VirtualBox</a></li><li>Download <a href="https://ubuntu.com/download/desktop">Ubuntu 22.04 LTS ISO</a></li><li>Create VM: 2GB RAM, 25GB storage minimum</li></ul><h3>The Linux Terminal</h3><p>When you connect to a Linux server, you’ll see something like:</p><pre><code>ubuntu@ip-172-31-25-42:~$</code></pre><p>Let’s break this down:</p><pre><code>ubuntu@ip-172-31-25-42:~$
+  │           │         │ │
+  │           │         │ └─ Prompt (waiting for command)
+  │           │         └─── Current directory (~ = home)
+  │           └───────────── Hostname (server name)
+  └───────────────────────── Username</code></pre><h3>The Linux Filesystem</h3><p>Linux organizes files differently than Windows:</p><pre><code>/                          ← Root (top of filesystem)
+├── home/                  ← User home directories
+│   ├── ubuntu/            ← Your files (~)
+│   └── otheruser/
+├── etc/                   ← System configuration files
+├── var/                   ← Variable data (logs, databases)
+│   ├── log/               ← System and application logs
+│   └── www/               ← Web server files (Apache/Nginx)
+├── usr/                   ← User programs and utilities
+│   ├── bin/               ← Essential user commands
+│   └── lib/               ← Libraries
+├── opt/                   ← Optional/third-party software
+├── tmp/                   ← Temporary files (cleared on reboot)
+├── root/                  ← Root user's home directory
+└── proc/                  ← Virtual filesystem (system info)</code></pre><p><strong>Key differences from Windows:</strong></p><ul><li>/ instead of C:\</li><li>Forward slashes / instead of backslashes \</li><li>Case-sensitive: File.txt ≠ file.txt</li><li>No drive letters (everything under /)</li></ul><hr><h2>3 | Essential Linux Commands</h2><h3>Navigation and Files</h3><p>Moving around:</p><pre><code># Where am I?
+pwd
+# Output: /home/ubuntu
+
+# What's in this directory?
+ls              # Simple list
+ls -l           # Detailed list
+ls -la          # Include hidden files
+ls -lh          # Human-readable sizes
+
+# Change directory
+cd /var/log     # Go to absolute path
+cd ..           # Go up one level
+cd ~            # Go to home directory
+cd -            # Go to previous directory</code></pre><p><strong>Example ls -la output:</strong></p><pre><code>$ ls -la
+total 36
+drwxr-xr-x 5 ubuntu ubuntu 4096 Jan 15 10:30 .
+drwxr-xr-x 3 root   root   4096 Jan 10 08:00 ..
+-rw-r--r-- 1 ubuntu ubuntu  220 Jan 10 08:00 .bashrc
+drwxr-xr-x 2 ubuntu ubuntu 4096 Jan 15 10:30 projects
+-rwxr-xr-x 1 ubuntu ubuntu  512 Jan 15 09:00 script.sh
+
+# Breaking down: -rwxr-xr-x
+# │ │  │  │
+# │ │  │  └── Others: r-x (read, execute)
+# │ │  └───── Group: r-x (read, execute)
+# │ └──────── Owner: rwx (read, write, execute)
+# └────────── File type: - (file) or d (directory)</code></pre><h3>File Operations</h3><pre><code># Create files and directories
+touch newfile.txt              # Create empty file
+mkdir new-directory            # Create directory
+mkdir -p parent/child/grandchild  # Create nested directories
+
+# Copy files
+cp file.txt backup.txt         # Copy file
+cp -r folder/ backup/          # Copy directory recursively
+
+# Move/rename files
+mv old.txt new.txt             # Rename file
+mv file.txt /tmp/              # Move file to /tmp
+
+# Delete files (⚠️ no recycle bin!)
+rm file.txt                    # Delete file
+rm -r directory/               # Delete directory
+rm -rf directory/              # Force delete (dangerous!)</code></pre><h3>Viewing File Contents</h3><pre><code># View entire file
+cat config.txt                 # Display all at once
+
+# View large files (with navigation)
+less /var/log/syslog           # Page through file
+# Press: q=quit, /=search, n=next match, Space=next page
+
+# View portions of files
+head -n 20 file.txt            # First 20 lines
+tail -n 20 file.txt            # Last 20 lines
+tail -f /var/log/syslog        # Follow file in real-time (Ctrl+C to stop)
+
+# Search within files
+grep "error" /var/log/syslog         # Find lines containing "error"
+grep -i "warning" file.txt           # Case-insensitive search
+grep -r "TODO" /home/ubuntu/project/ # Recursive search
+grep -n "pattern" file.txt           # Show line numbers</code></pre><h3>Text Editing</h3><p>Nano (beginner-friendly):</p><pre><code>nano myfile.txt
+
+# Inside nano:
+# Ctrl+O → Save (Write Out)
+# Ctrl+X → Exit
+# Ctrl+K → Cut line
+# Ctrl+U → Paste line
+# Ctrl+W → Search</code></pre><p>Vim (powerful, but learning curve):</p><pre><code>vim myfile.txt
+
+# Vim has modes:
+# i          → Enter INSERT mode (type normally)
+# Esc        → Return to NORMAL mode
+# :w         → Save
+# :q         → Quit
+# :wq        → Save and quit
+# :q!        → Quit without saving
+# dd         → Delete line
+# /pattern   → Search</code></pre><hr><h2>4 | File Permissions and Security</h2><h3>Understanding Permissions</h3><p>Linux permissions protect your files and system:</p><pre><code>-rwxr-xr-x 1 ubuntu www-data 4096 Jan 15 10:30 script.sh
+│└┬┘└┬┘└┬┘   └──┬──┘└───┬──┘
+│ │  │  │       │       │
+│ │  │  │       │       └── Group owner
+│ │  │  │       └────────── File owner
+│ │  │  └────────────────── Others permissions (r-x)
+│ │  └───────────────────── Group permissions (r-x)
+│ └──────────────────────── Owner permissions (rwx)
+└────────────────────────── File type (- = file, d = directory)</code></pre><p><strong>Permission meanings:</strong></p><p>Each permission symbol has a specific meaning, and that meaning changes slightly depending on whether you’re dealing with files or directories.</p><p><strong>r</strong> (read): <em>For files, this allows viewing the contents. For directories, it allows listing what’s inside.</em></p><p><strong>w</strong> (write): <em>For files, this allows modifying the contents. For directories, it allows creating or deleting files within.</em></p><p><strong>x</strong> (execute): <em>For files, this allows running the file as a program. For directories, it allows entering the directory with cd.</em></p><p><strong>-</strong> (none): <em>No permission granted for this action.</em></p><p>When you see a permission string like <strong>rwxr-xr-x</strong>, read it in groups of three: owner permissions, group permissions, and others permissions. The owner has full access <strong>(rwx),</strong> while the group and others can read and execute but not write <strong>(r-x).</strong></p><h3>Changing Permissions</h3><p>Symbolic method (easier to read):</p><pre><code>chmod u+x script.sh    # Add execute for owner (user)
+chmod g+w file.txt     # Add write for group
+chmod o-r file.txt     # Remove read for others
+chmod a+r file.txt     # Add read for all
+chmod u+x,g+r script.sh # Multiple changes</code></pre><p>Numeric method (faster):</p><pre><code>r = 4
+w = 2
+x = 1
+
+Common patterns:
+755 = rwxr-xr-x (owner: all, others: read/execute)
+644 = rw-r--r-- (owner: read/write, others: read only)
+700 = rwx------ (owner only)
+600 = rw------- (owner read/write only, for secrets)
+
+chmod 755 script.sh    # rwxr-xr-x (typical for scripts)
+chmod 644 config.txt   # rw-r--r-- (typical for files)
+chmod 600 ~/.ssh/id_rsa # rw------- (SSH private key)</code></pre><h3>Changing Ownership</h3><pre><code># Change owner
+sudo chown ubuntu file.txt
+
+# Change owner and group
+sudo chown ubuntu:www-data file.txt
+
+# Recursive (for directories)
+sudo chown -R ubuntu:ubuntu /var/www/myapp/  </code></pre><h3>Cloud Security Best Practice</h3><pre><code># Secure SSH key permissions
+chmod 400 ~/.ssh/id_rsa        # Private key: owner read only
+chmod 644 ~/.ssh/id_rsa.pub    # Public key: readable
+
+# Secure sensitive config files
+chmod 600 /etc/myapp/secrets.conf
+
+# Web server files
+sudo chown -R www-data:www-data /var/www/html/
+chmod -R 755 /var/www/html/</code></pre><hr><h2>5 | Process and Service Management</h2><h3>Understanding Processes</h3><p>Every running program is a process:</p><pre><code># View all processes
+ps aux
+
+# Sample output:
+USER       PID %CPU %MEM    VSZ   RSS TTY  STAT START   TIME COMMAND
+root         1  0.0  0.1 169432 12984 ?    Ss   Jan10   0:05 /sbin/init
+ubuntu    1234  0.1  0.5 725948 48276 ?    Ssl  10:30   0:12 nginx
+ubuntu    5678  2.3  1.2 892456 98324 pts/0 Sl+ 11:45   1:23 python3 app.py</code></pre><p>Key columns:</p><ul><li><strong>PID</strong>: Process ID (unique identifier)</li><li><strong>%CPU</strong>: CPU usage percentage</li><li><strong>%MEM</strong>: Memory usage percentage</li><li><strong>STAT: </strong>Process state (S=sleeping, R=running, Z=zombie)</li><li><strong>COMMAND:</strong> The command that started this process</li></ul><h3>Managing Processes</h3><pre><code># Find specific processes
+ps aux | grep nginx
+pgrep -l nginx              # Just PIDs and names
+
+# Real-time process monitor
+top                         # Basic monitor (q to quit)
+htop                        # Enhanced monitor (install if needed)
+
+# Kill processes
+kill 1234                   # Graceful termination (SIGTERM)
+kill -9 1234                # Force kill (SIGKILL)
+pkill nginx                 # Kill by name
+killall python3             # Kill all matching processes
+
+# Run processes in background
+python3 app.py &amp;            # Run in background
+nohup python3 app.py &amp;      # Survives logout
+jobs                        # List background jobs
+fg %1                       # Bring job to foreground</code></pre><h3>Systemd Services</h3><p>Modern Linux uses systemd to manage services (daemons):</p><pre><code># Check service status
+sudo systemctl status nginx
+
+# Output:
+● nginx.service - A high performance web server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled)
+     Active: active (running) since Mon 2024-01-15 10:30:00 UTC
+    Process: 1234 ExecStart=/usr/sbin/nginx
+   Main PID: 1235 (nginx)
+      Tasks: 2 (limit: 1137)
+     Memory: 5.6M
+        CPU: 123ms
+
+# Control services
+sudo systemctl start nginx      # Start service
+sudo systemctl stop nginx       # Stop service
+sudo systemctl restart nginx    # Restart service
+sudo systemctl reload nginx     # Reload config (no downtime)
+
+# Enable/disable on boot
+sudo systemctl enable nginx     # Start on boot
+sudo systemctl disable nginx    # Don't start on boot
+
+# View logs
+sudo journalctl -u nginx        # All nginx logs
+sudo journalctl -u nginx -f     # Follow nginx logs
+sudo journalctl -u nginx --since "1 hour ago"</code></pre><h3>Creating Your Own Service</h3><p>Create a service for your application:</p><pre><code># Create service file
+sudo nano /etc/systemd/system/myapp.service
+
+[Unit]
+Description=My Python Application
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/myapp
+Environment="PATH=/home/ubuntu/myapp/venv/bin"
+ExecStart=/home/ubuntu/myapp/venv/bin/python app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+# Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable myapp
+sudo systemctl start myapp
+sudo systemctl status myapp</code></pre><hr><h2>6 | System Monitoring and Resources</h2><h3>Checking System Resources</h3><pre><code># Memory usage
+free -h
+
+# Output:
+              total        used        free      shared  buff/cache   available
+Mem:          7.8Gi       2.1Gi       1.5Gi       256Mi       4.2Gi       5.2Gi
+Swap:         2.0Gi          0B       2.0Gi
+
+# Disk usage
+df -h
+
+# Output:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1       30G   12G   17G  42% /
+tmpfs           3.9G     0  3.9G   0% /tmp
+
+# Directory size
+du -sh /var/log/          # Size of /var/log
+du -sh *                   # Size of each item in current dir
+du -h --max-depth=1 /      # Size of top-level directories
+
+# CPU information
+lscpu                      # CPU details
+nproc                      # Number of processors
+
+# System uptime and load
+uptime
+# Output: 10:45:32 up 5 days, 2:30, 1 user, load average: 0.08, 0.15, 0.12</code></pre><h3>Log Analysis</h3><p>Logs are crucial for troubleshooting:</p><pre><code># System logs
+sudo journalctl -f                    # Follow all logs
+sudo journalctl -p err                # Only errors
+sudo journalctl --since "2024-01-15"  # Since date
+
+# Traditional log files
+sudo tail -f /var/log/syslog          # System log
+sudo tail -f /var/log/auth.log        # Authentication log
+sudo tail -f /var/log/nginx/access.log # Nginx access log
+
+# Search logs
+sudo grep -i "error" /var/log/syslog
+sudo grep -i "failed" /var/log/auth.log</code></pre><hr><h2>7 | Package Management</h2><h3>Ubuntu/Debian (APT)</h3><pre><code># Update package lists (always do first!)
+sudo apt update
+
+# Upgrade installed packages
+sudo apt upgrade                # Upgrade packages
+sudo apt full-upgrade           # Upgrade + handle dependencies
+
+# Install packages
+sudo apt install nginx          # Install single package
+sudo apt install nginx php mysql-server  # Install multiple
+
+# Remove packages
+sudo apt remove nginx           # Remove package
+sudo apt purge nginx            # Remove + config files
+sudo apt autoremove             # Remove unused dependencies
+
+# Search packages
+apt search docker               # Find packages
+apt show nginx                  # Package details
+apt list --installed            # List installed packages</code></pre><h3>CentOS/RHEL (DNF/YUM)</h3><pre><code># Update packages
+sudo dnf update                 # CentOS 8+, Fedora
+sudo yum update                 # CentOS 7
+
+# Install packages
+sudo dnf install nginx
+sudo yum install nginx
+
+# Remove packages
+sudo dnf remove nginx
+sudo yum remove nginx
+
+# Search
+dnf search docker
+yum search docker</code></pre><h3>Comparing Package Managers</h3><p>Different Linux distributions use different package managers, but they all accomplish the same tasks. If you learn one, switching to another is straightforward.</p><p><strong>Updating your package</strong> list refreshes the local database of available software. On Ubuntu and Debian, use apt update. On CentOS and RHEL, use dnf check-update.</p><p><strong>Upgrading installed packages</strong> downloads and installs newer versions of everything on your system. Ubuntu uses apt upgrade, while CentOS uses dnf upgrade.</p><p><strong>Installing new software</strong> is where you’ll spend most of your time. On Ubuntu, run apt install package-name. On CentOS, run dnf install package-name.</p><p><strong>Removing software</strong> you no longer need keeps your system clean. Ubuntu uses apt remove package-name, and CentOS uses dnf remove package-name.</p><p><strong>Searching for packages</strong> helps you find the right software when you’re not sure of the exact name. Use apt search term on Ubuntu or dnf search term on CentOS.</p><p><em>The syntax differs slightly, but the concepts remain identical. Master one, and you’ll feel comfortable with any Linux distribution.</em></p><hr><h2>8 | Networking</h2><h3>Network Information</h3><pre><code># IP addresses
+ip addr show                # All network interfaces
+ip a                        # Short version
+hostname -I                 # Just IP addresses
+
+# Network connections
+ss -tulpn                   # Active connections (modern)
+netstat -tulpn              # Active connections (legacy)
+
+# Sample output:
+tcp  LISTEN 0  128  *:22    *:*    users:(("sshd",pid=1234,fd=3))
+tcp  LISTEN 0  511  *:80    *:*    users:(("nginx",pid=5678,fd=6))</code></pre><h3>Testing Connectivity</h3><pre><code># Ping (test reachability)
+ping google.com             # Ping until Ctrl+C
+ping -c 4 google.com        # Ping 4 times
+
+# DNS lookup
+nslookup google.com
+dig google.com
+
+# HTTP requests
+curl https://api.example.com/health    # GET request
+curl -I https://example.com            # Just headers
+curl -X POST -d '{"key":"value"}' https://api.example.com
+
+# Download files
+wget https://example.com/file.zip
+curl -O https://example.com/file.zip</code></pre><h3>Firewall Configuration (UFW)</h3><p>UFW (Uncomplicated Firewall) is the standard on Ubuntu:</p><pre><code># Enable firewall
+sudo ufw enable
+
+# Allow common ports
+sudo ufw allow 22/tcp       # SSH (always do this first!)
+sudo ufw allow 80/tcp       # HTTP
+sudo ufw allow 443/tcp      # HTTPS
+sudo ufw allow 3000/tcp     # Custom app port
+
+# Allow from specific IP
+sudo ufw allow from 192.168.1.100
+
+# Deny connections
+sudo ufw deny 8080/tcp
+
+# Check status
+sudo ufw status verbose
+
+# Sample output:
+Status: active
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere
+80/tcp                     ALLOW       Anywhere
+443/tcp                    ALLOW       Anywhere</code></pre><h3>SSH Configuration</h3><pre><code># Connect to remote server
+ssh ubuntu@192.168.1.100
+ssh -i ~/.ssh/mykey.pem ubuntu@ec2-instance.compute.amazonaws.com
+
+# SSH config file (~/.ssh/config)
+nano ~/.ssh/config
+Host myserver
+    HostName 192.168.1.100
+    User ubuntu
+    IdentityFile ~/.ssh/mykey.pem
+    Port 22
+
+Host production
+    HostName ec2-12-34-56-78.compute.amazonaws.com
+    User ec2-user
+    IdentityFile ~/.ssh/aws-key.pem
+# Now connect with just:
+ssh myserver
+ssh production
+
+# Copy files over SSH
+scp file.txt myserver:/home/ubuntu/
+scp -r folder/ myserver:/home/ubuntu/
+scp myserver:/var/log/app.log ./
+
+# Sync directories
+rsync -avz local-folder/ myserver:/remote-folder/</code></pre><hr><h2>9 | Docker on Linux</h2><h3>Installing Docker</h3><pre><code># Install Docker on Ubuntu
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Add your user to docker group (avoids sudo)
+sudo usermod -aG docker $USER
+# Log out and back in for this to take effect
+
+# Verify installation
+docker --version
+docker run hello-world</code></pre><h3>Docker Basics</h3><pre><code># Pull images
+docker pull ubuntu:22.04
+docker pull nginx:latest
+docker pull python:3.11-slim
+
+# List images
+docker images
+
+# Run containers
+docker run -it ubuntu:22.04 bash        # Interactive shell
+docker run -d nginx                      # Detached (background)
+docker run -d -p 80:80 nginx            # Map port 80
+docker run -d -p 8080:80 --name webserver nginx  # Named container
+
+# List containers
+docker ps                                # Running containers
+docker ps -a                             # All containers
+
+# Container management
+docker stop webserver                    # Stop container
+docker start webserver                   # Start stopped container
+docker restart webserver                 # Restart container
+docker rm webserver                      # Remove container
+docker rm -f webserver                   # Force remove running container
+
+# Interact with containers
+docker exec -it webserver bash           # Shell into container
+docker logs webserver                    # View logs
+docker logs -f webserver                 # Follow logs</code></pre><h3>Building Docker Images</h3><p>Create a Dockerfile:</p><pre><code># Dockerfile for Python Flask app
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first (for caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Expose port
+EXPOSE 5000
+
+# Set environment variables
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+
+# Run application
+CMD ["flask", "run", "--host=0.0.0.0"]</code></pre><h3>Docker Compose</h3><p>For multi-container applications, use Docker Compose:</p><pre><code># docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://db:5432/myapp
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Rebuild after changes
+docker-compose up -d --build</code></pre><hr><h2>10 | Shell Scripting</h2><h3>Bash Script Basics</h3><p>Shell scripts automate repetitive tasks:</p><pre><code>#!/bin/bash
+# save as: my-script.sh
+
+# Variables
+NAME="Cloud Developer"
+DATE=$(date +%Y-%m-%d)
+SERVER_COUNT=3
+
+# Print statements
+echo "Hello, $NAME!"
+echo "Today is $DATE"
+echo "Managing $SERVER_COUNT servers"
+
+# User input
+read -p "Enter your name: " USERNAME
+echo "Welcome, $USERNAME!"
+# Make executable and run
+chmod +x my-script.sh
+./my-script.sh</code></pre><h3>Conditionals</h3><pre><code>#!/bin/bash
+
+# If statements
+if [ -f "/var/log/syslog" ]; then
+    echo "Syslog exists"
+else
+    echo "Syslog not found"
+fi
+
+# Compare numbers
+COUNT=5
+if [ $COUNT -gt 10 ]; then
+    echo "Count is greater than 10"
+elif [ $COUNT -eq 5 ]; then
+    echo "Count is exactly 5"
+else
+    echo "Count is less than 5"
+fi
+
+# Compare strings
+STATUS="running"
+if [ "$STATUS" = "running" ]; then
+    echo "Service is running"
+fi
+
+# Check if command succeeded
+if docker ps &gt; /dev/null 2&gt;&amp;1; then
+    echo "Docker is running"
+else
+    echo "Docker is not running"
+fi</code></pre><h3>Loops</h3><pre><code>#!/bin/bash
+
+# For loop
+for i in 1 2 3 4 5; do
+    echo "Number: $i"
+done
+
+# For loop with range
+for i in {1..10}; do
+    echo "Count: $i"
+done
+
+# Loop through files
+for file in /var/log/*.log; do
+    echo "Processing: $file"
+done
+
+# While loop
+COUNT=0
+while [ $COUNT -lt 5 ]; do
+    echo "Count is $COUNT"
+    COUNT=$((COUNT + 1))
+done
+
+# Read file line by line
+while read -r line; do
+    echo "Line: $line"
+done &lt; /etc/hosts</code></pre><h3>Functions</h3><pre><code>#!/bin/bash
+
+# Define function
+check_service() {
+    local SERVICE=$1
+    if systemctl is-active --quiet $SERVICE; then
+        echo "✅ $SERVICE is running"
+        return 0
+    else
+        echo "❌ $SERVICE is not running"
+        return 1
+    fi
+}
+
+# Call function
+check_service nginx
+check_service mysql
+check_service redis</code></pre><h3>Practical Deployment Script</h3><pre><code>#!/bin/bash
+# deploy.sh - Automated deployment script
+
+set -e  # Exit on any error
+
+# Configuration
+APP_NAME="myapp"
+DEPLOY_DIR="/var/www/$APP_NAME"
+REPO_URL="https://github.com/yourusername/myapp.git"
+BRANCH="main"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Logging function
+log() {
+    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+warn() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Main deployment
+main() {
+    log "Starting deployment of $APP_NAME"
+
+    # Check if directory exists
+    if [ ! -d "$DEPLOY_DIR" ]; then
+        log "Creating deploy directory"
+        sudo mkdir -p "$DEPLOY_DIR"
+        sudo chown $USER:$USER "$DEPLOY_DIR"
+    fi
+
+    cd "$DEPLOY_DIR"
+
+    # Clone or pull
+    if [ -d ".git" ]; then
+        log "Pulling latest changes"
+        git fetch origin
+        git reset --hard origin/$BRANCH
+    else
+        log "Cloning repository"
+        git clone -b $BRANCH $REPO_URL .
+    fi
+
+    # Install dependencies
+    log "Installing dependencies"
+    if [ -f "requirements.txt" ]; then
+        pip install -r requirements.txt
+    fi
+
+    # Restart service
+    log "Restarting service"
+    sudo systemctl restart $APP_NAME
+
+    # Health check
+    sleep 5
+    if systemctl is-active --quiet $APP_NAME; then
+        log "✅ Deployment successful!"
+    else
+        error "Deployment failed - service not running"
+    fi
+}
+
+# Run main function
+main</code></pre><hr><h3>🏗️ Let’s Build</h3><h2>11 | Deploy Your Portfolio to the Cloud</h2><h3>Prerequisites</h3><ol><li><a href="https://ntombizakhona.medium.com/amazon-web-services-a8e57a9c6084"><strong>AWS Account</strong></a></li><li><a href="https://ntombizakhona.medium.com/abstraction-d1335bec022e"><strong>A Key Pair</strong></a></li><li><a href="https://ntombizakhona.medium.com/abstraction-d1335bec022e"><strong>How To Launch An EC2 Instance</strong></a></li></ol><p>Throughout this series, you’ve built an impressive portfolio:</p><ol><li>HTML: Created the semantic structure</li><li>CSS:Added professional styling</li><li>JavaScript: Made it interactive with animations</li><li>Python: Built a Flask backend API</li><li>Git: Pushed everything to GitHub</li></ol><p><strong><em>Now it’s time to deploy your portfolio to a live Linux server in the cloud! This is the ultimate test of your cloud skills.</em></strong></p><h3>What We’re Deploying</h3><pre><code>portfolio-project/
+├── index.html              ← Frontend (HTML/CSS/JavaScript)
+├── styles/
+│   └── main.css
+├── scripts/
+│   └── main.js
+├── assets/
+│   └── images/
+└── python-backend/         ← Backend (Flask API)
+    ├── app.py
+    ├── portfolio_manager.py
+    ├── requirements.txt
+    └── data/
+        └── portfolio.json</code></pre><h3>Step 01: Launch Your Cloud Server</h3><ol><li>Go to AWS Console → EC2 → Launch Instance</li><li><strong>Name:</strong> CloudLanguages</li><li><strong>Amazon Machine Image: </strong>Ubuntu 22.04 LTS (free tier eligible)</li><li>Instance Type: <strong>t3.micro</strong> (free tier)</li><li><strong>Key Pair</strong> → Download .pem file or Select CloudGlossary Key Pair</li><li><strong>Create Security Group:</strong> CloudLanguagesSG</li><li><strong>Description: </strong>My Cloud Languages Security Group</li><li>Inbound Security Group Rules</li></ol><ul><li><strong>SSH</strong> (22): My IP</li><li><strong>HTTP</strong> (80): Anywhere</li><li><strong>HTTPS</strong> (443): Anywhere</li><li><strong>Custom TCP</strong> (5000): Anywhere (for API)</li></ul><p><strong>Launch instance.</strong></p><pre><code># Connect to your server
+ssh -i CloudGlossary.pem ubuntu@your-server-ip
+
+# You should see:
+# Welcome to Ubuntu 22.04.3 LTS
+# ubuntu@ip-172-31-25-42:~$</code></pre><p><strong>🎉 Congratulations!</strong> You’re now logged into a Linux server in the cloud!</p><h3>Step 02: Initial Server Setup</h3><pre><code># Update the system (always do this first!)
+sudo apt update &amp;&amp; sudo apt upgrade -y
+
+# Set your timezone
+sudo timedatectl set-timezone UTC
+
+# Install essential tools
+sudo apt install -y git curl wget unzip
+
+# Configure firewall
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 5000/tcp
+sudo ufw --force enable
+
+# Verify firewall
+sudo ufw status</code></pre><h3>Step 03: Install Required Software</h3><pre><code># Install Nginx (web server)
+sudo apt install nginx -y
+sudo systemctl enable nginx
+sudo systemctl start nginx
+
+# Verify Nginx is running
+sudo systemctl status nginx
+# Visit http://your-server-ip in browser - you should see "Welcome to nginx!"
+
+# Install Python 3 and pip
+sudo apt install python3 python3-pip python3-venv -y
+
+# Verify Python
+python3 --version
+# Output: Python 3.10.x
+
+# Install Git (should already be installed)
+  sudo apt install git -y</code></pre><h3>Step 04: Clone Your Portfolio from GitHub</h3><p>Remember when you pushed your portfolio to GitHub in the Git post? Now we’ll pull it down to the server!</p><pre><code># Create web directory
+sudo mkdir -p /var/www/languagesportfolio
+sudo chown ubuntu:ubuntu /var/www/languagesportfolio
+cd /var/www/languagesportfolio
+
+# Clone YOUR portfolio repository
+git clone https://github.com/yourusername/languagesportfolio.git .
+
+# Verify the files are there
+ls -la
+# You should see:
+# index.html  styles/  scripts/  assets/  python-backend/</code></pre><h3>Step 05: Set Up the Python Backend</h3><pre><code># Navigate to backend directory
+cd /var/www/languagesportfolio/python-backend
+
+# Create virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install Flask and dependencies
+pip install flask flask-cors gunicorn
+
+# If you have a requirements.txt:
+pip install -r requirements.txt
+
+# Test the backend locally
+python app.py
+# You should see: Running on http://0.0.0.0:5000
+# Press Ctrl+C to stop</code></pre><h3>Step 06: Create Systemd Service for Flask API</h3><p>Make your Python backend run automatically and restart if it crashes:</p><pre><code>sudo nano /etc/systemd/system/languagesportfolio-api.service</code></pre><p>Paste this configuration (replace paths as needed):</p><pre><code>[Unit]
+Description=Portfolio Flask API
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/var/www/languagesportfolio/python-backend
+Environment="PATH=/var/www/languagesportfolio/python-backend/venv/bin"
+ExecStart=/var/www/languagesportfolio/python-backend/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:5000 app:app
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target</code></pre><p>Enable the service:</p><pre><code># Enable and start the service
+sudo systemctl daemon-reload
+sudo systemctl enable languagesportfolio-api
+sudo systemctl start languagesportfolio-api
+
+# Check status
+sudo systemctl status languagesportfolio-api
+# ● portfolio-api.service - Portfolio Flask API
+#      Active: active (running) since...</code></pre><h3>Step 07: Configure Nginx to Serve Your Portfolio</h3><pre><code># Create Nginx configuration
+sudo nano /etc/nginx/sites-available/languagesportfolio</code></pre><p>Paste this configuration:</p><pre><code>server {
+    listen 80;
+    server_name _;  # Accept any hostname
+
+    # Serve static frontend files
+    root /var/www/languagesportfolio;
+    index index.html;
+
+    # Handle frontend routes
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API requests to Flask backend
+    location /api {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Cache static assets
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+}</code></pre><p>Enable the site:</p><pre><code># Enable the site
+sudo ln -s /etc/nginx/sites-available/languagesportfolio /etc/nginx/sites-enabled/
+
+# Remove default site
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+sudo nginx -t
+# nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+# Reload Nginx
+  sudo systemctl reload nginx</code></pre><h3>Step 08: Verify Your Deployment</h3><p>Check all services are running:</p><pre><code># Check Nginx
+sudo systemctl status nginx
+# ● nginx.service
+#      Active: active (running)
+
+# Check Flask API
+sudo systemctl status languagesportfolio-api
+# ● portfolio-api.service
+#      Active: active (running)
+
+# Test API locally
+curl http://localhost/api/skills
+# Should return JSON with your skills!
+
+# Check the logs if anything goes wrong
+sudo journalctl -u languagesportfolio-api -f
+sudo tail -f /var/log/nginx/access.log</code></pre><p><strong>Open your browser and visit</strong>: <a href="http://your-server-ip"><em>http://your-server-ip</em></a></p><p><strong>🎉 YOUR PORTFOLIO IS NOW LIVE ON THE CLOUD!</strong></p><h3>Step 09: Create a Deployment Script</h3><p>Make future updates easy with a deployment script:</p><pre><code>nano /var/www/languagesportfolio/deploy.sh</code></pre><p>Paste this:</p><pre><code>#!/bin/bash
+# deploy.sh - Update portfolio from GitHub
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+log() {
+    echo -e "${GREEN}[DEPLOY]${NC} $1"
+}
+
+cd /var/www/languagesportfolio
+
+log "Pulling latest changes from GitHub..."
+git fetch origin
+git reset --hard origin/main
+
+log "Updating Python dependencies..."
+cd python-backend
+source venv/bin/activate
+pip install -r requirements.txt --quiet
+
+log "Restarting API service..."
+sudo systemctl restart languagesportfolio-api
+
+log "Reloading Nginx..."
+sudo systemctl reload nginx
+
+log "✅ Deployment complete!"
+log "Visit: http://$(curl -s ifconfig.me)"</code></pre><p>Run the script</p><pre><code>chmod +x /var/www/languagesportfolio/deploy.sh
+
+# Now whenever you push changes to GitHub, just run:
+  ./deploy.sh</code></pre><h3>Step 10: Update Your Portfolio Skills</h3><p>Now that you’ve deployed to Linux, update your JavaScript to reflect your progress:</p><p>In your scripts/main.js, update the skill progress:</p><pre><code>const skillProgress = {
+    'english': 100,
+    'mathematics': 100,
+    'html': 100,
+    'css': 100,
+    'javascript': 100,
+    'python': 100,
+    'git': 100,
+    'linux': 100,  // 🎉 You just mastered this!
+    'sql': 0,
+    'kubernetes': 0
+};</code></pre><p>Commit and deploy:</p><pre><code># On your local machine
+git add .
+git commit -m "Update skills progress - Linux complete!"
+git push origin main
+
+# On the server
+./deploy.sh</code></pre><h3>Step 11: SSH Hardening</h3><pre><code># Edit SSH config
+sudo nano /etc/ssh/sshd_config
+
+# Make these changes:
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries 3
+
+# Restart SSH
+sudo systemctl restart sshd</code></pre><h3>Step 12: Fail2ban (Intrusion Prevention)</h3><pre><code># Install fail2ban
+sudo apt install fail2ban -y
+
+# Create local config
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 3600
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+sudo fail2ban-client status sshd</code></pre><h3>Step 13: Automatic Security Updates</h3><pre><code># Install unattended-upgrades
+sudo apt install unattended-upgrades -y
+sudo dpkg-reconfigure -plow unattended-upgrades
+
+# Enable automatic updates
+sudo nano /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";</code></pre><h3>⛔ End of Building Tutorial⛔</h3><hr><h2>12 | Building Tutorial Overview</h2><h3>What You’ve Accomplished</h3><pre><code>┌───────────────────────────────────────────────────────────────────┐
+│              YOUR CLOUD PORTFOLIO ARCHITECTURE                    │
+├───────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│   Internet Users                                                  │
+│         │                                                         │
+│         ▼                                                         │
+│   ┌─────────────────┐                                             │
+│   │  Your Domain    │  ← Public IP / Domain Name                  │
+│   │  (or Public IP) │                                             │
+│   └────────┬────────┘                                             │
+│            │                                                      │
+│            ▼                                                      │
+│   ┌─────────────────┐                                             │
+│   │     Nginx       │  ← Web Server / Reverse Proxy               │
+│   │   Port 80/443   │                                             │
+│   └────────┬────────┘                                             │
+│            │                                                      │
+│      ┌─────┴─────┐                                                │
+│      │           │                                                │
+│      ▼           ▼                                                │
+│  ┌────────┐  ┌────────────┐                                       │
+│  │ Static │  │  Flask API │  ← Python Backend                     │
+│  │ Files  │  │  Port 5000 │                                       │
+│  │ HTML   │  │            │                                       │
+│  │ CSS    │  │ /api/*     │                                       │
+│  │ JS     │  │            │                                       │
+│  └────────┘  └────────────┘                                       │
+│                    │                                              │
+│                    ▼                                              │
+│            ┌────────────┐                                         │
+│            │ portfolio  │  ← JSON Data Storage                    │
+│            │   .json    │                                         │
+│            └────────────┘                                         │
+│                                                                   │
+│   All running on Ubuntu 22.04 LTS in AWS EC2! 🚀                  │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘</code></pre><p>Take a moment to appreciate what you’ve built. Your portfolio isn’t just code on your laptop anymore, it’s a production application running on real cloud infrastructure.</p><p>The architecture you’ve created:</p><p>Internet users access your public IP address, which hits Nginx, your web server and reverse proxy.</p><p>Nginx serves your static files (HTML, CSS, JavaScript) directly for maximum performance.</p><p>When requests come in for /api/* endpoints, Nginx forwards them to your Flask application running on port 5000.</p><p>Flask processes the request, interacts with your JSON data storage, and returns the response.</p><p>All of this runs on Ubuntu 22.04 LTS in AWS EC2, protected by a UFW firewall, monitored by systemd, and deployable with a single script.</p><p>You’ve mastered:</p><ol><li>Launching and connecting to cloud servers</li><li>Navigating the Linux filesystem</li><li>Managing files and permissions</li><li>Controlling processes and services</li><li>Installing and updating software</li><li>Configuring web servers and reverse proxies</li><li>Running applications as system services</li><li>Writing deployment automation scripts</li><li>Securing servers against common attacks</li></ol><p><strong><em>This is real cloud engineering. These are the exact skills used by DevOps engineers, site reliability engineers, and cloud architects at companies of every size.</em></strong></p><hr><h3>Final Thoughts</h3><p>Think about where you started: someone curious about cloud computing, perhaps wondering how websites actually get “onto the internet.”</p><p>Now look at what you’ve accomplished:</p><p>You’ve SSH’d into a remote server.</p><p>You’ve navigated the Linux filesystem with confidence.</p><p>You’ve installed software, configured firewalls, set up web servers, and created services that run automatically.</p><p>You’ve deployed a real application that anyone in the world can access!</p><h2>Concluding Remarks</h2><p>Linux is vast. What we covered is the foundation, but there’s always more to learn.</p><figure><img src="https://cdn-images-1.medium.com/max/800/1*gSme4o5nLAJ-3thCSWOovQ.png" alt="" loading="lazy"><figcaption>Linux — The Operating System</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>✅ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>⬜ <strong>09 — SQL:</strong> Cloud Data Management</p><p>⬜ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>⬜ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><hr><h2>Additional Resources</h2><h3><a href="https://ntombizakhona.medium.com/list/cloud-glossary-528956a3c181">Cloud Glossary</a></h3><blockquote>Cloud Computing Simplified: A Cloud Glossary For Beginners</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34703">Cloud Practitioner Exam Guide</a></h3><blockquote>In a world where nearly every industry is moving toward cloud-first strategies, having a baseline understanding of these principles is no longer optional but essential.</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34979">AI Practitioner Exam Guide</a></h3><blockquote>Whether you’re an Executive, Developer, Engineer, or Project Manager, having a baseline understanding of AI principles is no longer a <em>nice to have</em>, it’s <strong>absolutely essential.</strong></blockquote><h3><a href="https://www.youtube.com/watch?v=sWbUDq4S6Y8">Linux for Beginners</a></h3><blockquote>A comprehensive six-hour course covering everything from basic commands to shell scripting. Completely free and well-paced for beginners.</blockquote>
+

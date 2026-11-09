@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Article · Cloud Languages</title>
+  <meta name="description" content="An article from Ntombizakhona's Cloud Languages series.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Cloud Languages by Ntombizakhona">
+  <meta property="og:description" content="An article from the Cloud Languages series.">
+  <meta property="og:image" content="https://ntombizakhona.github.io/images/profile.jpg">
+  <link rel="icon" href="images/favicon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/markdown.js" defer></script>
+  <script src="js/post.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="./"><span>Cloud Languages</span></a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to light mode">☀️</button>
+      <div class="menu">
+        <button class="icon-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <nav id="site-menu" class="site-nav" aria-label="Main" hidden>
+          <a href="./">Articles</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="container layout">
+    <main id="main">
+      <article>
+        <p class="kicker" data-kicker></p>
+        <div class="post-meta" data-meta></div>
+        <img class="post-cover" data-cover alt="" hidden>
+        <div class="prose" data-content><p>Loading the article…</p></div>
+        <nav class="post-nav" aria-label="Previous and next articles" data-post-nav></nav>
+      </article>
+    </main>
+
+    <aside class="sidebar" aria-label="Sidebar">
+      <section class="widget"><h2>About me</h2><p data-about></p><a href="about.html">More about me</a></section>
+      <section class="widget toc"><h2>On this page</h2><ul data-toc></ul></section>
+      <section class="widget"><h2>Search</h2>
+        <form action="./" role="search"><input class="search" type="search" name="q" placeholder="Search articles" aria-label="Search articles"></form>
+      </section>
+      <section class="widget"><h2>Categories</h2><ul data-categories></ul></section>
+      <section class="widget"><h2>Tags</h2><div class="chips" data-tags></div></section>
+      <section class="widget"><h2>Latest posts</h2><ul data-recent></ul></section>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container"><span>© <span data-year></span> Ntombizakhona</span><span>Hosted free on GitHub Pages</span></div>
+  </footer>
+</body>
+</html>

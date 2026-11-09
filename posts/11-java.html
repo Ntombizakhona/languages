@@ -1,0 +1,288 @@
+<!-- Imported from https://ntombizakhona.medium.com/java-in-the-cloud-216ebe022a1b by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Java in the Cloud</h1>
+<h2>The Enterprise Development Language</h2>
+<blockquote><strong><em>Java is one of the very first languages I have ever learned, I just had to sneak it in here, also because it is robust and… my favourite. So, it’s a save the best for “</em>lastish” <em>kind of situation.</em></strong></blockquote><figure><img src="https://cdn-images-1.medium.com/max/1024/1*1_cuUN-W_3o3rTUHvWkgnw.jpeg" alt="" loading="lazy"></figure><p>So, you’ve built and orchestrated a cloud-native portfolio with Python, SQL, Docker, and Kubernetes.</p><p>But cloud computing is not only about startups and small services. Banks, telecommunications companies, retailers, and governments run systems that must process millions of requests reliably for years.</p><p>Think about it:</p><ul><li><em>Mission-critical transactions?</em> → <strong>They need reliability and strong typing</strong></li><li><em>Large engineering teams?</em> → <strong>They need maintainable, well-structured code</strong></li><li><em>Distributed cloud services? </em>→ <strong>They need mature frameworks and observability</strong></li><li><em>Enterprise integrations?</em> → <strong>They need a proven ecosystem</strong></li></ul><p><strong>This is where Java comes in.</strong></p><p>Java remains the backbone of enterprise cloud applications. From Spring Boot microservices to Apache Kafka streaming platforms, Java powers mission-critical cloud infrastructure worldwide.</p><p><em>In this post, Java joins our portfolio. We won’t throw away the Python backend. We’ll add Java </em><strong><em>next to it</em></strong><em>, the way real companies do: two small Java programs that talk to the Flask API over HTTP, run in Docker, and deploy to the same Kubernetes cluster from the previous post.</em></p><h2>Topics</h2><ol><li>How Java runs: JDK, JVM, and bytecode</li><li>Setting up Java on Windows</li><li>Java fundamentals: A Portfolio Health Checker</li><li>Compiling, Inspecting bytecode, And Packaging a JAR</li><li>Containerising Java with Docker</li><li>Running Java as a Kubernetes Job</li><li>Spring Boot: A Java Microservice For The Portfolio</li><li>Deploying the Spring Boot Service To Kubernetes</li><li>Java’s Cloud Ecosystem And Best Practices</li><li>Troubleshooting</li></ol><h2>1 | How Java Runs</h2><p>Python runs your .py file directly through the Python interpreter. Java adds a compile step:</p><pre><code>PortfolioHealthCheck.java ──javac──► PortfolioHealthCheck.class ──java──► JVM
+  source code you write              bytecode: the same file          runs it on Windows,
+                                     for every operating system       Linux, macOS, x86, ARM</code></pre><ul><li><strong>Source code</strong> (.java files) is what you write.</li><li><strong>javac</strong>, the Java compiler, checks your code and turns it into <strong>bytecode</strong> (.class files). Bytecode isn't machine code for a real CPU. It's a set of instructions for the JVM.</li><li><strong>The JVM</strong> (Java Virtual Machine) loads the bytecode and runs it. While your program runs, the JVM’s <strong>JIT (just-in-time) compiler</strong> turns frequently used code into fast native machine code, and its <strong>garbage collector</strong> frees memory you no longer use.</li></ul><p>That’s Java’s famous promise: <em>write once, run anywhere</em>. You compile on your Windows laptop, and the same bytecode runs in a Linux container in the cloud.</p><h3>JDK vs. JRE vs. JVM</h3><p>The <strong>JVM</strong> (<em>Java Virtual Machine</em>) is the engine that runs Java bytecode and is always present as part of the JRE and JDK.</p><p>The <strong>JRE</strong> (<em>Java Runtime Environment</em>) includes the JVM and the standard library, making it suitable for running Java applications, for example, in a production container.</p><p>The <strong>JDK</strong> (<em>Java Development Kit</em>) includes the runtime environment and development tools such as javac, jar, javap, and jshell, which you need to write, compile, build, and debug Java applications on your laptop.</p><h3>Why This Matters in the Cloud</h3><ul><li><strong>Portability:</strong> one build artifact (a JAR file) runs on any cloud, operating system, or CPU architecture that has a JVM.</li><li><strong>Long-running performance:</strong> the JIT optimizes code while a service runs, so busy APIs get faster after they warm up.</li><li><strong>The trade-off:</strong> JVM apps start slower and use more memory than a small Python script. Where startup time matters, such as serverless functions, tools like GraalVM native images and AWS Lambda SnapStart help.</li></ul><h3>Java Versions and LTS</h3><p>A new Java version ships every six months.</p><p>Every two years, one of them is a <strong>Long-Term Support (LTS)</strong> release that receives security updates for years. Java 17, 21, and 25 are LTS releases, and cloud teams standardize on LTS versions. This post uses <strong>Java 21</strong>, which every tool and base image in this post supports.</p><h3>Java for Python Developers</h3><p>You learned Python already, so here’s a map from one to the other:</p><pre><code>+-------------------+----------------------------+------------------------------------------+
+
+| Feature           | Python                     | Java                                     |
++-------------------+----------------------------+------------------------------------------+
+
+| Typing            | Dynamic: level = 75        | Static: int level = 75; (or var level)   |
+| Code blocks       | Indentation                | Curly braces { } and semicolons          |
+| Running           | python app.py              | javac then java, or java -jar app.jar    |
+| Dependencies      | pip + requirements.txt     | Maven + pom.xml (or Gradle)              |
+| Web framework     | Flask                      | Spring Boot                              |
+| A route           | @app.route('/api/health')  | @GetMapping("/api/health")               |
+| "No value"        | None                       | null                                     |
+| Handling errors   | try / except               | try / catch                              |
++-------------------+----------------------------+------------------------------------------+</code></pre><h2>2 | Set Up Java on Windows</h2><p>Install Eclipse Temurin JDK 21, a free, open-source build of OpenJDK:</p><pre><code>winget install EclipseAdoptium.Temurin.21.JDK</code></pre><p>If you prefer a regular installer, download the JDK 21 .msi from <a href="https://adoptium.net/">adoptium.net</a> and enable <strong>Set JAVA_HOME variable</strong> during setup.</p><p>Close and reopen your terminal so it picks up the updated PATH, then check both tools:</p><pre><code>java --version
+javac --version</code></pre><p><strong>Both should report version 21.</strong></p><p>You <strong>don’t need to install Maven</strong>.</p><p>The Spring Boot project we generate in Section 7 includes the <em>Maven Wrapper</em> (mvnw.cmd), which downloads the right Maven version for you. You'll also use Docker Desktop and kubectl from Post 10.</p><h3>🏗️ Let’s Build</h3><h2>3 | A Portfolio Health Checker</h2><p>Our first Java program checks the Flask API.</p><p>It calls four endpoints, prints the result of each one, and <strong>exits with code 0 if everything is up, or 1 if anything failed</strong>.</p><p>Exit codes are how scripts, CI pipelines, and Kubernetes Jobs know whether a program succeeded, so this small program is a real cloud tool.</p><p>Create LanguagesPortfolio/java/health-check/PortfolioHealthCheck.java:</p><pre><code>import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+
+/**
+ * Checks the portfolio's Flask API and reports which endpoints are up.
+ * Exit code 0 = all checks passed, 1 = at least one check failed.
+ */
+public class PortfolioHealthCheck {
+
+    // A record is a compact, immutable data class. Java generates the
+    // constructor, accessor methods, equals(), hashCode() and toString().
+    record CheckResult(String path, boolean up, String detail, long millis) {}
+
+    // static final = one shared constant. List.of() creates an unmodifiable list.
+    static final List&lt;String&gt; ENDPOINTS = List.of(
+            "/api/health",
+            "/api/skills",
+            "/api/projects",
+            "/api/analytics/progress"
+    );
+
+    public static void main(String[] args) {
+        // Read configuration from the environment, with a local default.
+        String baseUrl = System.getenv().getOrDefault("PORTFOLIO_API_URL", "http://localhost:5000");
+
+        HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(3))
+                .build();
+
+        System.out.println("Checking portfolio API at " + baseUrl);
+
+        int failures = 0;
+        for (String path : ENDPOINTS) {
+            CheckResult result = check(client, baseUrl, path);
+            System.out.printf("  %-4s  %-25s %-20s %5d ms%n",
+                    result.up() ? "UP" : "DOWN", result.path(), result.detail(), result.millis());
+            if (!result.up()) {
+                failures++;
+            }
+        }
+
+        System.out.println(failures == 0 ? "All checks passed." : failures + " check(s) failed.");
+        System.exit(failures == 0 ? 0 : 1);
+    }
+
+    static CheckResult check(HttpClient client, String baseUrl, String path) {
+        HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl + path))
+                .timeout(Duration.ofSeconds(5))
+                .GET()
+                .build();
+
+        long start = System.nanoTime();
+        try {
+            HttpResponse&lt;String&gt; response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            long millis = (System.nanoTime() - start) / 1_000_000;
+            boolean up = response.statusCode() == 200;
+            return new CheckResult(path, up, "HTTP " + response.statusCode(), millis);
+        } catch (IOException | InterruptedException e) {
+            // Connection refused, timeout, unknown host: the endpoint is down.
+            long millis = (System.nanoTime() - start) / 1_000_000;
+            return new CheckResult(path, false, e.getClass().getSimpleName(), millis);
+        }
+    }
+}</code></pre><h3>What This Code Means</h3><ul><li><strong>Classes</strong>: All Java code lives in classes, and a public class (like <strong>public class PortfolioHealthCheck</strong>) must match its file name.</li><li><strong>Main Method</strong>: The <strong>public static void main(String[] args)</strong> method serves as the official entry point that the JVM calls to start the program.</li><li><strong>Static Typing</strong>: Explicit declarations like <strong>String baseUrl and </strong><strong>int failures</strong> allow the compiler to catch type mistakes before the code ever runs.</li><li><strong>Generics</strong>: Container types like <strong>List&lt;String&gt;</strong> enforce strict rules so you cannot accidentally insert a number into a list of strings.</li><li><strong>Records</strong>: The <strong>CheckResult record</strong> handles immutable data without boilerplate, letting you read values cleanly via result.up().</li><li><strong>Checked Exceptions</strong>: The language forces you to safely handle unpredictable errors by <strong>catching </strong><strong>IOException and </strong><strong>InterruptedException</strong>.</li><li><strong>Timeouts</strong>: Network configurations like <strong>connectTimeout()</strong> prevent a single hung server from freezing the entire program indefinitely.</li><li><strong>Environment Config</strong>: Using <strong>System.getenv(...)</strong> ensures the exact same code runs seamlessly across your laptop, Docker, and Kubernetes.</li><li><strong>Exit Codes</strong>: Triggering <strong>System.exit(...)</strong> tells the calling pipeline or terminal whether the health check passed or failed.</li></ul><h3>Run It</h3><p><strong>Start the Flask backend:</strong></p><pre><code># Terminal 1, in LanguagesPortfolio\backend
+.\venv\Scripts\Activate.ps1
+python app.py</code></pre><p><strong>Then run the Java program:</strong></p><pre><code># Terminal 2, in LanguagesPortfolio\java\health-check
+java PortfolioHealthCheck.java
+$LASTEXITCODE</code></pre><p>java PortfolioHealthCheck.java <em>compiles the file in memory and runs it straight away. Java 11 added this shortcut for single-file programs.</em></p><p><strong>You should see something like:</strong></p><pre><code>Checking portfolio API at http://localhost:5000
+  UP    /api/health               HTTP 200                12 ms
+  UP    /api/skills               HTTP 200                 8 ms
+  UP    /api/projects             HTTP 200                 6 ms
+  UP    /api/analytics/progress   HTTP 200                 9 ms
+All checks passed.
+0</code></pre><p>Now stop Flask with Ctrl+C and run the program again.</p><p>Every line shows DOWN with an error such as ConnectException, the last line says 4 check(s) failed., and $LASTEXITCODE prints 1.</p><p>The program is doing its job.</p><h2>4 | Compile, Inspect, and Package</h2><p>The shortcut hides the compile step. Do it by hand to see what the JVM actually runs:</p><pre><code># In LanguagesPortfolio\java\health-check
+
+# Compile: .java source -&gt; .class bytecode, written to the "classes" folder
+javac -d classes PortfolioHealthCheck.java
+
+# List the output: one .class file per class
+Get-ChildItem classes
+
+# Run the bytecode (-cp tells the JVM where to find classes)
+java -cp classes PortfolioHealthCheck
+
+# Look inside the bytecode
+javap -c -cp classes PortfolioHealthCheck</code></pre><p>classes <em>now contains</em> PortfolioHealthCheck.class <em>and</em> PortfolioHealthCheck$CheckResult.class, b<em>ecause the record is a class of its own. In the</em> javap <em>output you'll see JVM instructions such as</em> getstatic, invokestatic, <em>and</em> invokevirtual. <em>You never write these by hand, but this is the portable format that every JVM runs.</em></p><p><strong>Now package the classes into a JAR:</strong></p><pre><code>jar --create --file health-check.jar --main-class PortfolioHealthCheck -C classes .
+java -jar health-check.jar</code></pre><p><em>A </em><strong>JAR</strong> (Java ARchive) <em>is a ZIP file of</em> .class <em>files plus a</em> META-INF/MANIFEST.MF <em>file.</em> --main-class <em>records the entry point in the manifest, so</em> java -jar <em>knows which</em> main <em>method to run. The JAR is Java's unit of deployment: you build it once and ship the same file everywhere.</em></p><p>Build output doesn’t belong in Git.</p><p><strong>Add these lines to</strong> LanguagesPortfolio/.gitignore:</p><pre><code>java/health-check/classes/
+java/health-check/*.jar
+java/insights/target/</code></pre><h2>5 | Containerise It</h2><p>Create LanguagesPortfolio/java/health-check/Dockerfile:</p><pre><code># Stage 1: build with the full JDK (compiler and tools)
+FROM eclipse-temurin:21-jdk AS build
+WORKDIR /src
+COPY PortfolioHealthCheck.java .
+RUN javac -d classes PortfolioHealthCheck.java \
+ &amp;&amp; jar --create --file health-check.jar --main-class PortfolioHealthCheck -C classes .
+
+# Stage 2: run with only the JRE (smaller image, no compiler)
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /src/health-check.jar .
+# Run as a regular user instead of root
+USER 1000
+ENTRYPOINT ["java", "-jar", "health-check.jar"]</code></pre><p><em>This is a </em><strong><em>multi-stage build</em></strong><em>. The first stage uses the JDK to compile the code. The second stage starts fresh from the smaller JRE image and copies in only the finished JAR. The compiler and the source code never reach the final image, so it’s smaller and gives an attacker fewer tools to work with.</em></p><blockquote><strong><em>Why Eclipse Temurin?</em></strong><em> Older tutorials use the </em><em>openjdk Docker image, but that image is deprecated. </em><em>eclipse-temurin is a Docker Official Image of the Adoptium project's OpenJDK builds, with both </em><em>-jdk and </em><em>-jre tags.</em></blockquote><p><strong>Build and run it while Flask is running on your machine:</strong></p><pre><code># In LanguagesPortfolio\java\health-check
+docker build -t portfolio-health-check:1.0 .
+docker run --rm -e PORTFOLIO_API_URL=http://host.docker.internal:5000 portfolio-health-check:1.0</code></pre><p>Inside a container, localhost means the container itself, not your laptop. Docker Desktop provides the hostname host.docker.internal for reaching your machine. In Kubernetes we'll use a Service name instead.</p><h3>The JVM Knows It’s in a Container</h3><p>Modern JVMs read the container’s memory limit. By default, the JVM uses at most <strong>25% of the container’s memory</strong> for its heap, the area where your objects live. That’s cautious for a container that runs only one Java app, so cloud teams commonly raise it:</p><pre><code>-XX:MaxRAMPercentage=75.0</code></pre><p>We’ll pass this option through the JAVA_TOOL_OPTIONS environment variable in Kubernetes. The JVM reads that variable at startup and prints a Picked up JAVA_TOOL_OPTIONS line, so you can confirm it took effect.</p><h2>6 | Run It as a Kubernetes Job</h2><p>In Post 10 we used <strong>Deployments</strong>, which keep a program running forever. A <strong>Job</strong> runs a program until it finishes, and the program’s exit code decides whether the Job succeeded. That fits our health checker exactly.</p><p>Create LanguagesPortfolio/k8s/java-health-check.yaml:</p><pre><code>apiVersion: batch/v1
+kind: Job
+metadata:
+  name: java-health-check
+  namespace: languages-portfolio
+spec:
+  backoffLimit: 0                 # Don't retry: a failed check should stay visible
+  ttlSecondsAfterFinished: 3600   # Delete the finished Job after one hour
+  template:
+    spec:
+      restartPolicy: Never        # Jobs must use Never or OnFailure
+      containers:
+      - name: health-check
+        image: portfolio-health-check:1.0
+        imagePullPolicy: IfNotPresent    # Use the local image instead of pulling from Docker Hub
+        env:
+        - name: PORTFOLIO_API_URL
+          value: http://backend-service:5000    # Kubernetes DNS name of the Flask Service
+        resources:
+          limits:
+            memory: "256Mi"</code></pre><p>backend-service<em> is the Service defined in</em> k8s/backend.yaml. <em>Inside the</em> languages-portfolio <em>namespace, Kubernetes DNS resolves that name to the Service's IP address, and the Service forwards each request to one of the Flask pods. The Java program finds the Python API without knowing any pod's IP address.</em></p><p><strong>Deploy it and check the result:</strong></p><pre><code># In LanguagesPortfolio
+
+# Minikube only: copy your local image into the cluster
+minikube image load portfolio-health-check:1.0
+
+kubectl apply -f k8s\java-health-check.yaml
+kubectl get jobs -n languages-portfolio
+kubectl logs job/java-health-check -n languages-portfolio</code></pre><p><em>The Job takes a few seconds to finish.</em> COMPLETIONS 1/1 <em>means the program exited with code 0.</em> <em>If it stays at</em> 0/1<em>, at least one check failed. The logs show the same table you saw on your laptop, so you can see which endpoint was down.</em></p><p><strong>You can’t change a Job after creating it, so delete it before running it again:</strong></p><pre><code>kubectl delete job java-health-check -n languages-portfolio
+kubectl apply -f k8s\java-health-check.yaml</code></pre><p>To run the check on a schedule, put the same pod template inside a <strong>CronJob</strong> with schedule: "*/15 * * * *" (every 15 minutes).</p><h2>7 | From Script to Service: Spring Boot</h2><p>The health checker is a script: it runs and then exits. Enterprise systems are mostly <strong>services</strong>, programs that run all the time and answer requests. In Java, the standard way to build one is <strong>Spring Boot</strong>.</p><p>Spring Boot gives you:</p><ul><li><strong>An embedded web server.</strong> Tomcat is packaged inside your JAR, so java -jar starts a complete web service.</li><li><strong>Dependency injection.</strong> A class lists what it needs in its constructor, and Spring creates and connects the objects for you.</li><li><strong>Auto-configuration.</strong> Add a dependency, and Spring Boot configures it with sensible defaults.</li><li><strong>Actuator.</strong> Built-in health and metrics endpoints that Kubernetes can probe.</li></ul><p>We’ll build <strong>java-insights</strong>, a small service that reports its own status and whether the Flask backend is reachable.</p><h3>Step 1: Generate the Project</h3><p>Go to <a href="https://start.spring.io/">start.spring.io</a> and:</p><p><strong>Project</strong> is set to Maven.<br><strong>Language</strong> is chosen as Java.<br><strong>Spring Boot</strong> version uses the default stable release.<br><strong>Group</strong> identifier is configured as com.portfolio.<br><strong>Artifact</strong> name is specified as insights.<br><strong>Packaging</strong> type is defined as Jar.<br><strong>Java</strong> version is selected as 21.<br><strong>Dependencies</strong> include Spring Web and Spring Boot Actuator.</p><p>Click <strong>Generate</strong> and unzip the download into LanguagesPortfolio\java.</p><p>The zip contains an insights folder, so the project ends up inLanguagesPortfolio\java\insights.</p><p><strong>Open</strong> src/main/java/com/portfolio/insights/InsightsApplication.java. <strong>Spring Initializr generated it for you:</strong></p><pre><code>@SpringBootApplication
+public class InsightsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(InsightsApplication.class, args);
+    }
+}</code></pre><p>It’s an ordinary main method, like the one in our health checker. SpringApplication.run starts Spring, which finds your classes in this package, configures everything, and starts the web server. @SpringBootApplication switches all of that on.</p><h3>Step 2: Write a REST Controller</h3><p>Create src/main/java/com/portfolio/insights/StatusController.java:</p><pre><code>package com.portfolio.insights;
+
+import java.time.Instant;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+
+@RestController
+@RequestMapping("/api/java")
+public class StatusController {
+
+    // The JSON shape this endpoint returns. Spring converts records to JSON automatically.
+    public record Status(String service, String javaVersion, String flaskBackend, String checkedAt) {}
+
+    private final RestClient flaskApi;
+
+    // Spring calls this constructor and passes in the configured Flask URL.
+    public StatusController(@Value("${portfolio.api.url}") String portfolioApiUrl) {
+        this.flaskApi = RestClient.create(portfolioApiUrl);
+    }
+
+    @GetMapping("/status")
+    public Status status() {
+        String flaskBackend;
+        try {
+            // Java calling Python: GET &lt;flask-url&gt;/api/health
+            flaskApi.get().uri("/api/health").retrieve().toBodilessEntity();
+            flaskBackend = "UP";
+        } catch (RestClientException e) {
+            // Flask is down, unreachable, or returned an error status
+            flaskBackend = "DOWN";
+        }
+        return new Status(
+                "java-insights",
+                System.getProperty("java.version"),
+                flaskBackend,
+                Instant.now().toString());
+    }
+}</code></pre><h3>What The Annotation Means</h3><ul><li><strong>The </strong><strong>@RestController annotation</strong> marks a class as a controller where every method automatically returns JSON data in response to HTTP requests, which functions similarly to Flask functions using @app.route that return a jsonify(...) response.</li><li><strong>The </strong><strong>@RequestMapping("/api/java") annotation</strong> defines a base URL prefix for all endpoints within that class, operating much like a Flask Blueprint with a designated url_prefix.</li><li><strong>The </strong><strong>@GetMapping("/status") annotation</strong> specifies that a method will handle incoming HTTP GET requests for the combined path (e.g., /api/java/status), which serves the same purpose as Flask’s @app.route('/api/java/status', methods=['GET']).</li><li><strong>The </strong><strong>@Value("${portfolio.api.url}") annotation</strong> injects a configuration value directly into a variable from the application properties, matching the behavior of loading environment variables in Flask via os.getenv(...) within a config.py file.</li></ul><p>This small class carries two cloud lessons:</p><ul><li><strong>Service-to-service calls.</strong> RestClient is Spring's HTTP client. Java and Python don't share any code. They share an HTTP contract, so either side can be rewritten without the other noticing.</li><li><strong>Failure isolation.</strong> If Flask is down, this service still answers and reports DOWN instead of crashing. One broken service shouldn't take others down with it.</li></ul><p>RestClient requires Spring Boot 3.2 or newer, and Initializr's default version is newer than that.</p><h3>Step 3: Configure It</h3><p>Replace the contents of src/main/resources/application.properties with:</p><pre><code>spring.application.name=insights
+server.port=8080
+
+# Where the Flask API lives. Uses the PORTFOLIO_API_URL environment
+# variable if it's set, otherwise falls back to localhost.
+portfolio.api.url=${PORTFOLIO_API_URL:http://localhost:5000}
+
+# Expose /actuator/health/liveness and /actuator/health/readiness
+# for Kubernetes probes (and when running locally).
+management.endpoint.health.probes.enabled=true</code></pre><p>In a .properties file, comments must be on their own line. Anything after the = is part of the value.</p><p>This follows the same rule as the Flask backend’s config.py: the code reads its settings from the environment, so one JAR works on your laptop, in Docker, and in Kubernetes.</p><h3>Step 4: Run and Test</h3><p>With Flask still running, start the Java service:</p><pre><code># In LanguagesPortfolio\java\insights
+.\mvnw.cmd spring-boot:run</code></pre><p>The first run downloads Maven and the project’s libraries, so it takes a few minutes. When you see Started InsightsApplication, test it from another terminal. curl.exe comes with Windows and prints the raw JSON:</p><pre><code>curl.exe http://localhost:8080/api/java/status
+curl.exe http://localhost:8080/actuator/health</code></pre><p>The first command prints something like the line below. Spring turned the Status record into JSON, with one field per record component:</p><pre><code>{"service":"java-insights","javaVersion":"21.0.x","flaskBackend":"UP","checkedAt":"2026-10-03T09:30:12.345678Z"}</code></pre><p>The second returns Actuator’s health report, which includes "status":"UP". Now stop Flask and call /api/java/status again. flaskBackend changes to DOWN, but the Java service keeps answering.</p><h2>8 | Deploy the Spring Boot Service to Kubernetes</h2><h3>Package the JAR</h3><p>Stop the running service with Ctrl+C, then build and run the JAR:</p><pre><code># In LanguagesPortfolio\java\insights
+.\mvnw.cmd clean package
+java -jar target\insights-0.0.1-SNAPSHOT.jar</code></pre><p>package compiles the code, runs the test Initializr generated, and builds target\insights-0.0.1-SNAPSHOT.jar. This is a Spring Boot "fat JAR": it contains your classes, every library, and the embedded Tomcat server. That single file is the whole application.</p><p>Stop it with Ctrl+C once you've seen it start.</p><h3>Containerise</h3><p>Create LanguagesPortfolio/java/insights/Dockerfile:</p><pre><code>FROM eclipse-temurin:21-jre
+WORKDIR /app
+# The JAR built by "mvnw.cmd clean package"
+COPY target/*.jar app.jar
+USER 1000
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre><p>This time Maven builds the JAR on your machine, and the Dockerfile only packages it, so one stage is enough. The multi-stage pattern from Section 5 works here too, and CI pipelines usually use it.</p><pre><code># In LanguagesPortfolio\java\insights
+docker build -t portfolio-java-insights:1.0 .</code></pre><h3>Deploy</h3><p>Create LanguagesPortfolio/k8s/java-insights.yaml:</p><pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-insights
+  namespace: languages-portfolio
+  labels:
+    app: java-insights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-insights
+  template:
+    metadata:
+      labels:
+        app: java-insights
+    spec:
+      containers:
+      - name: java-insights
+        image: portfolio-java-insights:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORTFOLIO_API_URL
+          value: http://backend-service:5000
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:MaxRAMPercentage=75.0"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-insights-service
+  namespace: languages-portfolio
+spec:
+  selector:
+    app: java-insights
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP</code></pre><p>What’s different from the Flask Deployment:</p><ul><li><strong>PORTFOLIO_API_URL</strong> points at the Flask Service, exactly like the Job does.</li><li><strong>The probes use Actuator.</strong> The Flask backend’s probes in k8s/backend.yaml call /api/health. Here, readiness tells Kubernetes when to send traffic to the pod, and liveness tells it when to restart the container.</li><li><strong>The initial delays are longer</strong> because the JVM and Spring need several seconds to start.</li><li><strong>JAVA_TOOL_OPTIONS</strong> lets the heap use 75% of the 512Mi memory limit.</li></ul><p><strong>Deploy and test:</strong></p><pre><code># In LanguagesPortfolio
+
+# Minikube only
+minikube image load portfolio-java-insights:1.0
+
+kubectl apply -f k8s\java-insights.yaml
+kubectl get pods -n languages-portfolio -l app=java-insights
+kubectl port-forward service/java-insights-service 8080:8080 -n languages-portfolio</code></pre><p>Then, in another terminal:</p><pre><code>curl.exe http://localhost:8080/api/java/status</code></pre><p>"flaskBackend":"UP" proves that Java reached Python through Kubernetes DNS inside the cluster. Your portfolio's backend now runs two languages.</p><h3>⛔ End of Building Tutorial⛔</h3><h2>9 | Java’s Cloud Ecosystem</h2><p>These two programs use a small slice of what Java offers. Here’s where to go next:</p><h3>Web APIs, Microservices, and Databases</h3><ul><li><strong>Web APIs and microservices</strong> are commonly built using robust frameworks like <strong>Spring Boot</strong>, <strong>Quarkus</strong>, and <strong>Micronaut</strong>.</li><li><strong>Database interactions</strong> are handled through core technologies like <strong>JDBC</strong> or object-relational mapping frameworks like <strong>Spring Data JPA and Hibernate</strong>, which can be used against systems like your <strong>MySQL database</strong>.</li><li><strong>Database migrations</strong> and version control for schemas are managed using tools like <strong>Flyway</strong> or <strong>Liquibase</strong>.</li></ul><h3>Messaging, Security, and Observability</h3><ul><li><strong>Messaging and streaming</strong> architectures rely on clients for <strong>Apache Kafka</strong> (which itself is written in Java and Scala) or <strong>RabbitMQ</strong>.</li><li><strong>Application security</strong>, including authentication and authorization via <strong>OAuth2</strong> and <strong>JWT</strong>, is typically implemented using <strong>Spring Security</strong>.</li><li><strong>Observability</strong>, metrics, and distributed tracing are configured using <strong>Spring Boot Actuator</strong>, <strong>Micrometer</strong>, and <strong>OpenTelemetry</strong>.</li></ul><h3>Cloud, Operations, and Building</h3><ul><li><strong>Cloud SDKs</strong> allow seamless integration with major platforms through the <strong>AWS SDK for Java</strong>, <strong>Azure SDK for Java</strong>, and <strong>Google Cloud client libraries</strong>.</li><li><strong>Serverless deployment</strong> targets platforms like <strong>AWS Lambda Java runtimes</strong> utilizing <strong>SnapStart</strong>, as well as <strong>Azure Functions</strong>.</li><li><strong>Fast startup times</strong> and reduced memory footprints are achieved by compiling to a <strong>GraalVM native image</strong> or using <strong>OpenJDK CRaC</strong> (Coordinated Restore at Checkpoint).</li><li><strong>Project builds</strong> and dependency management are handled by the industry-standard build tools <strong>Maven</strong> or <strong>Gradle</strong>.</li></ul><h3>Best Practices for Java in the Cloud</h3><ul><li><strong>Use an LTS JDK and pin your image tags</strong> (eclipse-temurin:21-jre, not latest) so builds are repeatable.</li><li><strong>Ship the JRE, not the JDK,</strong> in production images, and run as a non-root user.</li><li><strong>Read configuration from the environment.</strong> Keep passwords in Kubernetes Secrets as in Post 10, never in code or in application.properties.</li><li><strong>Set timeouts on every outbound call.</strong> The health checker does. A production version of StatusController should too.</li><li><strong>Expose health endpoints and connect them to probes.</strong> Actuator does most of the work.</li><li><strong>Size memory on purpose.</strong> Set a container memory limit and tune MaxRAMPercentage to match it.</li><li><strong>Log to standard output.</strong> Kubernetes collects it for kubectl logs, so don't write log files inside the container.</li></ul><h2>10 | Troubleshooting</h2><h3>Local Environment and Compilation Issues</h3><ul><li><strong>If </strong><strong>java is not recognized</strong>, the likely cause is that the terminal was opened before Java was installed. You can fix this by <strong>opening a new terminal</strong> and checking the installation with Get-Command java.</li><li><strong>When </strong><strong>mvnw.cmd complains about </strong><strong>JAVA_HOME</strong>, the installer did not set the environment variable. To resolve this, <strong>run </strong><strong>$env:JAVA_HOME = Split-Path (Split-Path (Get-Command java).Source)</strong> in that terminal, or set it permanently under Environment Variables in your Windows settings.</li><li><strong>If you get an error stating that </strong><strong>class PortfolioHealthCheck is public, should be declared in a file named PortfolioHealthCheck.java</strong>, the file name and the class name do not match. You must <strong>rename the file</strong> to match the class name exactly, including identical capital letters.</li></ul><h3>Connection and Network Issues</h3><ul><li><strong>When every check shows </strong><strong>DOWN with a </strong><strong>ConnectException</strong>, Flask either is not running or the configured URL is incorrect. To fix this, <strong>start Flask</strong> and verify your environment variable by checking $env:PORTFOLIO_API_URL.</li><li><strong>If the container cannot reach </strong><strong>localhost:5000</strong>, it is because localhost refers to the container itself. You should change the connection URL to use <strong>http://host.docker.internal:5000</strong> instead.</li><li><strong>If you find that port </strong><strong>8080 is already in use</strong>, another program or a second copy of the service is occupying that port. You need to <strong>stop the conflicting program</strong>, or start your service on a different port by running $env:SERVER_PORT = "8081".</li></ul><h3>Kubernetes Deployment Issues</h3><ul><li><strong>When encountering </strong><strong>ErrImagePull or </strong><strong>ImagePullBackOff errors</strong>, your cluster cannot see your local container image. If you are using Minikube, fix this by running <strong>minikube image load &lt;image&gt;.</strong> Otherwise, push the image to a registry and update the image: field in your deployment configuration.</li><li><strong>If a Pod status shows </strong><strong>OOMKilled</strong>, the memory limit configured in Kubernetes is too low for the Java Virtual Machine (JVM). You can resolve this by <strong>raising </strong><strong>limits.memory</strong> in your pod specification or lowering the MaxRAMPercentage in your Java options.</li><li><strong>When re-applying a Job fails with an error stating a field is immutable</strong>, it means Kubernetes Jobs cannot be modified after they are created. To fix this, <strong>delete the existing Job</strong> and apply your configuration file again.</li></ul><h3>Final Thoughts</h3><p>Java adds a proven enterprise layer to your cloud toolkit. You compiled source code into bytecode, packaged it as a JAR, shipped it in a container, and ran it on the same Kubernetes platform you learned in the previous article.</p><p>Then you built a Spring Boot microservice that talks to your Python API over HTTP.</p><p>The syntax is only part of the lesson.</p><p><strong>Java’s real value in the cloud comes from its mature ecosystem, predictable structure, and ability to support large systems and engineering teams over time.</strong> As your portfolio now shows, it doesn’t have to replace anything: Java and Python run side by side, connected by HTTP and Kubernetes DNS.</p><h2>Concluding Remarks</h2><p>Java completes the application language layer of our cloud journey. Next, we move into <strong>Infrastructure as Code with Terraform: </strong>codifying the cloud itself.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*IChG83lz_2khuPPPr2_KMQ.png" alt="" loading="lazy"><figcaption>Java — The Enterprise Development Language</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>✅ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>✅ <strong>09 — SQL:</strong> Cloud Data Management</p><p>✅ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>✅ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><h2>Additional Resources</h2><h3><a href="https://docs.oracle.com/javase/tutorial/"><strong>The Java™ Tutorials</strong></a></h3><blockquote>The Java Tutorials are practical guides for programmers who want to use the Java programming language to create applications.</blockquote><blockquote>They include hundreds of complete, working examples, and dozens of lessons. Groups of related lessons are organized into “trails”.</blockquote><h3><a href="https://developer.mozilla.org/en-US/docs/Glossary/Java">Java</a></h3><blockquote>Java is a <a href="https://developer.mozilla.org/en-US/docs/Glossary/Compile">compiled</a>, <a href="https://developer.mozilla.org/en-US/docs/Glossary/OOP">object-oriented</a>, highly portable <a href="https://developer.mozilla.org/en-US/docs/Glossary/Computer_Programming">programming</a> language.</blockquote><blockquote>Java is statically typed and features a similar syntax to C. It comes with a large library of readily usable functions, the Java Software Development Kit (SDK).</blockquote>

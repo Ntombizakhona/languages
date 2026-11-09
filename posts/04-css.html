@@ -1,0 +1,1191 @@
+<!-- Imported from https://ntombizakhona.medium.com/css-8c98ee3ec762 by tools/import_medium.py. Re-run it to update this file. -->
+<h1>CSS in the Cloud</h1>
+<h2>The Styling Language</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/800/1*rdHxTrgHp4YoJckKmSmuBQ@2x.jpeg" alt="" loading="lazy"></figure><p>You’ve built the <em>skeleton</em> <a href="post.html?slug=03-html">(HTML)</a>. Now it’s time to make it beautiful.</p><p><strong>CSS</strong> <em>(Cascading Style Sheets)</em> is what separates amateur websites from professional ones. It’s the difference between:</p><p>❌ <strong>Before CSS:</strong> Black text on white background, Times New Roman font, no spacing<br>✅ <strong>After CSS:</strong> Beautiful colors, modern layouts, professional typography, responsive design</p><p>Think of it like this:</p><ul><li><strong>HTML: </strong><em>The frame of a house</em> (structure)</li><li><strong>CSS</strong>:<em> Paint, furniture, landscaping</em> (appearance)</li><li><strong>JavaScript: </strong><em>Electricity, plumbing</em> (functionality — coming next)</li></ul><h2>Why CSS Matters in Cloud Computing</h2><p><em>“I thought cloud engineering was about servers, not design?”</em></p><p>Here’s the reality:</p><ul><li><strong>AWS Console?</strong> <em>Styled with CSS</em></li><li><strong>Monitoring dashboards?</strong> <em>CSS layouts and visualizations</em></li><li><strong>Internal tools you’ll build?</strong> <em>Need CSS for usability</em></li><li><strong>Your portfolio to get hired?</strong> <em>CSS makes the first impression</em></li></ul><p>Professional cloud engineers can build full-stack solutions, and that requires CSS.</p><hr><h2>Topics</h2><ol><li>CSS syntax, selectors, and specificity</li><li>The box model (margin, padding, border)</li><li>Modern layouts with Flexbox and Grid</li><li>Responsive designs that work on mobile, tablet, desktop</li><li>Professional color schemes and typography</li></ol><hr><h2>1 | CSS Fundamentals</h2><h3>The Language of Style</h3><p><strong>CSS Syntax: The Basic Pattern</strong></p><p>CSS follows a simple, repeatable structure:</p><pre><code>selector {
+    property: value;
+    another-property: another-value;
+}</code></pre><p>Example:</p><pre><code>h1 {
+    color: blue;
+    font-size: 2rem;
+    font-weight: bold;
+}</code></pre><p>Breaking it down:</p><ul><li><strong>h1</strong> = Selector: <em>what you’re styling</em></li><li><strong>{ }</strong> = Declaration block: <em>contains all styles</em></li><li><strong>color: blue;</strong> = Declaration: <em>property + value</em></li><li><strong>;</strong> = Semicolon: <em>ends each declaration</em></li></ul><h3>The Three Types of Selectors</h3><p><strong>1. Element Selector: </strong><em>Targets HTML tags</em></p><pre><code>/* Styles ALL paragraphs */
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Styles ALL links */
+a {
+    color: #3498db;
+    text-decoration: none;
+}</code></pre><p><strong>2. Class Selector: </strong><em>Targets elements with specific class</em></p><pre><code>/* Targets &lt;div class="card"&gt; */
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Targets &lt;button class="primary-button"&gt; */
+.primary-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+}</code></pre><p><strong>HTML usage:</strong></p><pre><code>
+&lt;div class="card"&gt;Card content&lt;/div&gt;
+&lt;button class="primary-button"&gt;Click Me&lt;/button&gt;</code></pre><p><strong>3. ID Selector: </strong><em>Targets Single Unique Element</em></p><pre><code>/* Targets &lt;section id="hero"&gt; */
+#hero {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 100px 20px;
+}
+
+/* Targets &lt;nav id="main-navigation"&gt; */
+#main-navigation {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}</code></pre><p>HTML usage:</p><pre><code>&lt;section id="hero"&gt;Hero content&lt;/section&gt;
+&lt;nav id="main-navigation"&gt;Navigation&lt;/nav&gt;</code></pre><p><strong>💡Note:</strong></p><ul><li>Use <strong>classes</strong> for reusable styles (.button, .card, .container)</li><li>Use <strong>IDs </strong>for unique elements (#header, #hero, #contact-form)</li><li>Use element <strong>selectors</strong> for general styling (p, h1, a)</li></ul><h3>Selector Specificity: Which Style Wins?</h3><p>When multiple rules target the same element, specificity determines which style applies:</p><pre><code>/* Specificity: 1 (element) */
+p {
+    color: black;
+}
+
+/* Specificity: 10 (class) */
+.highlight {
+    color: blue;
+}
+
+/* Specificity: 100 (ID) */
+#important {
+    color: red;
+}</code></pre><p>HTML:</p><pre><code>&lt;p class="highlight" id="important"&gt;What color is this text?&lt;/p&gt;</code></pre><p><strong>Result:</strong> <em>Text is red</em></p><p>ID has highest specificity: 100 &gt; 10 &gt; 1</p><p>Specificity hierarchy:</p><pre><code>Inline styles (in HTML)     = 1000 points
+IDs                         = 100 points
+Classes, attributes, pseudo = 10 points
+Elements, pseudo-elements   = 1 point</code></pre><p><strong>💡Best Practice:</strong></p><p>Use classes for most styling. Avoid over-relying on IDs or inline styles.</p><hr><h2>2 | The Box Model</h2><h3>Understanding Space</h3><p>Every HTML element is a box with four layers:</p><pre><code>┌─────────────────────────────────────┐
+│           MARGIN (outside)          │
+│  ┌──────────────────────────────┐   │
+│  │      BORDER (edge)           │   │
+│  │  ┌────────────────────────┐  │   │
+│  │  │   PADDING (inside)     │  │   │
+│  │  │  ┌──────────────────┐  │  │   │
+│  │  │  │   CONTENT        │  │  │   │
+│  │  │  │  (text/images)   │  │  │   │
+│  │  │  └──────────────────┘  │  │   │
+│  │  └────────────────────────┘  │   │
+│  └──────────────────────────────┘   │
+└─────────────────────────────────────┘</code></pre><h3>Box Model Properties</h3><pre><code>.box-example {
+    /* Content size */
+    width: 300px;
+    height: 200px;
+    
+    /* Padding - space INSIDE the box */
+    padding: 20px;              /* All sides */
+    padding: 10px 20px;         /* Top/bottom, Left/right */
+    padding: 10px 20px 15px 25px; /* Top, Right, Bottom, Left (clockwise) */
+    
+    /* Border - edge of the box */
+    border: 2px solid #333;     /* Width, style, color */
+    border-radius: 10px;        /* Rounded corners */
+    
+    /* Margin - space OUTSIDE the box */
+    margin: 20px;               /* All sides */
+    margin: 0 auto;             /* Top/bottom 0, Left/right auto (centers block) */
+}</code></pre><h3>Practical Example: Card Component</h3><pre><code>.skill-card {
+    /* Content */
+    width: 300px;
+    
+    /* Inside space (breathing room for content) */
+    padding: 30px;
+    
+    /* Border */
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    
+    /* Outside space (distance from other cards) */
+    margin: 20px;
+    
+    /* Visual enhancement */
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}</code></pre><h3>Box-Sizing: Making Math Easier</h3><p>By default, width only applies to content. Padding and border add to the total size:</p><pre><code>/* Without box-sizing */
+.box {
+    width: 300px;
+    padding: 20px;
+    border: 2px solid black;
+}
+/* Actual width = 300 + 40 (padding) + 4 (border) = 344px */</code></pre><p>Better approach:</p><pre><code>/* Apply this to ALL elements (best practice) */
+* {
+    box-sizing: border-box;
+}
+
+.box {
+    width: 300px;      /* This is now the TOTAL width */
+    padding: 20px;     /* Included in 300px */
+    border: 2px solid black; /* Included in 300px */
+}
+/* Actual width = 300px (much easier to calculate!) */</code></pre><hr><h2>3 | Colors and Typography</h2><h3>Creating Visual Hierarchy</h3><p><strong>Color Systems: </strong>Hexadecimal (most common):</p><pre><code>color: #3498db;        /* Blue */
+background: #2c3e50;   /* Dark blue-gray */
+border-color: #e74c3c; /* Red */</code></pre><p><strong>Color Systems: </strong>RGB/RGBA (with transparency):</p><pre><code>color: rgb(52, 152, 219);           /* Blue */
+background: rgba(0, 0, 0, 0.5);     /* Black with 50% opacity */
+box-shadow: rgba(0, 0, 0, 0.1);     /* Subtle shadow */</code></pre><p><strong>Color Systems: </strong>HSL (Hue, Saturation, Lightness):</p><pre><code>color: hsl(204, 70%, 53%);          /* Blue */
+background: hsl(210, 10%, 90%);     /* Light gray */</code></pre><h3>Professional Color Palette (60–30–10 Rule)</h3><pre><code>:root {
+    /* Primary (60% of design) */
+    --primary-dark: #2c3e50;
+    --primary-light: #ecf0f1;
+    
+    /* Secondary (30% of design) */
+    --secondary: #3498db;
+    --secondary-hover: #2980b9;
+    
+    /* Accent (10% of design) */
+    --accent: #e74c3c;
+    --accent-hover: #c0392b;
+    
+    /* Neutral */
+    --text-dark: #333333;
+    --text-light: #666666;
+    --background: #ffffff;
+}
+
+/* Usage */
+body {
+    color: var(--text-dark);
+    background: var(--background);
+}
+
+button {
+    background: var(--secondary);
+}
+
+button:hover {
+    background: var(--secondary-hover);
+}</code></pre><h3>Typography Best Practices</h3><pre><code>body {
+    /* Font stack (fallbacks if first font unavailable) */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Base size (16px default, use rem for scalability) */
+    font-size: 16px;
+    
+    /* Line height for readability (1.5-1.6 is ideal) */
+    line-height: 1.6;
+    
+    /* Base color */
+    color: #333;
+}
+
+/* Heading hierarchy */
+h1 {
+    font-size: 3rem;      /* 48px */
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 2.5rem;    /* 40px */
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+h3 {
+    font-size: 1.75rem;   /* 28px */
+    font-weight: 600;
+}
+
+p {
+    font-size: 1.1rem;    /* 17.6px */
+    margin-bottom: 1rem;
+}
+
+/* Emphasis */
+strong {
+    font-weight: 600;
+}
+
+em {
+    font-style: italic;
+}
+
+/* Links */
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}</code></pre><hr><h2>4 | Modern Layouts with Flexbox</h2><p>Flexbox makes layouts intuitive. It’s perfect for navigation bars, card grids, and centering content.</p><h3>Flexbox Container Properties</h3><pre><code>.flex-container {
+    display: flex;
+    
+    /* Main axis direction */
+    flex-direction: row;        /* horizontal (default) */
+    flex-direction: column;     /* vertical */
+    
+    /* Horizontal alignment (main axis) */
+    justify-content: flex-start;    /* left */
+    justify-content: center;        /* center */
+    justify-content: flex-end;      /* right */
+    justify-content: space-between; /* spread with space between */
+    justify-content: space-around;  /* spread with space around */
+    justify-content: space-evenly;  /* equal space everywhere */
+    
+    /* Vertical alignment (cross axis) */
+    align-items: flex-start;   /* top */
+    align-items: center;       /* middle */
+    align-items: flex-end;     /* bottom */
+    align-items: stretch;      /* fill height */
+    
+    /* Wrapping */
+    flex-wrap: nowrap;         /* single line (default) */
+    flex-wrap: wrap;           /* wrap to multiple lines */
+    
+    /* Gap between items */
+    gap: 20px;                 /* space between all items */
+}</code></pre><h3>Real-World Example: Navigation Bar</h3><pre><code>nav {
+    display: flex;
+    justify-content: space-between; /* Logo left, menu right */
+    align-items: center;            /* Vertically centered */
+    padding: 1rem 2rem;
+    background: #2c3e50;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;                      /* Space between menu items */
+}</code></pre><p>HTML:</p><pre><code>&lt;nav&gt;
+    &lt;h1&gt;Your Name&lt;/h1&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#about"&gt;About&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#skills"&gt;Skills&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#contact"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;</code></pre><h3>Real-World Example: Card Grid</h3><pre><code>.skill-list {
+    display: flex;
+    flex-wrap: wrap;           /* Allow wrapping to multiple rows */
+    gap: 30px;                 /* Space between cards */
+    justify-content: center;   /* Center cards */
+}
+
+.skill-card {
+    flex: 1 1 300px;          /* Grow, shrink, base width 300px */
+    /* This means: cards are 300px minimum but can grow to fill space */
+}</code></pre><h3>Centering Content (The Old Problem, New Solution)</h3><p>Old way (difficult):</p><pre><code>/* Required absolute positioning, negative margins, etc. */</code></pre><p>Flexbox way (easy!):</p><pre><code>.center-everything {
+    display: flex;
+    justify-content: center;  /* Horizontal center */
+    align-items: center;      /* Vertical center */
+    height: 100vh;            /* Full viewport height */
+}</code></pre><hr><h2>5 | Responsive Design</h2><h3>Mobile-First Approach</h3><p>73% of web traffic is mobile. Your site <strong>MUST </strong>work on phones.</p><h3>Media Queries: Breakpoints</h3><pre><code>/* Mobile-first approach: Start with mobile styles */
+
+/* Base styles (mobile, 0-768px) */
+.container {
+    width: 100%;
+    padding: 20px;
+}
+
+nav ul {
+    flex-direction: column; /* Stack vertically on mobile */
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+    .container {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    
+    nav ul {
+        flex-direction: row; /* Horizontal on tablet+ */
+    }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+    }
+    
+    .skill-list {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    }
+}
+
+/* Large desktop (1440px and up) */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1400px;
+    }
+}</code></pre><h3>Common Responsive Patterns</h3><p><strong>1. Flexible Images:</strong></p><pre><code>img {
+    max-width: 100%;    /* Never exceed container */
+    height: auto;       /* Maintain aspect ratio */
+    display: block;     /* Remove bottom spacing */
+}</code></pre><p><strong>2. Responsive Typography:</strong></p><pre><code>/* Mobile */
+h1 {
+    font-size: 2rem; /* 32px */
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    h1 {
+        font-size: 3rem; /* 48px */
+    }
+}</code></pre><p><strong>3. Hide/Show Content:</strong></p><pre><code>/* Hide on mobile */
+.desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .desktop-only {
+        display: block;
+    }
+}</code></pre><hr><h2>6 | Visual Effects</h2><h3>Polish and Professionalism</h3><p><strong>Shadows: Depth and Elevation</strong></p><pre><code>/* Subtle shadow (cards) */
+.card {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Medium shadow (hover state) */
+.card:hover {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Strong shadow (modals) */
+.modal {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Text shadow (rarely needed) */
+h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}</code></pre><p><strong>Gradients: Modern Backgrounds</strong></p><pre><code>/* Linear gradient */
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Radial gradient */
+.spotlight {
+    background: radial-gradient(circle, #fff 0%, #f0f0f0 100%);
+}
+
+/* Gradient with transparency */
+.overlay {
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+
+</code></pre><p><strong>Transitions: Smooth Animations</strong></p><pre><code>/* Apply to property you want to animate */
+button {
+    background: #3498db;
+    transform: scale(1);
+    transition: all 0.3s ease; /* property, duration, easing */
+}
+
+button:hover {
+    background: #2980b9;
+    transform: scale(1.05);    /* Grow by 5% */
+}
+
+/* Specific property transitions */
+a {
+    color: blue;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: darkblue;
+}</code></pre><p><strong>Border Radius: Rounded Corners</strong></p><pre><code>/* Subtle rounding */
+.card {
+    border-radius: 5px;
+}
+
+/* More pronounced */
+button {
+    border-radius: 10px;
+}
+
+/* Pill shape */
+.tag {
+    border-radius: 50px;
+}
+
+/* Circle (for profile images) */
+img.avatar {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}</code></pre><hr><h3>🏗️ Let’s Build</h3><h2>7 | Style Your Portfolio</h2><p>Now let’s apply everything to your portfolio!</p><h3>Step 01: Link CSS to HTML</h3><p>Add this to your index.html in the &lt;head&gt; section:</p><pre><code>&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Your Name - Cloud Developer Portfolio&lt;/title&gt;
+    
+    &lt;!-- Link to CSS file --&gt;
+    &lt;link rel="stylesheet" href="styles/main.css"&gt;
+&lt;/head&gt;</code></pre><h3>Step 02: Create Complete Portfolio CSS</h3><p>Create portfolio-project/styles/main.css with this complete styling:</p><pre><code>/* ===================================
+   1. RESET AND BASE STYLES
+   =================================== */
+
+/* Box model fix + reset margins/padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Root variables (color scheme) */
+:root {
+    /* Primary colors */
+    --primary-dark: #2c3e50;
+    --primary-light: #ecf0f1;
+    
+    /* Accent colors */
+    --accent-blue: #3498db;
+    --accent-blue-dark: #2980b9;
+    --accent-purple: #9b59b6;
+    --accent-green: #27ae60;
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-button: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-progress: linear-gradient(90deg, #28a745, #20c997);
+    
+    /* Neutral colors */
+    --text-dark: #333333;
+    --text-medium: #666666;
+    --text-light: #999999;
+    --background: #ffffff;
+    --background-alt: #f8f9fa;
+    --border-color: #e9ecef;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+    
+    /* Spacing */
+    --spacing-xs: 10px;
+    --spacing-sm: 20px;
+    --spacing-md: 30px;
+    --spacing-lg: 60px;
+    --spacing-xl: 100px;
+}
+
+/* Body base styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--background);
+    font-size: 16px;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Remove list styling */
+ul {
+    list-style: none;
+}
+
+/* Image defaults */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===================================
+   2. TYPOGRAPHY
+   =================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--primary-dark);
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--text-medium);
+}
+
+a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: var(--accent-blue-dark);
+}
+
+strong {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* ===================================
+   3. HEADER &amp; NAVIGATION
+   =================================== */
+
+header {
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 1rem 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+nav h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+nav p {
+    font-size: 0.9rem;
+    color: var(--primary-light);
+    margin: 0;
+}
+
+nav ul {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+nav a {
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===================================
+   4. MAIN CONTENT
+   =================================== */
+
+main {
+    margin-top: 80px; /* Account for fixed header */
+}
+
+section {
+    padding: var(--spacing-lg) var(--spacing-sm);
+}
+
+/* Alternating section backgrounds */
+section:nth-child(even) {
+    background-color: var(--background-alt);
+}
+
+/* ===================================
+   5. HERO SECTION
+   =================================== */
+
+#hero {
+    background: var(--gradient-hero);
+    color: white;
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-sm);
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#hero p {
+    font-size: 1.3rem;
+    max-width: 600px;
+    margin: 0 auto var(--spacing-md);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+#hero a {
+    display: inline-block;
+    background: white;
+    color: var(--primary-dark);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#hero a:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+
+/* ===================================
+   6. ABOUT SECTION
+   =================================== */
+
+#about {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#about h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+}
+
+#about img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin: 0 auto var(--spacing-sm);
+    border: 5px solid var(--accent-blue);
+    box-shadow: var(--shadow-md);
+}
+
+#about p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+}
+
+/* ===================================
+   7. SKILLS SECTION
+   =================================== */
+
+#skills {
+    background-color: var(--background-alt);
+}
+
+#skills h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+}
+
+#skills &gt; p {
+    text-align: center;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-lg);
+}
+
+.skill-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.skill-item {
+    background: white;
+    padding: var(--spacing-md);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.skill-item h3 {
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-xs);
+    font-size: 1.4rem;
+}
+
+.skill-item p {
+    color: var(--text-medium);
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.skill-item strong {
+    color: var(--accent-green);
+    font-weight: 600;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background-color: var(--border-color);
+    border-radius: 10px;
+    height: 25px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xs);
+}
+
+.progress {
+    background: var(--gradient-progress);
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    transition: width 1s ease-in-out;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================================
+   8. PROJECTS SECTION
+   =================================== */
+
+#projects h2 {
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+}
+
+#projects &gt; p {
+    text-align: center;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-lg);
+}
+
+.project-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.project {
+    background: white;
+    padding: var(--spacing-md);
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--accent-blue);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+}
+
+.project h3 {
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.project p {
+    color: var(--text-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project ul {
+    list-style: disc;
+    margin-left: 20px;
+    color: var(--text-medium);
+}
+
+.project ul li {
+    margin-bottom: 5px;
+}
+
+/* ===================================
+   9. CONTACT SECTION
+   =================================== */
+
+#contact {
+    background-color: var(--background-alt);
+    text-align: center;
+}
+
+#contact h2 {
+    margin-bottom: var(--spacing-md);
+}
+
+#contact &gt; p {
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-lg);
+}
+
+form {
+    max-width: 600px;
+    margin: 0 auto var(--spacing-lg);
+    background: white;
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-sm);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+button {
+    background: var(--gradient-button);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+form p {
+    margin-top: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-align: center;
+}
+
+/* Contact info links */
+.contact-info {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.contact-info h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.contact-info ul {
+    list-style: none;
+}
+
+.contact-info li {
+    margin-bottom: var(--spacing-xs);
+    font-size: 1.1rem;
+}
+
+.contact-info a {
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+
+/* ===================================
+   10. FOOTER
+   =================================== */
+
+footer {
+    background-color: var(--primary-dark);
+    color: white;
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-sm);
+}
+
+footer p {
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-light);
+}
+
+footer a {
+    color: white;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--accent-blue);
+}
+
+footer small {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* ===================================
+   11. RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+    /* Typography scaling */
+    h1 {
+        font-size: 3.5rem;
+    }
+    
+    h2 {
+        font-size: 2.75rem;
+    }
+    
+    /* Skills grid - 2 columns */
+    .skill-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Hero adjustments */
+    #hero h1 {
+        font-size: 3.5rem;
+    }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+    /* Larger typography */
+    h1 {
+        font-size: 4rem;
+    }
+    
+    #hero h1 {
+        font-size: 4rem;
+    }
+    
+    /* Projects grid - 2 columns */
+    .project-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile (below 768px) */
+@media (max-width: 767px) {
+    /* Navigation stacking */
+    nav {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm);
+    }
+    
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    /* Adjust main margin for taller mobile header */
+    main {
+        margin-top: 140px;
+    }
+    
+    /* Smaller hero */
+    #hero {
+        padding: var(--spacing-lg) var(--spacing-sm);
+        min-height: 400px;
+    }
+    
+    #hero h1 {
+        font-size: 2rem;
+    }
+    
+    #hero p {
+        font-size: 1.1rem;
+    }
+    
+    /* Section title sizing */
+    section h2 {
+        font-size: 2rem;
+    }
+    
+    /* Form padding */
+    form {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+}
+
+/* Very small mobile (below 480px) */
+@media (max-width: 479px) {
+    /* Even smaller typography */
+    #hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    section h2 {
+        font-size: 1.75rem;
+    }
+    
+    /* Stack navigation vertically */
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    nav a {
+        display: block;
+        text-align: center;
+    }
+    
+    /* Further increase main margin */
+    main {
+        margin-top: 200px;
+    }
+}
+
+/* ===================================
+   12. UTILITY CLASSES
+   =================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}</code></pre><h3>Step 03: Test Your Styled Portfolio</h3><p><strong>01. </strong>Open index.html in your browser</p><p><strong>02.</strong> Check these features:</p><p>✅ Fixed navigation that stays at top when scrolling<br>✅ Gradient hero section with call-to-action button<br>✅ Hover effects on navigation links and cards<br>✅ Progress bars showing completed skills<br>✅ Responsive layout (resize browser window to test)<br>✅ Smooth animations on hover<br>✅ Professional colour scheme throughout</p><p><strong>03. </strong>Test responsive design:</p><ul><li><strong>Desktop (1200px+)</strong>: Full layout</li><li><strong>Tablet (768–1023px): </strong>Adjusted navigation, 2-column grids</li><li><strong>Mobile (below 768px):</strong> Stacked navigation, single column</li></ul><p><strong>04. </strong>Check browser DevTools:</p><ul><li>Right-click → Inspect</li><li>Click device toolbar icon</li><li>Test on iPhone, iPad, etc.</li></ul><h3>Step 04: Add Finishing Touches</h3><p>Optional enhancements:</p><p><strong>Add Google Fonts For Better Typography</strong></p><p>In your HTML &lt;head&gt;:</p><pre><code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</code></pre><p><strong>In your CSS:</strong></p><pre><code>body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}</code></pre><h3>Add Favicon: Browser Tab Icon</h3><p>Create a simple icon (or use an emoji as PNG), save as favicon.png, then add to HTML &lt;head&gt;:</p><pre><code>&lt;link rel="icon" type="image/png" href="assets/images/favicon.png"&gt;</code></pre><h3>⛔ End of Building Tutorial⛔</h3><hr><h2>8 | Understanding What You Built</h2><h3>The CSS Cascade</h3><p><strong><em>“Cascading” </em></strong>means styles flow from general to specific:</p><pre><code>/* 1. Browser defaults (lowest priority) */
+p { font-size: 16px; }
+
+/* 2. Your base styles */
+body p { font-size: 1.1rem; }
+
+/* 3. Component-specific styles */
+.skill-item p { font-size: 1rem; }
+
+/* 4. State-specific styles (highest priority) */
+.skill-item:hover p { font-size: 1.05rem; }</code></pre><p><strong><em>Later styles override earlier ones (if same specificity).</em></strong></p><h3>CSS Architecture You Used</h3><pre><code>main.css
+├── 1. Reset &amp; Variables (foundation)
+├── 2. Typography (text styles)
+├── 3. Header &amp; Nav (top of page)
+├── 4. Main sections (About, Skills, Projects)
+├── 5. Forms (Contact section)
+├── 6. Footer (bottom of page)
+├── 7. Responsive breakpoints (mobile/tablet/desktop)
+└── 8. Utility classes (reusable helpers)</code></pre><p><em>This organization is called ITCSS (Inverted Triangle CSS), from general to specific.</em></p><hr><h2>9 | Common CSS Mistakes And How to Fix Them</h2><h3><em>Mistake 01: Not Linking CSS Correctly</em></h3><pre><code>&lt;!-- ❌ Wrong path --&gt;
+link rel="stylesheet" href="main.css"&gt;
+
+&lt;!-- ✅ Correct (assuming styles folder) --&gt;
+&lt;link rel="stylesheet" href="styles/main.css"&gt;</code></pre><p><strong>💡Debugging:</strong> <em>Check browser DevTools Console for 404 errors.</em></p><h3>Mistake 02: Forgetting Semicolons</h3><pre><code>/* ❌ Missing semicolons breaks subsequent properties */
+.button {
+    color: white
+    background: blue
+    padding: 10px
+}
+
+/* ✅ Always end with semicolon */
+.button {
+    color: white;
+    background: blue;
+    padding: 10px;
+}</code></pre><h3>Mistake 03: Using Pixels for Everything</h3><pre><code>/* ❌ Not scalable */
+font-size: 16px;
+padding: 20px;
+
+/* ✅ Use relative units */
+font-size: 1rem;     /* Scales with user preferences */
+padding: 1.25rem;    /* 20px if base is 16px */</code></pre><h3>Mistake 04: Not Testing Responsive Design</h3><pre><code>/* ❌ Only looks good on your screen */
+.container {
+    width: 1400px;
+}
+
+/* ✅ Adapts to all screens */
+.container {
+    max-width: 1400px;
+    width: 100%;
+    padding: 0 20px;
+}</code></pre><h3>Mistake 05: Over-Nesting Selectors</h3><pre><code>/* ❌ Too specific, hard to override */
+body main section.skills div.skill-list article.skill-item h3 {
+    color: blue;
+}
+
+/* ✅ Simple and maintainable */
+.skill-item h3 {
+    color: blue;
+}</code></pre><hr><h3>Final Thoughts</h3><ol><li><strong>CSS transforms HTML:</strong> From skeleton to beautiful website in one day</li><li><strong>Box model is fundamental: </strong>Understanding margin, padding, border, content is crucial</li><li><strong>Flexbox simplifies layouts: </strong>Modern CSS makes complex layouts simple</li><li><strong>Mobile-first is best:</strong> Start with mobile, enhance for desktop</li><li><strong>Small details matter: </strong>Shadows, transitions, and spacing create professional feel</li><li><strong>Organization prevents chaos:</strong> CSS architecture keeps files maintainable</li><li><strong>Testing is essential: </strong>Always check responsive design on multiple devices</li></ol><h2><strong>Concluding Remarks</strong></h2><h3>Congratulations! 🎉</h3><p>You’ve just completed one of the biggest transformations in web development:</p><p>From this:</p><pre><code>Plain black text
+Times New Roman
+No styling
+Desktop only</code></pre><p>To this:</p><pre><code>✨ Professional gradient hero
+✨ Modern typography
+✨ Interactive hover effects
+✨ Fully responsive
+✨ Accessible colors
+✨ Smooth transitions</code></pre><p><em>You didn’t just learn CSS, you built a portfolio that rivals professional templates!</em></p><p>Take a moment to appreciate what you’ve accomplished. Four days ago, you had zero web development experience. Now you have a beautiful, responsive portfolio website.</p><p><strong>Next up:</strong> We make it interactive with JavaScript. Get ready for smooth scrolling, animated progress bars, and form validation! 🚀</p><figure><img src="https://cdn-images-1.medium.com/max/800/1*WkfEkGX4k9i8cSr8uywZGg.png" alt="" loading="lazy"><figcaption>CSS — The Styling Language</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>⬜ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>⬜ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>⬜ <strong>07 — Git: </strong>Version Control And Deployment</p><p>⬜ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>⬜ <strong>09 — SQL:</strong> Cloud Data Management</p><p>⬜ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>⬜ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><hr><h2>Additional Resources</h2><h3><a href="https://ntombizakhona.medium.com/list/cloud-glossary-528956a3c181">Cloud Glossary</a></h3><blockquote>Cloud Computing Simplified: A Cloud Glossary For Beginners</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34703">Cloud Practitioner Exam Guide</a></h3><blockquote>In a world where nearly every industry is moving toward cloud-first strategies, having a baseline understanding of these principles is no longer optional but essential.</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34979">AI Practitioner Exam Guide</a></h3><blockquote>Whether you’re an Executive, Developer, Engineer, or Project Manager, having a baseline understanding of AI principles is no longer a <em>nice to have</em>, it’s <strong>absolutely essential.</strong></blockquote><h3><a href="https://developer.mozilla.org/en-US/docs/Web/CSS">MDN CSS Reference</a></h3><blockquote>Comprehensive documentation</blockquote><h3><a href="https://css-tricks.com/">CSS-Tricks</a></h3><blockquote>Tutorials and guides</blockquote><h3><a href="https://flexboxfroggy.com/">Flexbox Froggy</a></h3><blockquote>Learn Flexbox through a game</blockquote><h3><a href="https://cssgridgarden.com/">Grid Garden</a></h3><blockquote>Learn CSS Grid through a game</blockquote><h2>Design Inspiration</h2><h3><a href="https://dribbble.com/">Dribbble</a></h3><blockquote>Professional design examples</blockquote><h3><a href="https://www.awwwards.com/">Awwwards</a></h3><blockquote>Award-winning websites</blockquote><h3><a href="https://coolors.co/">Coolors.co</a></h3><blockquote>Color scheme generator</blockquote><h3><a href="https://fonts.google.com/">Google Fonts</a></h3><blockquote>Free web fonts</blockquote><h2>Tools</h2><h3><a href="https://jigsaw.w3.org/css-validator/">CSS Validator</a></h3><blockquote>Validate your CSS</blockquote><h3><a href="https://webaim.org/resources/contrastchecker/">ColorContrast Checker</a></h3><blockquote>Accessibility testing</blockquote>
+

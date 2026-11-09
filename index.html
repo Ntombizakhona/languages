@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ntombizakhona · Cloud Languages</title>
+  <meta name="description" content="Thirteen articles on the languages of the cloud, from English and HTML to Kubernetes, Terraform, and agentic IDEs.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ntombizakhona · Cloud Languages">
+  <meta property="og:description" content="Thirteen articles on the languages of the cloud, from English and HTML to Kubernetes, Terraform, and agentic IDEs.">
+  <meta property="og:url" content="https://ntombizakhona.github.io/">
+  <meta property="og:image" content="https://ntombizakhona.github.io/images/profile.jpg">
+  <link rel="icon" href="images/favicon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/home.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="./"><span>Cloud Languages</span></a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to light mode">☀️</button>
+      <div class="menu">
+        <button class="icon-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <nav id="site-menu" class="site-nav" aria-label="Main" hidden>
+          <a href="./" aria-current="page">Articles</a>
+          <a href="about.html">About</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="profile" aria-label="Profile">
+      <div class="avatar-ring"><img class="avatar" src="images/profile.jpg" alt="Profile photo of Ntombizakhona" width="150" height="150"></div>
+      <div>
+        <h1 data-name>Ntombizakhona</h1>
+        <p class="handle" data-handle></p>
+        <ul class="stats" data-stats></ul>
+        <p class="bio" data-bio></p>
+        <div class="actions" data-links></div>
+      </div>
+    </section>
+
+    <ul class="stories" data-stories aria-label="Filter articles by language"></ul>
+
+    <div class="toolbar">
+      <h2 data-grid-title>All articles</h2>
+      <input class="search" type="search" placeholder="Search articles" aria-label="Search articles by title, language, category, or tag" data-search>
+    </div>
+    <div class="grid" data-grid aria-live="polite"><p class="empty">Loading articles…</p></div>
+    <div class="ghost-wrap" data-ghost hidden></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><span>© <span data-year></span> Ntombizakhona</span><span>Hosted free on GitHub Pages</span></div>
+  </footer>
+</body>
+</html>

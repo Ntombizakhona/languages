@@ -1,0 +1,461 @@
+<!-- Imported from https://ntombizakhona.medium.com/git-in-the-cloud-d8fed43331fc by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Git in the Cloud</h1>
+<h2>The Language of Version Control and Deployment</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/800/1*XriCWQN3HOdXDGOZAXZlAg.png" alt="" loading="lazy"></figure><p>You’ve built a beautiful, fully-functional portfolio with <a href="post.html?slug=03-html">HTML</a>, <a href="post.html?slug=04-css">CSS</a>, <a href="post.html?slug=05-javascript">JavaScript</a>, and a <a href="post.html?slug=06-python">Python</a> backend.</p><p>But here’s the problem: it only exists on your computer.</p><p>What happens if:</p><ul><li><em>Your laptop crashes?</em> → <strong>All your code is gone</strong></li><li><em>You want to work from a different computer?</em> → <strong>No access</strong></li><li><em>A potential employer asks to see your code?</em> → <strong>“Uh… let me email you the files?”</strong></li><li><em>You make a change that breaks everything?</em> → <strong>No way to undo it</strong></li></ul><p>Git solves all of these problems.</p><p>Git is the version control system that powers modern software development. It tracks every change you make, lets you collaborate with others, and enables you to deploy your code to the world.</p><p>In cloud computing, Git isn’t optional, it’s essential:</p><ul><li><strong>AWS CodeCommit? </strong>Git-based repository</li><li><strong>Azure DevOps?</strong> Built on Git</li><li><strong>GitHub Actions?</strong> Triggered by Git commits</li><li><strong>Infrastructure as Code?</strong> Stored in Git</li><li><strong>CI/CD pipelines?</strong> All start with Git</li></ul><p>If you want to work in cloud computing, Git is non-negotiable…somewhat.</p><hr><h2>Topics</h2><ol><li>Git fundamentals and core concepts</li><li>Repository management and branching</li><li>Collaboration with remote repositories (GitHub)</li><li>Deploying your portfolio to GitHub Pages</li><li>GitHub Actions for automated deployments</li><li>Professional Git workflows</li></ol><hr><h2>1 | Why Git Matters</h2><h3>The Problem Git Solves</h3><p>Before version control, developers managed code like this:</p><pre><code>portfolio/
+├── index.html
+├── index_backup.html
+├── index_old.html
+├── index_FINAL.html
+├── index_FINAL_v2.html
+├── index_FINAL_v2_FIXED.html
+└── index_DONT_DELETE.html</code></pre><p>Sound familiar? This approach has serious problems:</p><ul><li>Which version is actually current?</li><li>What changed between versions?</li><li>How do you undo just ONE change?</li><li>How do two people work on the same file?</li></ul><p>Git tracks every change, who made it, when, and why…<strong><em>forever.</em></strong></p><h3>Git vs. Other Systems</h3><p>Git transforms the way developers manage their code by solving problems that once seemed unavoidable.</p><p>Without Git, backing up your work means manually copying files and hoping you remember which version is current, whereas Git automatically maintains a complete history of every change you’ve ever made.</p><p>When something breaks, developers without version control can only hope they saved a working backup somewhere, but Git lets you revert to any previous commit with a single command.</p><p>Collaboration is perhaps where the difference is most stark because instead of emailing files back and forth and trying to manually merge everyone’s changes, Git allows entire teams to work together seamlessly on the same codebase.</p><p>Tracking changes goes from a frustrating guessing game of <strong><em>“What did I even change?”</em></strong> to a clear, searchable history complete with descriptive messages explaining every modification.</p><p>Managing multiple versions no longer means drowning in folders named “final,” “final_v2,” and “final_REALLY_final,” but instead involves clean, organized branches that keep experimental work separate from stable code.</p><p>Even deployment improves dramatically: rather than manually uploading files via FTP and hoping nothing goes wrong, Git enables you to push your code with a single command, often triggering automatic deployment pipelines that handle everything else for you.</p><h3>Git in Cloud Computing</h3><p>Git is the foundation of modern cloud development:</p><pre><code>Developer writes code
+       ↓
+Git commit (save snapshot)
+       ↓
+Git push to GitHub
+       ↓
+GitHub Actions triggered (CI/CD)
+       ↓
+Automated tests run
+       ↓
+Deploy to AWS/Azure/GCP
+       ↓
+Your app is live! 🚀</code></pre><p>Every major cloud platform integrates with Git:</p><ul><li><strong>AWS:</strong> CodeCommit, CodePipeline, CodeDeploy</li><li><strong>Azure: </strong>Azure Repos, Azure Pipelines</li><li><strong>GCP:</strong> Cloud Source Repositories, Cloud Build</li><li><strong>GitHub:</strong> Actions, Pages, Packages</li></ul><hr><h2>2 | Git Fundamentals</h2><h3>Installing Git</h3><p>Check if Git is installed:</p><pre><code>git --version
+# Expected output: git version 2.52.0 (or similar)</code></pre><p>If not installed:</p><ul><li><strong>Windows:</strong> Download from <a href="https://git-scm.com/download/win">git-scm.com</a></li><li><strong>Mac: </strong>brew install git (if you have Homebrew) or download from git-scm.com</li><li><strong>Linux:</strong> sudo apt install git (Ubuntu/Debian) or sudo yum install git (CentOS)</li></ul><h3>First-Time Setup</h3><p>Configure Git with your identity:</p><pre><code># Set your name (appears in commit history)
+git config --global user.name "Your Name"
+
+# Set your email (use same email as your GitHub account)
+git config --global user.email "your.email@example.com"
+
+# Verify settings
+git config --list</code></pre><h3>Understanding Git Concepts</h3><p>Think of Git like a time machine for your code:</p><pre><code>┌─────────────────────────────────────────────────────────────┐
+│                     YOUR PROJECT TIMELINE                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Commit 1      Commit 2      Commit 3      Commit 4         │
+│  "Initial      "Add CSS      "Add          "Fix             │
+│   structure"    styling"      JavaScript"   bug"            │
+│      │            │              │            │             │
+│      ▼            ▼              ▼            ▼             │
+│   ┌────┐       ┌────┐        ┌────┐       ┌────┐            │
+│   │ v1 │ ───→  │ v2 │  ───→  │ v3 │ ───→  │ v4 │  (HEAD)    │
+│   └────┘       └────┘        └────┘       └────┘            │
+│                                                             │
+│   You can go back to ANY point in this timeline!            │
+└─────────────────────────────────────────────────────────────┘</code></pre><h3>Key Concepts</h3><p><strong>Term:</strong> Repository (repo)<br><strong>Definition: </strong>A project tracked by Git<br><strong>Analogy: </strong><em>A folder with superpowers that remembers everything that ever happened inside it</em></p><p><strong>Term:</strong> Commit<br><strong>Definition:</strong> A snapshot of your code at a point in time<br><strong>Analogy:</strong> <em>A save point in a video game, you can always return to any previous save if things go wrong</em></p><p><strong>Term:</strong> Branch<br><strong>Definition:</strong> An independent line of development<br><strong>Analogy:</strong> <em>A parallel universe where you can experiment freely without affecting the original timeline</em></p><p><strong>Term:</strong> Merge<br><strong>Definition:</strong> Combining changes from different branches<br><strong>Analogy:</strong> <em>Merging parallel universes back into one</em></p><p><strong>Term:</strong> Remote<br><strong>Definition:</strong> A copy of your repository stored on a server like GitHub<br><strong>Analogy: </strong><em>Your cloud backup that ensures your code is never lost</em></p><p><strong>Term:</strong> Clone<br><strong>Definition:</strong> Downloading a remote repository to your computer<br><strong>Analogy:</strong> <em>Making a local copy of a project you can work with</em></p><p><strong>Term:</strong> Push<br><strong>Definition:</strong> Uploading your commits to a remote<br><strong>Analogy:</strong> <em>Syncing your work to the cloud</em></p><p><strong>Term:</strong> Pull<br><strong>Definition:</strong> Downloading updates from a remote<br><strong>Analogy:</strong> <em>Syncing from the cloud back to your machine</em></p><p><strong>Term</strong>: Staging Area (Index)<br><strong>Definition:</strong> A holding area where you prepare changes before committing<br><strong>Analogy: </strong><em>A shopping cart, you add items before checking out</em></p><p><strong>Term:</strong> HEAD<br><strong>Definition:</strong> A pointer to the current commit you’re working on<br><strong>Analogy:</strong> <em>A </em><strong><em>“You Are Here”</em></strong><em> marker on a map</em></p><p><strong>Term:</strong> Checkout<br><strong>Definition:</strong> Switching between branches or commits<br><strong>Analogy:</strong> <em>Time traveling to a different point in your project’s history</em></p><p><strong>Term:</strong> Fetch<br><strong>Definition:</strong> Downloading updates from a remote without merging them<br><strong>Analogy:</strong> <em>Checking your mailbox without opening the letters yet</em></p><p><strong>Term:</strong> Stash<br><strong>Definition:</strong> Temporarily saving uncommitted changes to work on something else<br><strong>Analogy:</strong> <em>Putting your work in a drawer to deal with later</em></p><p><strong>Term:</strong> Conflict<br><strong>Definition:</strong> When Git can’t automatically merge changes because two people edited the same lines<br><strong>Analogy:</strong> <em>Two people trying to write different things in the same spot on a shared document</em></p><p><strong>Term: </strong>Fork<br><strong>Definition:</strong> Creating your own copy of someone else’s repository on GitHub<br><strong>Analogy:</strong> <em>Making a photocopy of a recipe so you can modify it without changing the original</em></p><p><strong>Term:</strong> Pull Request (PR)<br><strong>Definition:</strong> A request to merge your changes into another branch or repository<br><strong>Analogy:</strong> <em>Raising your hand to ask permission before adding your work to the group project</em></p><h3>The Three States of Git</h3><p>Files in Git exist in three states:</p><pre><code>┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  WORKING     │     │   STAGING    │     │  REPOSITORY  │
+│  DIRECTORY   │────▶│    AREA      │────▶│   (COMMITS) │
+│              │     │              │     │              │
+│  Your files  │     │  Ready to    │     │  Permanent   │
+│  as you      │     │  be          │     │  snapshots   │
+│  edit them   │     │  committed   │     │  of history  │
+└──────────────┘     └──────────────┘     └──────────────┘
+       │                    │                    │
+       │   git add          │   git commit       │
+       └────────────────────┴────────────────────┘</code></pre><ol><li><strong>Working Directory:</strong> Where you edit files normally</li><li><strong>Staging Area: </strong>Where you prepare changes for a commit</li><li><strong>Repository:</strong> Where permanent snapshots (commits) are stored</li></ol><hr><h2>3 | Basic Git Commands</h2><h3>Starting a Repository</h3><p><strong>Option 1:</strong> Create a new repository</p><pre><code># Navigate to your project folder
+cd portfolio-project
+
+# Initialize Git (creates .git folder)
+git init
+
+# Output: Initialized empty Git repository in /path/to/portfolio-project/.git/</code></pre><p><strong>Option 2:</strong> Clone an existing repository</p><pre><code># Download a project from GitHub
+git clone https://github.com/username/repository-name.git
+
+# This creates a folder with the repo contents
+cd repository-name</code></pre><h3>The Basic Workflow</h3><p>Here’s the workflow you’ll use daily:</p><pre><code># 1. Check what's changed
+git status
+
+# 2. Stage changes (add to staging area)
+git add filename.html        # Add specific file
+git add .                    # Add ALL changed files
+
+# 3. Commit changes (create snapshot)
+git commit -m "Describe what you changed"
+
+# 4. View history
+git log --oneline</code></pre><h3>Understanding Each Command</h3><p><strong>git status: </strong>See what’s happening</p><pre><code>git status
+
+# Output:
+# On branch main
+# Changes not staged for commit:
+#   modified:   index.html
+#   modified:   styles/main.css
+#
+# Untracked files:
+#   scripts/new-feature.js</code></pre><p><strong>Color coding:</strong></p><p>🔴 <strong>Red:</strong> Changed but not staged</p><p>🟢 <strong>Green:</strong> Staged and ready to commit</p><p><strong>Untracked: </strong>New files Git doesn’t know about yet</p><p><strong>git add: </strong>Stage changes</p><pre><code># Stage one file
+git add index.html
+
+# Stage multiple files
+git add index.html styles/main.css
+
+# Stage all changes in current directory
+git add .
+
+# Stage all changes everywhere
+git add -A</code></pre><p><strong>git commit: </strong>Create a snapshot</p><pre><code># Commit with a message
+git commit -m "Add responsive navigation menu"
+
+# Commit with detailed message (opens editor)
+git commit</code></pre><p><strong>Writing Good Commit Messages:</strong></p><pre><code># ❌ Bad commit messages
+git commit -m "fix"
+git commit -m "changes"
+git commit -m "update"
+git commit -m "asdfasdf"
+
+# ✅ Good commit messages
+git commit -m "Add responsive navigation for mobile devices"
+git commit -m "Fix contact form validation bug"
+git commit -m "Update hero section with gradient background"
+git commit -m "Refactor CSS to use CSS variables"</code></pre><p><strong>Commit Message Formula:</strong></p><pre><code>[Action] [What] [Why/Where] (optional)
+
+Examples:
+- Add contact form validation
+- Fix broken link in navigation
+- Update skills section with Python progress
+- Remove unused CSS styles
+- Refactor JavaScript for better performance</code></pre><p><strong>git log: </strong>View commit history</p><pre><code># Simple one-line format
+git log --oneline
+
+# Output:
+# a1b2c3d Add Python backend API
+# e4f5g6h Update skills progress bars
+# i7j8k9l Add contact form styling
+# m0n1o2p Initial portfolio structure
+
+# Detailed view
+git log
+
+# Visual branch graph
+git log --oneline --graph --all</code></pre><p><strong>git diff</strong>: See what changed</p><pre><code># See unstaged changes
+git diff
+
+# See staged changes
+git diff --staged
+
+# See changes in specific file
+git diff index.html</code></pre><hr><h2>4 | Branching and Merging</h2><h3>Why Branches?</h3><p>Branches let you work on features without affecting the main code:</p><pre><code>┌─── feature/dark-mode ───┐
+                   /                           \
+main: ────●────●────●────●────●────●────●────●────●
+                         \                   /
+                          └─ bugfix/nav ────┘</code></pre><p><strong>Real-world scenarios:</strong></p><ul><li>Add a new feature without breaking the live site</li><li>Fix a bug while someone else adds features</li><li>Experiment without fear</li><li>Work on multiple things simultaneously</li></ul><h3>Branch Commands</h3><p>Create and switch branches:</p><pre><code># See all branches (* = current branch)
+git branch
+
+# Create a new branch
+git branch feature/contact-form
+
+# Switch to a branch
+git checkout feature/contact-form
+
+# Create AND switch in one command (recommended)
+git checkout -b feature/contact-form
+
+# Modern alternative (Git 2.23+)
+git switch -c feature/contact-form</code></pre><p>Common branch naming conventions:</p><pre><code>feature/add-dark-mode     # New feature
+bugfix/fix-navigation     # Bug fix
+hotfix/security-patch     # Urgent fix
+refactor/clean-css        # Code cleanup
+docs/update-readme        # Documentation</code></pre><h3>Merging Branches</h3><p>After finishing work on a branch, merge it back:</p><pre><code># 1. Switch to main branch
+git checkout main
+
+# 2. Merge the feature branch into main
+git merge feature/contact-form
+
+# 3. Delete the branch (optional, keeps things clean)
+git branch -d feature/contact-form</code></pre><p><strong>Visual representation:</strong></p><pre><code>Before merge:
+main:    ────●────●────●
+                        \
+feature:                 ●────●────●
+
+After merge:
+main:    ────●────●────●─────────────●  (merge commit)
+                        \           /
+feature:                 ●────●────●</code></pre><h3>Handling Merge Conflicts</h3><p>Sometimes Git can’t automatically merge changes:</p><pre><code>git merge feature/dark-mode
+
+# Output:
+# Auto-merging styles/main.css
+# CONFLICT (content): Merge conflict in styles/main.css
+# Automatic merge failed; fix conflicts and then commit.</code></pre><p>The conflict looks like this in your file:</p><pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+background-color: #ffffff;
+=======
+background-color: #1a1a1a;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/dark-mode</code></pre><p>How to resolve:</p><ol><li>Open the file with conflicts</li><li>Decide which code to keep (or combine them)</li><li>Remove the conflict markers (&lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======, &gt;&gt;&gt;&gt;&gt;&gt;&gt;)</li><li>Save the file</li><li>Stage and commit:</li></ol><pre><code>git add styles/main.css
+git commit -m "Resolve merge conflict in CSS background color"</code></pre><hr><h2>5 | Remote Repositories (GitHub)</h2><h3>Connecting to GitHub</h3><p><strong>Step 01</strong>: Create a GitHub account<br>Go to <a href="https://github.com/">github.com</a> and sign up (free).</p><p><strong>Step 02: </strong>Create a new repository on GitHub</p><ol><li>Click the “+” icon → “New repository”</li><li>Name it portfolio (or similar)</li><li>Keep it public (required for free GitHub Pages)</li><li>Don’t initialize with README (you already have files)</li><li>Click “Create repository”</li></ol><p><strong>Step 03:</strong> Connect your local repo to GitHub</p><pre><code># Add the remote (origin is the conventional name)
+git remote add origin https://github.com/yourusername/portfolio.git
+
+# Verify it was added
+git remote -v
+
+# Push your code to GitHub
+git push -u origin main</code></pre><p>The -u flag sets up tracking, so future pushes only need git push.</p><h3>Push and Pull</h3><p>Push (upload your commits):</p><pre><code># Push current branch to remote
+git push
+
+# Push specific branch
+git push origin feature/new-section
+
+# Force push (⚠️ use carefully, overwrites remote)
+git push --force</code></pre><p>Pull (download updates):</p><pre><code># Pull changes from remote
+git pull
+
+# Pull from specific branch
+git pull origin main</code></pre><h3>Clone an Existing Repository</h3><pre><code># Download a project from GitHub
+git clone https://github.com/username/repository.git
+
+# Clone to a specific folder
+git clone https://github.com/username/repository.git my-folder-name</code></pre><h3>SSH vs HTTPS</h3><p><strong>HTTPS </strong>(what we used above):</p><ul><li>Works immediately</li><li>Asks for username/password (or token) each push</li></ul><p><strong>SSH</strong> (recommended for regular use):</p><pre><code># Generate SSH key
+ssh-keygen -t ed25519 -C "your.email@example.com"
+
+# Start SSH agent
+eval "$(ssh-agent -s)"
+
+# Add your key
+ssh-add ~/.ssh/id_ed25519
+
+# Copy public key to clipboard
+# Windows:
+clip &lt; ~/.ssh/id_ed25519.pub
+# Mac:
+pbcopy &lt; ~/.ssh/id_ed25519.pub
+# Linux:
+cat ~/.ssh/id_ed25519.pub</code></pre><p><strong>Then add the key to GitHub: Settings → SSH and GPG keys → New SSH key</strong></p><hr><h3>🏗️ Let’s Build</h3><h2>6 | Deploy Your Portfolio to GitHub Pages</h2><p>Now let’s deploy your portfolio for the world to see!</p><h3>Step 01: Prepare Your Portfolio</h3><p>Make sure your portfolio project has this structure:</p><pre><code>portfolio-project/
+├── index.html          ← GitHub Pages looks for this
+├── styles/
+│   └── main.css
+├── scripts/
+│   └── main.js
+├── assets/
+│   └── images/
+├── python-backend/     ← We'll exclude this from Pages
+└── README.md</code></pre><h3>Step 02: Initialize Git</h3><pre><code>cd portfolio-project
+
+# Initialize Git
+git init
+
+# Check status
+git status</code></pre><h3>Step 03: Create .gitignore</h3><p>Create a .gitignore file to exclude files you don’t want tracked:</p><pre><code># .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log</code></pre><h3>Step 04: Make Your First Commit</h3><pre><code># Stage all files
+git add .
+
+# Commit with descriptive message
+git commit -m "Initial portfolio with HTML, CSS, JavaScript, and Python backend"</code></pre><h3>Step 05: Create GitHub Repository</h3><ol><li>Go to <a href="https://github.com/">github.com</a></li><li>Click <strong>+</strong> → <strong>New repository</strong></li><li><strong>Name:</strong> languagesportfolio (or yourusername.github.io for a special URL)</li><li><strong>Description: </strong>My Cloud Languages for Beginners Portfolio</li><li><strong>Public </strong>(required for free GitHub Pages)</li><li><strong>Don’t</strong> add README, .gitignore, or license (you have files already)</li><li>Click <strong>Create repository</strong></li></ol><h3>Step 06: Push to GitHub</h3><pre><code># Add remote origin
+git remote add origin https://github.com/yourusername/languagesportfolio.git
+
+# Rename branch to main (if needed)
+git branch -M main
+
+# Push and set upstream
+git push -u origin main</code></pre><h3>Step 07: Enable GitHub Pages</h3><ol><li>Go to your repository on <strong>GitHub</strong></li><li>Click <strong>Settings </strong>tab</li><li>Scroll to <strong>Pages</strong> in the left sidebar</li><li>Under <strong>Source</strong>, select:</li></ol><p>Deploy from branch <strong>▼</strong></p><p>Branch: main</p><p>Folder: / (root)</p><p>Click <strong>Save</strong></p><p>✅ GitHub Pages source saved.</p><p>Wait 1–2 minutes, then visit:</p><pre><code>https://yourusername.github.io/languagesportfolio</code></pre><p><strong>🎉 Your portfolio is now live on the internet!</strong></p><h3>Step 08: Update Your Portfolio</h3><p>Every time you make changes:</p><pre><code># 1. Make your changes to files
+
+# 2. Check what changed
+git status
+
+# 3. Stage changes
+git add .
+
+# 4. Commit with message
+git commit -m "Update skills section with Git progress"
+
+# 5. Push to GitHub
+git push
+
+# GitHub Pages automatically deploys the new version!</code></pre><h3>⛔ End of Building Tutorial⛔</h3><hr><h2>7 | GitHub Actions (CI/CD)</h2><p>GitHub Actions automates tasks when you push code.</p><h3>Optional Step: Create a Basic Workflow</h3><p>Create .github/workflows/deploy.yml:</p><pre><code>name: Deploy Portfolio
+
+# Run on push to main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Get the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Step 2: Validate HTML (optional)
+    - name: Validate HTML
+      run: |
+        echo "✅ Checking HTML structure..."
+        # Add HTML validation here if desired
+    
+    # Step 3: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./</code></pre><p><strong>Now every push to main automatically triggers deployment!</strong></p><h3>Understanding the Workflow</h3><pre><code>name: Deploy Portfolio      # Workflow name (shows in GitHub UI)
+
+on:                         # Trigger conditions
+  push:
+    branches: [ main ]      # Only on main branch
+
+jobs:                       # Tasks to run
+  deploy:                   # Job name
+    runs-on: ubuntu-latest  # Virtual machine type
+    
+    steps:                  # Sequential actions
+    - name: Checkout code   # Step description
+      uses: actions/checkout@v4  # Pre-built action</code></pre><h3>View Your Actions</h3><ol><li>Go to your GitHub repository</li><li>Click <strong>Actions </strong>tab</li><li>See all workflow runs</li><li>Click on a run to see details</li></ol><hr><h2>8 | Professional Git Workflows</h2><h3>Feature Branch Workflow</h3><p>The standard way teams work with Git:</p><pre><code># 1. Start on main, pull latest
+git checkout main
+git pull
+
+# 2. Create feature branch
+git checkout -b feature/add-blog-section
+
+# 3. Make changes and commit
+git add .
+git commit -m "Add blog section HTML structure"
+git commit -m "Add blog section styling"
+git commit -m "Add blog post hover effects"
+
+# 4. Push feature branch to GitHub
+git push -u origin feature/add-blog-section
+
+# 5. Create Pull Request on GitHub
+# (Review, discuss, get approval)
+
+# 6. Merge via GitHub UI or locally
+git checkout main
+git pull
+git merge feature/add-blog-section
+git push
+
+# 7. Delete feature branch
+git branch -d feature/add-blog-section
+git push origin --delete feature/add-blog-section</code></pre><h3>Useful Git Aliases</h3><p>Add these to your Git config for faster commands:</p><pre><code>git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.cm "commit -m"
+git config --global alias.lg "log --oneline --graph --all"</code></pre><p>Now you can use:</p><pre><code>git st          # instead of git status
+git co main     # instead of git checkout main
+git cm "msg"    # instead of git commit -m "msg"
+git lg          # pretty log view</code></pre><hr><h2>9 | Common Git Mistakes and How to Fix Them</h2><h3>Mistake 01: Committing to Wrong Branch</h3><pre><code># ❌ Oops, committed to main instead of feature branch
+
+# ✅ Fix: Move the commit to a new branch
+git branch feature/new-stuff    # Create branch with current commits
+git reset --hard HEAD~1         # Remove last commit from main
+git checkout feature/new-stuff  # Switch to new branch</code></pre><h3>Mistake 02: Commit Message Typo</h3><pre><code># ❌ git commit -m "Add contct form"
+
+# ✅ Fix: Amend the last commit
+git commit --amend -m "Add contact form"
+
+# ⚠️ Only use amend if you haven't pushed yet!</code></pre><h3>Mistake 03: Forgot to Add a File</h3><pre><code># ❌ Committed but forgot styles.css
+
+# ✅ Fix: Add file and amend
+git add styles.css
+git commit --amend --no-edit</code></pre><h3>Mistake 04: Need to Undo Last Commit</h3><pre><code># Option 1: Keep changes, undo commit
+git reset --soft HEAD~1
+# Files are still staged, ready to recommit
+
+# Option 2: Undo commit AND unstage
+git reset HEAD~1
+# Files are modified but not staged
+
+# Option 3: Undo commit AND discard changes (⚠️ DANGEROUS)
+git reset --hard HEAD~1
+# Changes are GONE forever</code></pre><h3>Mistake 05: Pull Rejected (Remote Ahead)</h3><pre><code># ❌ git push rejected
+# hint: Updates were rejected because the remote contains work that you do not have locally.
+
+# ✅ Fix 1: Pull then push
+git pull --rebase
+git push
+
+# ✅ Fix 2: If you're sure yours is correct
+git push --force  # ⚠️ Use carefully!</code></pre><h3>Mistake 06: Accidentally Committed Secrets</h3><pre><code># ❌ Committed .env file with API keys!
+
+# ✅ Fix: Remove from history (if not pushed yet)
+git reset --soft HEAD~1
+# Add .env to .gitignore
+echo ".env" &gt;&gt; .gitignore
+git add .gitignore
+git commit -m "Add .gitignore, remove sensitive files"
+
+# If already pushed, you need to rotate your secrets!
+# The keys are compromised and visible in Git history</code></pre><h3>Mistake 07: Merge Conflict Panic</h3><pre><code># ❌ CONFLICT! Don't panic.
+
+# ✅ Fix:
+# 1. Open the conflicting file
+# 2. Look for &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+# 3. Decide what to keep
+# 4. Remove conflict markers
+# 5. Save, add, commit
+
+git add conflicted-file.html
+git commit -m "Resolve merge conflict in navigation"</code></pre><hr><h2>10 | Update Your Learning Journal</h2><p><strong>Add this (or something similar) to README.md</strong></p><pre><code>## Day 7: Git - Version Control and Deployment
+### Date: [Today's Date]
+### What I Learned:
+
+#### Git Fundamentals:
+- **Repository**: A project folder tracked by Git
+- **Commit**: A snapshot of code at a point in time
+- **Branch**: Independent line of development
+- **Remote**: Server copy of repository (GitHub)
+- **The Three States**: Working Directory → Staging Area → Repository
+
+#### Essential Commands Mastered:
+```bash
+git init          # Start tracking a project
+git status        # Check what's changed
+git add .         # Stage all changes
+git commit -m ""  # Create a snapshot
+git log --oneline # View history
+git branch        # List branches
+git checkout -b   # Create and switch branch
+git merge         # Combine branches
+git remote add    # Connect to GitHub
+git push          # Upload to GitHub
+git pull          # Download from GitHub
+git clone         # Copy a repository
+
+Aha! Moments:
+💡 Git is like a time machine, I can go back to any point!
+💡 Commits are cheap, commit often, with good messages
+💡 Branches let me experiment without fear of breaking things
+💡 GitHub Pages makes deployment FREE and automatic
+💡 Every cloud platform uses Git, this skill transfers everywhere
+
+Git Workflow Practiced:
+Check status: git status
+Stage changes: git add .
+Commit with message: git commit -m "Description"
+Push to remote: git push
+Create branches for features: git checkout -b feature/name
+Merge when complete: git merge feature/name
+
+Skills Progress:
+English: 100% ✅
+Mathematics: 100% ✅
+HTML: 100% ✅
+CSS: 100% ✅
+JavaScript: 75% ✅
+Python: 75% ✅
+Git: 75% ✅ (fundamentals + deployment mastered!)
+Linux: 0% 📅
+SQL: 0% 📅
+Kubernetes: 0% 📅
+Java: 0% 📅
+Terraform: 0% 📅
+
+Progress: 7/12 skills (63.6% of foundational languages!)</code></pre><h3>Key Concepts:</h3><ol><li><strong>Version Control: </strong>Track every change, who made it, when, and why</li><li><strong>Branching: </strong>Work on features without affecting main code</li><li><strong>Merge Conflicts:</strong> When Git can’t auto-merge, you decide</li><li><strong>GitHub Pages:</strong> Free hosting for static websites</li><li><strong>GitHub Actions:</strong> Automated workflows triggered by Git events</li></ol><hr><h3>Final Thoughts</h3><ol><li><strong>Git is your safety net:</strong> Every change is tracked and reversible</li><li><strong>Commit early, commit often:</strong> Small, frequent commits are better than huge ones</li><li><strong>Write good commit messages: </strong>Future you will thank present you</li><li><strong>Branches are free:</strong> Use them for every feature</li><li><strong>GitHub is your portfolio: </strong>Some recruiters look at your commit history</li><li><strong>Push daily: </strong>Your code should never only exist on your laptop</li><li><strong>Git skills transfer everywhere:</strong> Every cloud platform uses Git</li></ol><h2>Concluding Remarks</h2><p>Your portfolio is no longer a local project, it’s a live website that anyone in the world can visit.</p><p>You’re now at 63.6% of your learning journey!</p><p>The foundation is complete:</p><ul><li>🌐 Frontend (HTML, CSS, JavaScript) ✓</li><li>⚙️ Backend (Python) ✓</li><li>🔄 Version Control (Git) ✓</li><li>🚀 Deployment (GitHub Pages) ✓</li></ul><p>Next up: <strong>Linux </strong>— the operating system that powers the cloud. You’ll learn the command line skills that every cloud engineer needs.</p><p>Keep the momentum going! 💪☁️🚀</p><figure><img src="https://cdn-images-1.medium.com/max/800/1*XDDKnChbWkZA3w_VC9sqEw.png" alt="" loading="lazy"><figcaption>Git — The Deployment And Versioning Language</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>⬜ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>⬜ <strong>09 — SQL:</strong> Cloud Data Management</p><p>⬜ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>⬜ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><h2>Additional Resources</h2><h3><a href="https://ntombizakhona.medium.com/list/cloud-glossary-528956a3c181">Cloud Glossary</a></h3><blockquote>Cloud Computing Simplified: A Cloud Glossary For Beginners</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34703">Cloud Practitioner Exam Guide</a></h3><blockquote>In a world where nearly every industry is moving toward cloud-first strategies, having a baseline understanding of these principles is no longer optional but essential.</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34979">AI Practitioner Exam Guide</a></h3><blockquote>Whether you’re an Executive, Developer, Engineer, or Project Manager, having a baseline understanding of AI principles is no longer a <em>nice to have</em>, it’s <strong>absolutely essential.</strong></blockquote><h2>Git Learning Resources</h2><h3><a href="https://git-scm.com/book/en/v2">Pro Git Book</a></h3><blockquote>Free, comprehensive guide</blockquote><h3><a href="https://skills.github.com/">GitHub Skills</a></h3><blockquote>Interactive tutorials</blockquote><h3><a href="https://ohshitgit.com/">Oh Shit, Git!?!</a></h3><blockquote>Fixing common mistakes</blockquote><h3><a href="https://learngitbranching.js.org/">Learn Git Branching</a></h3><blockquote>Visual, interactive</blockquote>
+

@@ -1,0 +1,1379 @@
+<!-- Imported from https://ntombizakhona.medium.com/kubernetes-in-the-cloud-987d8d5c50ee by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Kubernetes in the Cloud</h1>
+<h2>The Container Orchestrator</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/1024/1*_YQ3raaW8zbufyO0JsD9vQ.jpeg" alt="" loading="lazy"></figure><p>You’ve built a portfolio with a frontend, backend API, and database. You’ve deployed it to a Linux server in the cloud.</p><p>But here’s the problem: your application runs on one server.</p><p>Think about it:</p><ul><li><em>What happens when that server crashes? </em>→ <strong>Your entire portfolio goes down</strong></li><li><em>Black Friday traffic spike?</em> → <strong>One server can’t handle it</strong></li><li><em>Need to update your code?</em> → <strong>Downtime for users</strong></li><li><em>Server maintenance required? </em>→ <strong>More downtime</strong></li></ul><p>Your deployed portfolio is a single point of failure. One server, one chance, one prayer.</p><p>In the real world, companies don’t run one server. They run hundreds…sometimes thousands… of containers that need to work together seamlessly. But managing all those containers manually? Impossible.</p><p><strong>That’s where Kubernetes comes in.</strong></p><p>Kubernetes (K8s) is the operating system for the cloud. It takes your containers and orchestrates them: automatically deploying, scaling, and healing your applications. It’s the industry standard for running production workloads:</p><ul><li>Google created it (based on 15 years of internal experience)</li><li>Every major cloud provider offers managed Kubernetes (GKE , EKS, AKS)</li><li>90% of organizations using containers use Kubernetes</li></ul><p>If you’re serious about cloud, be serious about Kubernetes as well.</p><h2>Topics</h2><ol><li>Kubernetes architecture and core concepts</li><li>Pods, Deployments, and Services explained</li><li>Deploying applications to Kubernetes clusters</li><li>Configuration management with ConfigMaps and Secrets</li><li>Scaling and load balancing strategies</li><li>Persistent storage for stateful applications</li><li>Monitoring and troubleshooting K8s clusters</li><li>Deploying your portfolio to Kubernetes</li><li>CI/CD integration with GitOps</li></ol><h2>1 | Why Kubernetes Rules the Cloud</h2><h3>The Problem Kubernetes Solves</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    THE CONTAINER MANAGEMENT NIGHTMARE                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Without Kubernetes:                                                   │
+│   ──────────────────                                                    │
+│                                                                         │
+│   ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐       │
+│   │Container│  │Container│  │Container│  │Container│  │Container│       │
+│   │   App1  │  │   App2  │  │ Database│  │  Cache  │  │  Queue  │       │
+│   └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘       │
+│        │            │            │            │            │            │
+│        ▼            ▼            ▼            ▼            ▼            │
+│   YOU manually manage:                                                  │
+│   ─────────────────────                                                 │
+│   • Which server runs which container?                                  │
+│   • What if a container crashes at 3 AM?                                │
+│   • How do we scale from 5 to 500 containers?                           │
+│   • How do containers find each other?                                  │
+│   • How do we update without downtime?                                  │
+│   • What about secrets and configuration?                               │
+│                                                                         │
+│   Answer: You don't sleep. Ever. 😰                                     │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                                    ▼
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      WITH KUBERNETES                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   YOU:                                                                  │
+│   "I want 3 copies of my app, always running, with this configuration"  │
+│                                                                         │
+│   KUBERNETES:                                                           │
+│   ────────────                                                          │
+│   ✓ Schedules containers across servers automatically                   │
+│   ✓ Restarts crashed containers instantly                               │
+│   ✓ Scales up/down based on demand                                      │
+│   ✓ Provides service discovery and load balancing                       │
+│   ✓ Handles rolling updates with zero downtime                          │
+│   ✓ Manages secrets and configuration                                   │
+│   ✓ YOU SLEEP PEACEFULLY 😴                                             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>Kubernetes in the Cloud Ecosystem</h3><p>Every major cloud provider offers a managed Kubernetes service, handling the complexity of running the control plane so you can focus on deploying applications.</p><p><strong>Google Cloud </strong>offers<em> GKE (Google Kubernetes Engine)</em>, which provides the tightest integration since Google created Kubernetes. Features like Autopilot mode handle node management automatically, and you benefit from Google’s deep expertise in container orchestration.</p><p><strong>Amazon Web Services</strong> provides <em>EKS (Elastic Kubernetes Service)</em>, the most popular combination of cloud provider and Kubernetes. Integration with other AWS services like IAM, VPC, and CloudWatch makes EKS a natural choice for organizations already invested in the AWS ecosystem.</p><p><strong>Microsoft Azure</strong> delivers <em>AKS (Azure Kubernetes Service)</em>, which offers the best experience for organizations using the Microsoft stack. Integration with Azure Active Directory, Azure DevOps, and Visual Studio makes development workflows seamless.</p><p>Self-managed Kubernetes remains an option on any cloud provider by installing Kubernetes on virtual machines yourself. This approach gives you full control but requires significantly more operational expertise.</p><h3>Docker vs Kubernetes</h3><p>A common point of confusion for newcomers is the relationship between Docker and Kubernetes. They’re complementary tools that solve different problems.</p><p>Docker builds and runs individual containers. It packages your application with all its dependencies into a portable unit that runs consistently anywhere. When you’re developing locally, Docker lets you run your app, test changes, and share your work with teammates. Docker answers the question: <strong>“How do I package and run my application?”</strong></p><p>Kubernetes orchestrates many containers across many machines. It doesn’t replace Docker, it uses Docker (or other container runtimes) under the hood. Kubernetes answers different questions: <strong>“How do I run 100 copies of my application? How do I keep them running when servers fail? How do I balance traffic between them? How do I update them without downtime?”</strong></p><p>Think of it this way: Docker is a shipping container that packages your application for transport. Kubernetes is the shipping port that manages thousands of containers, deciding where each one goes, replacing damaged ones, and routing cargo efficiently.</p><p>For development, you need Docker. For production at scale, you need both.</p><h2>2 | Kubernetes Architecture</h2><h3>The Big Picture</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    KUBERNETES CLUSTER ARCHITECTURE                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌───────────────────────────────────────────────────────────────┐     │
+│   │                     CONTROL PLANE (Master)                    │     │
+│   │                                                               │     │
+│   │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────────┐   │     │
+│   │  │ API Server  │  │   etcd      │  │ Controller Manager   │   │     │
+│   │  │             │  │             │  │                      │   │     │
+│   │  │ Gateway for │  │ Key-value   │  │ Ensures desired      │   │     │
+│   │  │ all K8s     │  │ store for   │  │ state matches        │   │     │
+│   │  │ requests    │  │ cluster     │  │ actual state         │   │     │
+│   │  │             │  │ data        │  │                      │   │     │
+│   │  └─────────────┘  └─────────────┘  └──────────────────────┘   │     │
+│   │                                                               │     │
+│   │  ┌─────────────────────────────────────────────────────────┐  │     │
+│   │  │                      Scheduler                          │  │     │
+│   │  │    Decides which node should run each new pod           │  │     │
+│   │  └─────────────────────────────────────────────────────────┘  │     │
+│   └───────────────────────────────────────────────────────────────┘     │
+│                              │                                          │
+│                              ▼                                          │
+│   ┌────────────────────────────────────────────────────────────────┐    │
+│   │                      WORKER NODES                              │    │
+│   │                                                                │    │
+│   │  ┌─────────────────────┐      ┌─────────────────────┐          │    │
+│   │  │     Node 1          │      │     Node 2          │          │    │
+│   │  │  ┌───────────────┐  │      │  ┌───────────────┐  │          │    │
+│   │  │  │   kubelet     │  │      │  │   kubelet     │  │          │    │
+│   │  │  │ (Node Agent)  │  │      │  │ (Node Agent)  │  │          │    │
+│   │  │  └───────────────┘  │      │  └───────────────┘  │          │    │
+│   │  │  ┌───────────────┐  │      │  ┌───────────────┐  │          │    │
+│   │  │  │  kube-proxy   │  │      │  │  kube-proxy   │  │          │    │
+│   │  │  │ (Networking)  │  │      │  │ (Networking)  │  │          │    │
+│   │  │  └───────────────┘  │      │  └───────────────┘  │          │    │
+│   │  │                     │      │                     │          │    │
+│   │  │  ┌─────┐ ┌─────┐    │      │  ┌─────┐ ┌─────┐    │          │    │
+│   │  │  │ Pod │ │ Pod │    │      │  │ Pod │ │ Pod │    │          │    │
+│   │  │  └─────┘ └─────┘    │      │  └─────┘ └─────┘    │          │    │
+│   │  └─────────────────────┘      └─────────────────────┘          │    │
+│   │                                                                │    │
+│   └────────────────────────────────────────────────────────────────┘    │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><p>The <strong>Kubernetes control plane</strong> consists of several interconnected components that work together to manage your cluster.</p><p>The <strong>API Server</strong> acts as the entry point for all Kubernetes commands, functioning like a reception desk that receives and processes every request.</p><p>Behind it, <strong>etcd</strong> serves as the cluster’s distributed key-value store, maintaining all configuration and state data, essentially the database that remembers everything about your cluster.</p><p>The <strong>Scheduler</strong> works like an assignment manager, analyzing resource requirements and deciding which worker node should run each new pod.</p><p>Meanwhile, the <strong>Controller Manager</strong> operates as quality control, continuously comparing the cluster’s actual state against your desired state and making adjustments to reconcile any differences.</p><p>On each worker node, the <strong>kubelet</strong> acts as a local supervisor, receiving instructions from the control plane and ensuring containers run correctly within their pods.</p><p>Finally, <strong>kube-proxy</strong> handles networking on each node like a router, maintaining network rules that enable communication between pods and directing traffic to the appropriate destinations.</p><h3>Core Kubernetes Objects</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                     KUBERNETES OBJECTS HIERARCHY                        │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Deployment                                                            │
+│   ─────────                                                             │
+│   "I want 3 replicas of my app"                                         │
+│       │                                                                 │
+│       ▼                                                                 │
+│   ReplicaSet                                                            │
+│   ──────────                                                            │
+│   "I'll ensure exactly 3 pods exist"                                    │
+│       │                                                                 │
+│       ├──────────────┬──────────────┐                                   │
+│       ▼              ▼              ▼                                   │
+│   ┌───────┐      ┌───────┐      ┌───────┐                               │
+│   │ Pod 1 │      │ Pod 2 │      │ Pod 3 │                               │
+│   │       │      │       │      │       │                               │
+│   │┌─────┐│      │┌─────┐│      │┌─────┐│                               │
+│   ││Cont.││      ││Cont.││      ││Cont.││                               │
+│   │└─────┘│      │└─────┘│      │└─────┘│                               │
+│   └───────┘      └───────┘      └───────┘                               │
+│                                                                         │
+│   Service                                                               │
+│   ───────                                                               │
+│   "Access all 3 pods via one stable IP/DNS name"                        │
+│       │                                                                 │
+│       └──────────────────────────────────────┐                          │
+│                                               ▼                         │
+│                                   ┌─────────────────┐                   │
+│                                   │  Load Balancer  │                   │
+│                                   │   10.0.0.5:80   │                   │
+│                                   └─────────────────┘                   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><p>Understanding Kubernetes objects is essential because everything you deploy is defined as an object with a specification.</p><p><strong>Pods</strong> are the smallest deployable units in Kubernetes. A pod contains one or more containers that share storage and network resources. While you can run a single container in a pod, multi-container pods enable patterns like sidecar containers that add logging or security features to your main application.</p><p><strong>ReplicaSets</strong> ensure a specified number of pod replicas run at any given time. If a pod crashes, the ReplicaSet creates a replacement. If you have too many pods, it terminates extras. You rarely create ReplicaSets directly instead, <em>Deployments</em> manage them for you.</p><p><strong>Deployments</strong> provide declarative updates for pods and ReplicaSets. You describe the desired state (three replicas of version 2.0), and the Deployment controller changes the actual state to match. Deployments enable rolling updates, rollbacks, and scaling and they’re what you’ll use most often.</p><p><strong>Services</strong> provide stable network endpoints for accessing pods. Since pods are ephemeral and their IP addresses change, you need a consistent way to reach them. A Service gives you a stable IP and DNS name that routes traffic to healthy pods automatically.</p><p><strong>ConfigMaps</strong> store non-sensitive configuration data as key-value pairs. Instead of hardcoding database hostnames or feature flags in your container, you store them in ConfigMaps and inject them as environment variables or files.</p><p><strong>Secrets</strong> store sensitive data like passwords, API keys, and certificates. They’re similar to <em>ConfigMaps </em>but encoded and intended for sensitive information. Kubernetes handles them more carefully, though for true security you’ll want additional tools like HashiCorp Vault.</p><p><strong>Ingress</strong> manages external HTTP and HTTPS access to services. Rather than exposing each service individually, Ingress lets you define routing rules, sending traffic for api.example.com to your backend service and example.com to your frontend.</p><h2>3 | Setting Up Your Kubernetes Environment</h2><h3>Option A: Local Development with Minikube</h3><pre><code># Install Minikube (Linux/macOS)
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# Start local cluster (uses Docker as driver)
+minikube start --driver=docker --memory=4096 --cpus=2
+
+# Verify installation
+kubectl cluster-info
+kubectl get nodes
+
+# Output:
+# NAME       STATUS   ROLES           AGE   VERSION
+# minikube   Ready    control-plane   1m    v1.28.0</code></pre><h3>Option B: Docker Desktop (Windows/Mac)</h3><p>If you’re on Windows or Mac, Docker Desktop has Kubernetes built in:</p><ol><li>Install <a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a></li><li>Open Settings → Kubernetes → check “Enable Kubernetes” → Apply &amp; Restart</li><li>Wait for the green dot, then verify:</li></ol><pre><code>kubectl get nodes
+
+# Output:
+# NAME             STATUS   ROLES           AGE   VERSION
+# docker-desktop   Ready    control-plane   5m    v1.28.x</code></pre><p>No minikube needed. Docker Desktop handles everything.</p><h3>Option C: Cloud Managed Kubernetes</h3><p><strong>AWS EKS (Elastic Kubernetes Service):</strong></p><pre><code># Install eksctl
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+
+# Create cluster (takes ~15-20 minutes)
+eksctl create cluster \
+  --name portfolio-cluster \
+  --region us-west-2 \
+  --nodes 3 \
+  --node-type t3.medium
+
+# Verify
+kubectl get nodes</code></pre><p><strong>Google Cloud GKE</strong></p><pre><code># Create cluster
+gcloud container clusters create portfolio-cluster \
+  --num-nodes=3 \
+  --zone=us-central1-a \
+  --machine-type=e2-medium
+
+# Get credentials
+gcloud container clusters get-credentials portfolio-cluster --zone=us-central1-a</code></pre><p><strong>Azure AKS</strong></p><pre><code># Create resource group
+az group create --name portfolio-rg --location eastus
+
+# Create cluster
+az aks create \
+  --resource-group portfolio-rg \
+  --name portfolio-cluster \
+  --node-count 3 \
+  --node-vm-size Standard_B2s \
+  --generate-ssh-keys
+
+# Get credentials
+az aks get-credentials --resource-group portfolio-rg --name portfolio-cluster</code></pre><h3>Install kubectl (Kubernetes CLI)</h3><pre><code># Linux
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# macOS (Homebrew)
+brew install kubectl
+
+# Windows (Chocolatey)
+choco install kubernetes-cli
+
+# Verify installation
+kubectl version --client</code></pre><h2>4 | Your First Kubernetes Deployment</h2><h3>Step 01: Create a Deployment</h3><pre><code># web-app-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5</code></pre><h3>What This YAML Means</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    KUBERNETES YAML ANATOMY                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   apiVersion: apps/v1      ← Which K8s API to use                       │
+│   kind: Deployment         ← What type of object                        │
+│   metadata:                                                             │
+│     name: web-app          ← Name for this deployment                   │
+│                                                                         │
+│   spec:                    ← Desired state specification                │
+│     replicas: 3            ← Run 3 copies of this pod                   │
+│                                                                         │
+│     selector:              ← How to find pods for this deployment       │
+│       matchLabels:                                                      │
+│         app: web-app       ← Match pods with label 'app: web-app'       │
+│                                                                         │
+│     template:              ← Pod template (what each pod looks like)    │
+│       metadata:                                                         │
+│         labels:                                                         │
+│           app: web-app     ← Label each pod                             │
+│       spec:                                                             │
+│         containers:        ← Container(s) in each pod                   │
+│         - name: web-app    ← Container name                             │
+│           image: nginx:1.21 ← Docker image to run                       │
+│                                                                         │
+│         resources:         ← CPU/Memory limits                          │
+│           requests:        ← Minimum guaranteed                         │
+│           limits:          ← Maximum allowed                            │
+│                                                                         │
+│         livenessProbe:     ← "Is the container alive?"                  │
+│         readinessProbe:    ← "Is the container ready for traffic?"      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>Step 02: Create A Service</h3><pre><code># web-app-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+spec:
+  selector:
+    app: web-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer  # Exposes externally</code></pre><h3>Understanding Service Types</h3><p>Kubernetes offers several Service types, each suited to different access patterns.</p><p><strong>ClusterIP </strong>is the default type, creating an internal IP address accessible only within the cluster. Use ClusterIP for backend services that other pods need to reach but external users don’t. Your frontend pods can reach your database through a ClusterIP service, but the internet cannot.</p><p><strong>NodePort</strong> exposes the service on each node’s IP at a static port between 30000 and 32767. This works for development and testing when you need external access without a cloud load balancer. Access your service at any node’s IP plus the assigned port.</p><p><strong>LoadBalancer</strong> provisions an external load balancer through your cloud provider. This is the standard choice for production services that need internet access.</p><ol><li>On AWS, it creates an ELB.</li><li>On GCP, a Cloud Load Balancer</li><li>On Azure, an Azure Load Balancer.</li></ol><p>Users access your service through the load balancer’s public IP.</p><p><strong>ExternalName</strong> maps a service to a DNS name rather than selecting pods. Use this when you need to access external services (like a managed database) through Kubernetes’ service discovery mechanism.</p><h3>Step 03: Deploy to Kubernetes</h3><pre><code># Apply the deployment
+kubectl apply -f web-app-deployment.yaml
+# Output: deployment.apps/web-app created
+
+# Apply the service
+kubectl apply -f web-app-service.yaml
+# Output: service/web-app-service created
+
+# Check deployment status
+kubectl get deployments
+# NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+# web-app   3/3     3            3           30s
+
+# Check pods
+kubectl get pods
+# NAME                       READY   STATUS    RESTARTS   AGE
+# web-app-6b7b8c7d4f-abc12   1/1     Running   0          30s
+# web-app-6b7b8c7d4f-def34   1/1     Running   0          30s
+# web-app-6b7b8c7d4f-ghi56   1/1     Running   0          30s
+
+# Check services
+kubectl get services
+# NAME              TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)
+# web-app-service   LoadBalancer   10.0.0.5       203.0.113.50    80:30080/TCP
+
+# Watch pods in real-time
+kubectl get pods -w</code></pre><h2>5 | Configuration Management</h2><h3>ConfigMaps for Application Configuration</h3><pre><code># app-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  # Simple key-value pairs
+  DATABASE_HOST: "mysql.default.svc.cluster.local"
+  DATABASE_PORT: "3306"
+  APP_ENV: "production"
+  LOG_LEVEL: "info"
+  
+  # Configuration file (multiline)
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+        
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+        }
+    }</code></pre><h3>Secrets for Sensitive Data</h3><pre><code># app-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+type: Opaque
+data:
+  # Values must be base64 encoded
+  DATABASE_USERNAME: YWRtaW4=           # echo -n 'admin' | base64
+  DATABASE_PASSWORD: c3VwZXJzZWNyZXQ=   # echo -n 'supersecret' | base64
+  API_KEY: bXktYXBpLWtleS0xMjM0NQ==     # echo -n 'my-api-key-12345' | base64
+# Create secrets from command line
+kubectl create secret generic app-secrets \
+  --from-literal=DATABASE_USERNAME=admin \
+  --from-literal=DATABASE_PASSWORD=supersecret \
+  --from-literal=API_KEY=my-api-key-12345</code></pre><h3>Using ConfigMaps and Secrets in Deployments</h3><pre><code># deployment-with-config.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        
+        # Environment variables from ConfigMap
+        env:
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DATABASE_HOST
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: APP_ENV
+              
+        # Environment variables from Secret
+        - name: DATABASE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DATABASE_USERNAME
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: DATABASE_PASSWORD
+              
+        # Mount config file
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
+          
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config</code></pre><h2>6 | Scaling and Load Balancing</h2><h3>Manual Scaling</h3><pre><code># Scale to 5 replicas
+kubectl scale deployment web-app --replicas=5
+
+# Scale down to 2 replicas
+kubectl scale deployment web-app --replicas=2
+
+# Check scaling status
+kubectl get deployment web-app
+kubectl get pods -l app=web-app</code></pre><h3>Horizontal Pod Autoscaler (HPA)</h3><pre><code># hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+# Apply HPA
+kubectl apply -f hpa.yaml
+
+# Monitor HPA
+kubectl get hpa
+kubectl describe hpa web-app-hpa
+
+# Watch scaling in action
+kubectl get hpa -w</code></pre><h3>How Auto-Scaling Works</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    KUBERNETES AUTOSCALING                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Normal Load (CPU ~30%)                                                │
+│   ─────────────────────                                                 │
+│                                                                         |
+│   ┌─────┐  ┌─────┐  ┌─────┐                                             │
+│   │ Pod │  │ Pod │  │ Pod │                                             │
+│   │ 30% │  │ 30% │  │ 30% │    3 replicas (minimum)                     │
+│   └─────┘  └─────┘  └─────┘                                             │
+│                                                                         │
+│                     ▼ Traffic increases                                 │
+│                                                                         │
+│   High Load (CPU ~80%)                                                  │
+│   ────────────────────                                                  │
+│                                                                         │
+│   ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐                  │
+│   │ Pod │  │ Pod │  │ Pod │  │ Pod │  │ Pod │  │ Pod │                  │
+│   │ 80% │  │ 80% │  │ 80% │  │ 80% │  │ 80% │  │ 80% │                  │
+│   └─────┘  └─────┘  └─────┘  └─────┘  └─────┘  └─────┘                  │
+│                                                                         │
+│   HPA automatically scaled to 6 replicas!                               │
+│                                                                         │
+│                     ▼ Traffic decreases                                 │
+│                                                                         │
+│   Back to Normal (CPU ~25%)                                             │
+│   ─────────────────────────                                             │
+│                                                                         │
+│   ┌─────┐  ┌─────┐  ┌─────┐                                             │
+│   │ Pod │  │ Pod │  │ Pod │                                             │
+│   │ 25% │  │ 25% │  │ 25% │    Scaled back to 3 replicas                │
+│   └─────┘  └─────┘  └─────┘                                             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>Ingress for Advanced Routing</h3><pre><code># ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portfolio-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - portfolio.example.com
+    - api.portfolio.example.com
+    secretName: portfolio-tls
+  rules:
+  - host: portfolio.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  - host: api.portfolio.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080</code></pre><h2>7 | Persistent Storage</h2><h3>PersistentVolume and PersistentVolumeClaim</h3><pre><code># storage.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard  # Use cloud provider default</code></pre><h3>Database Deployment with Persistent Storage</h3><pre><code># mysql-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: root-password
+        - name: MYSQL_DATABASE
+          value: "portfolio_db"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP  # Internal access only</code></pre><h2>8 | Monitoring and Troubleshooting</h2><h3>Essential kubectl Commands</h3><pre><code># ===============================================
+# VIEWING RESOURCES
+# ===============================================
+
+# Get all resources in current namespace
+kubectl get all
+
+# Get pods with more details
+kubectl get pods -o wide
+
+# Get pods across all namespaces
+kubectl get pods --all-namespaces
+
+# Watch pods in real-time
+kubectl get pods -w
+
+# ===============================================
+# INSPECTING RESOURCES
+# ===============================================
+
+# Describe pod (detailed info + events)
+kubectl describe pod &lt;pod-name&gt;
+
+# Describe deployment
+kubectl describe deployment &lt;deployment-name&gt;
+
+# Get YAML of existing resource
+kubectl get deployment web-app -o yaml
+
+# ===============================================
+# LOGS AND DEBUGGING
+# ===============================================
+
+# View pod logs
+kubectl logs &lt;pod-name&gt;
+
+# Follow logs in real-time
+kubectl logs -f &lt;pod-name&gt;
+
+# Logs from previous crashed container
+kubectl logs &lt;pod-name&gt; --previous
+
+# Logs from specific container in multi-container pod
+kubectl logs &lt;pod-name&gt; -c &lt;container-name&gt;
+
+# ===============================================
+# INTERACTIVE DEBUGGING
+# ===============================================
+
+# Execute command in pod
+kubectl exec &lt;pod-name&gt; -- ls /app
+
+# Interactive shell in pod
+kubectl exec -it &lt;pod-name&gt; -- /bin/bash
+
+# Port forward to access pod locally
+kubectl port-forward &lt;pod-name&gt; 8080:80
+
+# Port forward to service
+kubectl port-forward service/web-app-service 8080:80
+
+# ===============================================
+# RESOURCE USAGE
+# ===============================================
+
+# Node resource usage
+kubectl top nodes
+
+# Pod resource usage
+kubectl top pods
+
+# Sort by CPU
+kubectl top pods --sort-by=cpu
+
+# ===============================================
+# EVENTS AND TROUBLESHOOTING
+# ===============================================
+
+# View cluster events
+kubectl get events --sort-by=.metadata.creationTimestamp
+
+# Events for specific pod
+kubectl describe pod &lt;pod-name&gt; | grep -A 20 Events</code></pre><h3>Common Issues and Solutions</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    KUBERNETES TROUBLESHOOTING GUIDE                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Pod Status: Pending                                                   │
+│   ─────────────────────                                                 │
+│   Causes:                                                               │
+│   • Not enough resources (CPU/Memory)                                   │
+│   • No nodes match pod's nodeSelector                                   │
+│   • PersistentVolume not available                                      │
+│                                                                         │
+│   Debug:                                                                │
+│   $ kubectl describe pod &lt;pod-name&gt;                                     │
+│   $ kubectl get events                                                  │
+│                                                                         │
+│   ─────────────────────────────────────────────────────────────────     │
+│                                                                         │
+│   Pod Status: CrashLoopBackOff                                          │
+│   ──────────────────────────────                                        │
+│   Causes:                                                               │
+│   • Application crash on startup                                        │
+│   • Missing environment variables                                       │
+│   • Failed health checks                                                │
+│                                                                         │
+│   Debug:                                                                │
+│   $ kubectl logs &lt;pod-name&gt; --previous                                  │
+│   $ kubectl describe pod &lt;pod-name&gt;                                     │
+│                                                                         │
+│   ─────────────────────────────────────────────────────────────────     │
+│                                                                         │
+│   Pod Status: ImagePullBackOff                                          │
+│   ─────────────────────────────                                         │
+│   Causes:                                                               │
+│   • Image doesn't exist                                                 │
+│   • Wrong image name/tag                                                │
+│   • Private registry authentication failed                              │
+│                                                                         │
+│   Debug:                                                                │
+│   $ kubectl describe pod &lt;pod-name&gt; | grep -i image                     │
+│   $ docker pull &lt;image-name&gt;  # Test locally                            │
+│                                                                         │
+│   ─────────────────────────────────────────────────────────────────     │
+│                                                                         │
+│   Service Not Accessible                                                │
+│   ──────────────────────                                                │
+│   Causes:                                                               │
+│   • Selector doesn't match pod labels                                   │
+│   • Wrong port configuration                                            │
+│   • Pods not ready                                                      │
+│                                                                         │
+│   Debug:                                                                │
+│   $ kubectl get endpoints &lt;service-name&gt;                                │
+│   $ kubectl describe service &lt;service-name&gt;                             │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h2>🏗️ Let’s Build</h2><h3>9 | Deploy Your Portfolio to Kubernetes</h3><p>Throughout this series, you’ve built:</p><ul><li><strong>HTML/CSS/JavaScript:</strong> Frontend interface</li><li><strong>Python:</strong> Backend API with Flask</li><li><strong>Git</strong>: Version control and GitHub</li><li><strong>Linux: </strong>Deployed to the cloud</li><li><strong>SQL: </strong>Database for persistent storage</li></ul><p>Right now your portfolio runs on a single server. If that server goes down, your site goes down. Now let’s deploy your portfolio to <strong>Kubernetes</strong> with high availability, auto-scaling, and zero-downtime deployments!</p><h3>Portfolio Architecture on Kubernetes</h3><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    PORTFOLIO ON KUBERNETES                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Internet                                                              │
+│      │                                                                  │
+│      ▼                                                                  │
+│   ┌─────────────────┐                                                   │
+│   │     Ingress     │  ← HTTPS + Domain routing                         │
+│   │ portfolio.com   │                                                   │
+│   └────────┬────────┘                                                   │
+│            │                                                            │
+│      ┌─────┴─────┐                                                      │
+│      │           │                                                      │
+│      ▼           ▼                                                      │
+│   ┌────────┐  ┌────────────┐                                            │
+│   │Frontend│  │ Backend    │                                            │
+│   │Service │  │ Service    │                                            │
+│   │  :80   │  │   :5000    │                                            │
+│   └────┬───┘  └─────┬──────┘                                            │
+│        │            │                                                   │
+│   ┌────┴────┐  ┌────┴────┐                                              │
+│   │         │  │         │                                              │
+│   ▼         ▼  ▼         ▼                                              │
+│ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐                                         │
+│ │Nginx│ │Nginx│ │Flask│ │Flask│   ← Pods (auto-scaled)                  │
+│ │ Pod │ │ Pod │ │ Pod │ │ Pod │                                         │
+│ └─────┘ └─────┘ └─────┘ └─────┘                                         │
+│                    │                                                    │
+│                    ▼                                                    │
+│              ┌──────────┐                                               │
+│              │  MySQL   │  ← StatefulSet with PVC                       │
+│              │  Service │                                               │
+│              └──────────┘                                               │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h3>Step 01: Project Structure</h3><p>First, organize your portfolio for Kubernetes deployment:</p><pre><code>portfolio-k8s/
+├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── index.html
+│   ├── css/
+│   │   └── styles.css
+│   ├── js/
+│   │   └── main.js
+│   └── images/
+│       └── profile.jpg
+├── backend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── app.py
+│   └── config.py
+├── k8s/
+│   ├── namespace.yaml
+│   ├── secrets.yaml
+│   ├── mysql.yaml
+│   ├── backend.yaml
+│   ├── frontend.yaml
+│   ├── hpa.yaml
+│   └── ingress.yaml
+├── scripts/
+│   ├── deploy.sh
+│   └── init-db.sql
+└── README.md</code></pre><p>Before we deploy, let’s understand what each Kubernetes manifest file does, think of it like setting up a restaurant.</p><p>The <strong>namespace.yaml</strong> file acts like the restaurant name on the door, creating an isolated space called languages-portfolio that keeps all your resources organized and separate from other applications in the cluster.</p><p>The <strong>secrets.yaml</strong> file functions as the safe in the back office, securely storing sensitive information like database passwords where only authorized pods can access them.</p><p>The<strong> mysql.yaml</strong> file serves as your filing cabinet, deploying MySQL with persistent storage that survives pod restarts so your data is never lost.</p><p>The <strong>backend.yaml</strong> file represents your kitchen staff, running two copies of your Flask API that prepare and serve data to hungry users.</p><p>Similarly, <strong>frontend.yaml </strong>acts as the front-of-house staff, deploying two Nginx pods that greet visitors and serve your website’s HTML, CSS, and JavaScript.</p><p>The <strong>hpa.yaml</strong> file works like a manager who calls in extra staff when things get busy, automatically scaling your backend between 2 and 6 pods based on CPU usage.</p><p>Finally, <strong>ingress.yaml</strong> serves as the front door with your address on it, routing external internet traffic to the correct services based on domain names and URL paths.</p><p><strong>Create this structure:</strong></p><pre><code>mkdir -p languagesportfolio/{frontend/{css,js,images},backend,k8s,scripts}
+cd languagesportfolio</code></pre><h3>Step 02: Install The Tools</h3><p><strong>Windows (Recommended): </strong>Docker Desktop — one install, everything included.</p><p><em>Docker Desktop bundles Docker, Kubernetes, and kubectl in a single installer. No extra downloads, no application control headaches.</em></p><ol><li>Download Docker Desktop from <a href="https://www.docker.com/products/docker-desktop/">docker.com/products/docker-desktop</a></li><li>Run the installer (accept defaults)</li><li>Restart your computer when prompted</li><li>Open Docker Desktop and wait for the whale icon in the system tray to say “Docker Desktop is running”</li></ol><p><strong>Enable Kubernetes inside Docker Desktop:</strong></p><ol><li>Click the gear icon or <strong>⚙️ Settings</strong> in Docker Desktop</li><li>Go to <strong>Kubernetes</strong> in the left sidebar</li><li>Check <strong>Enable Kubernetes</strong></li><li>Click <strong>Apply &amp; Restart</strong></li><li>Wait 2–3 minutes (or thirty, well, until it’s done). A green dot appears next to <strong>Kubernetes</strong> when it’s ready</li></ol><p><em>That’s it. Docker Desktop just gave you Docker + Kubernetes + kubectl in one step.</em></p><p><strong>macOS:</strong> Same as above. Docker Desktop works the same way on Mac.</p><p><strong>Linux (alternative)</strong>: Minikube</p><p>On Linux, you can use Minikube instead:</p><pre><code># Install Minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# Install kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install kubectl /usr/local/bin/kubectl
+
+# Start the cluster
+minikube start --driver=docker --memory=4096 --cpus=2</code></pre><p>Verify everything works (all platforms):</p><pre><code>docker --version          # Docker version 29.x or higher
+kubectl version --client  # Client Version: v1.28.x</code></pre><h3>Step 03: Verify Your Kubernetes Cluster</h3><p>If you enabled Kubernetes in Docker Desktop, your cluster is already running. Let’s confirm:</p><pre><code>kubectl get nodes
+
+# Expected output:
+# NAME                    STATUS   ROLES           AGE   VERSION
+# desktop-control-plane   Ready    control-plane   5m    v1.28.x</code></pre><p>If you see <strong>Ready</strong>, you’re good. If not:</p><ol><li>Open Docker Desktop → Settings → Kubernetes → make sure the checkbox is ticked and the green dot is showing</li><li>If it says <em>Starting</em> just wait a minute or two or three</li></ol><p><strong>For Linux/Minikube users:</strong></p><pre><code>minikube start - driver=docker - memory=4096 - cpus=2
+kubectl get nodes
+# NAME STATUS ROLES AGE VERSION
+# minikube Ready control-plane 1m v1.28.0</code></pre><p><em>You now have a working Kubernetes cluster. It’s like having a tiny AWS/Azure/GCP on your laptop.</em></p><h3>Step 04: Understand The Docker Files</h3><p>Before Kubernetes can run your app, it needs container images. That’s what the Dockerfiles do.</p><p><strong>Frontend Dockerfile</strong></p><pre><code>LanguagesPortfolio/frontend/Dockerfile
+FROM nginx:1.25-alpine
+
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy frontend files
+COPY index.html /usr/share/nginx/html/
+COPY about.html /usr/share/nginx/html/
+COPY css/ /usr/share/nginx/html/css/
+COPY js/ /usr/share/nginx/html/js/
+COPY images/ /usr/share/nginx/html/images/
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]</code></pre><p><strong>What this does in plain English:</strong></p><ol><li>Start with a lightweight Nginx image</li><li>Replace the default config with ours (which knows how to proxy `/api/` calls to the backend)</li><li>Copy our HTML, CSS, JS, and images into the container</li><li>Listen on port 80</li></ol><p><strong>Backend Dockerfile</strong></p><pre><code>LanguagesPortfolio/backend/Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies first (for Docker layer caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app.py .
+COPY config.py .
+COPY portfolio_manager.py .
+
+# Create data directory for JSON persistence
+RUN mkdir -p data
+
+EXPOSE 5000
+
+# Run with gunicorn for production
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]</code></pre><p><strong>What this does:</strong></p><ol><li>Start with a Python 3.11 image</li><li>Install Flask and other dependencies</li><li>Copy the application code</li><li>Run with gunicorn (a production-grade server, not Flask’s dev server)</li></ol><h3>Step 05: Build The Docker Images</h3><pre><code># Navigate to your project
+cd LanguagesPortfolio
+
+# Build the frontend image
+docker build -t languages-portfolio-frontend:latest ./frontend
+
+# Build the backend image
+docker build -t languages-portfolio-backend:latest ./backend</code></pre><p><strong>Test them locally first</strong> <em>(optional but recommended)</em>:</p><pre><code># Run the backend
+docker run -d -p 5000:5000 --name test-backend languages-portfolio-backend:latest
+
+# Check it works
+curl http://localhost:5000/api/health
+# Should return: 
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"data":{"status":"healthy","timestamp":"2026-05-20T13:23:20.824932","uptime":"API is running normally"},"message":"Portfolio
+                    API is healthy","success":true}
+
+# Clean up
+docker stop test-backend &amp;&amp; docker rm test-backend</code></pre><p>Docker Desktop’s Kubernetes shares the same Docker engine, so your images are already available to the cluster with no extra loading step needed.</p><p><strong>For Linux/Minikube users only</strong> <em>(Minikube runs its own Docker, so it needs the images loaded separately)</em></p><pre><code>minikube image load languages-portfolio-frontend:latest
+minikube image load languages-portfolio-backend:latest</code></pre><h3>Step 06: Deploy To Kubernetes One File At A Time</h3><p>This is the exciting part. We’ll apply each manifest file and explain what happens.</p><p><strong>6a. Create the namespace</strong> (an isolated space for our app):</p><p><strong>Paste this into namespace.yaml:</strong></p><pre><code>apiVersion: v1
+kind: Namespace
+metadata:
+  name: languages-portfolio
+  labels:
+    app: languages-portfolio
+    project: cloud-languages-blog</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/namespace.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes created a namespace called </em><em>languages-portfolio. Think of it as a folder that keeps our app's resources separate from everything else.</em></p><p><strong>Verify:</strong></p><pre><code>kubectl get namespaces
+
+# You should see 'languages-portfolio' in the list</code></pre><p><strong>6b. Create the secrets</strong> (database passwords):</p><p><strong>Paste this into secrets.yaml:</strong></p><pre><code># IMPORTANT: In production, use a secrets manager (AWS Secrets Manager, etc.)
+# These base64 values are for local development only.
+# Generate your own: echo -n 'your-value' | base64
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: languages-portfolio
+type: Opaque
+data:
+  # echo -n 'rootpassword123' | base64
+  mysql-root-password: cm9vdHBhc3N3b3JkMTIz
+  # echo -n 'portfolio_password' | base64
+  mysql-password: cG9ydGZvbGlvX3Bhc3N3b3Jk</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/secrets.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes stored the MySQL passwords securely. Pods can read these values, but they’re not stored in plain text.</em></p><p><strong>6c. Deploy MySQL</strong> (the database):</p><p><strong>Paste this into mysql.yaml:</strong></p><pre><code># --- PersistentVolumeClaim: gives MySQL a place to store data that survives restarts ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: languages-portfolio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# --- Deployment: runs the MySQL container ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: languages-portfolio
+  labels:
+    app: mysql
+spec:
+  replicas: 1          # Databases typically run as a single instance
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-root-password
+        - name: MYSQL_DATABASE
+          value: "portfolio_db"
+        - name: MYSQL_USER
+          value: "portfolio_app"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      - name: init-script
+        configMap:
+          name: mysql-init
+
+---
+# --- ConfigMap: holds the SQL init script ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+  namespace: languages-portfolio
+data:
+  init-db.sql: |
+    CREATE DATABASE IF NOT EXISTS portfolio_db;
+    USE portfolio_db;
+
+    CREATE TABLE IF NOT EXISTS contacts (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        subject VARCHAR(200),
+        message TEXT NOT NULL,
+        ip_address VARCHAR(45),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        is_read BOOLEAN DEFAULT FALSE
+    );
+
+    CREATE TABLE IF NOT EXISTS page_views (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+        page_path VARCHAR(500),
+        referrer VARCHAR(500),
+        user_agent TEXT,
+        ip_address VARCHAR(45),
+        viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+---
+# --- Service: gives MySQL a stable network address inside the cluster ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: languages-portfolio
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+  type: ClusterIP       # Only accessible inside the cluster</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/mysql.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes created:</em></p><ul><li><em>A </em><strong><em>PersistentVolumeClaim</em></strong><em> (1GB of disk space that survives pod restarts)</em></li><li><em>A </em><strong><em>ConfigMap</em></strong><em> with the SQL init script (creates the tables)</em></li><li><em>A </em><strong><em>Deployment</em></strong><em> running one MySQL 8.0 pod</em></li><li><em>A </em><strong><em>Service</em></strong><em> called </em><em>mysql-service so other pods can connect to it</em></li></ul><p><strong>Wait for MySQL to be ready:</strong></p><pre><code>kubectl get pods -n languages-portfolio -w
+
+# Wait until you see:
+# NAME                     READY   STATUS    RESTARTS   AGE
+# mysql-xxxxxxxxxx-xxxxx   1/1     Running   0          30s
+
+# Press Ctrl+C to stop watching</code></pre><p><strong>6d. Deploy the backend </strong>(Flask API)</p><p><strong>Paste this into backend.yaml:</strong></p><pre><code># --- Deployment: runs the Flask API containers ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: languages-portfolio
+  labels:
+    app: backend
+spec:
+  replicas: 2            # Two copies for reliability
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: languages-portfolio-backend:latest
+        imagePullPolicy: IfNotPresent    # Use local image in Minikube
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_HOST
+          value: "mysql-service"         # Points to the MySQL Service name
+        - name: DATABASE_PORT
+          value: "3306"
+        - name: DATABASE_NAME
+          value: "portfolio_db"
+        - name: DATABASE_USER
+          value: "portfolio_app"
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: mysql-password
+        - name: FLASK_DEBUG
+          value: "False"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        # Kubernetes checks this endpoint to know if the container is alive
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        # Kubernetes checks this endpoint before sending traffic
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+# --- Service: gives the backend a stable address for the frontend to reach ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: languages-portfolio
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+  type: ClusterIP        # Only accessible inside the cluster (frontend proxies to it)</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/backend.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes created:</em></p><ul><li>A <strong>Deployment</strong> running 2 Flask API pods</li><li>Environment variables pointing to mysql-service for database access</li><li><strong>Health checks</strong> so Kubernetes knows if a pod is alive and ready</li><li>A <strong>Service</strong> called backend-service for the frontend to reach</li></ul><p><strong>6e. Deploy the frontend </strong>(Nginx)</p><p><strong>Paste this into frontend.yaml:</strong></p><pre><code># --- Deployment: runs the Nginx frontend containers ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: languages-portfolio
+  labels:
+    app: frontend
+spec:
+  replicas: 2            # Two copies for reliability
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: languages-portfolio-frontend:latest
+        imagePullPolicy: IfNotPresent    # Use local image in Minikube
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+# --- Service: exposes the frontend to the outside world ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: languages-portfolio
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: LoadBalancer      # Makes the frontend accessible from outside the cluster</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/frontend.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes created:</em></p><ul><li>A <strong>Deployment</strong> running 2 Nginx pods</li><li>A <strong>LoadBalancer Service</strong> that exposes the frontend to the outside world</li></ul><p><strong>6f. Apply the autoscaler</strong></p><p><strong>Paste this into hpa.yaml:</strong></p><pre><code># --- HorizontalPodAutoscaler: automatically adds/removes backend pods based on CPU ---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: languages-portfolio
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 2         # Never go below 2 pods
+  maxReplicas: 6         # Never go above 6 pods
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70   # Scale up when average CPU &gt; 70%</code></pre><p><strong>Apply:</strong></p><pre><code>kubectl apply -f k8s/hpa.yaml</code></pre><p><strong>What happened?</strong> <em>Kubernetes will now automatically scale the backend between 2 and 6 pods based on CPU usage.</em></p><h3>Step 07: Check Everything Is Running</h3><pre><code># See all pods
+kubectl get pods -n languages-portfolio
+
+# Expected output:
+# NAME                        READY   STATUS    RESTARTS   AGE
+# mysql-xxxxxxxxxx-xxxxx      1/1     Running   0          2m
+# backend-xxxxxxxxxx-xxxxx    1/1     Running   0          1m
+# backend-xxxxxxxxxx-yyyyy    1/1     Running   0          1m
+# frontend-xxxxxxxxxx-xxxxx   1/1     Running   0          45s
+# frontend-xxxxxxxxxx-yyyyy   1/1     Running   0          45s
+
+# See all services
+kubectl get services -n languages-portfolio
+
+# Expected output:
+# NAME               TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)
+# mysql-service      ClusterIP      10.96.x.x       &lt;none&gt;        3306/TCP
+# backend-service    ClusterIP      10.96.x.x       &lt;none&gt;        5000/TCP
+# frontend-service   LoadBalancer   10.96.x.x       &lt;pending&gt;     80:3xxxx/TCP
+
+# See the autoscaler
+kubectl get hpa -n languages-portfolio</code></pre><h3>Step 08: Open Your Portfolio In The Browser</h3><p><strong>Docker Desktop (Windows/Mac): </strong>The LoadBalancer service maps to localhost automatically. Just open your browser:</p><pre><code>http://localhost</code></pre><p>If port 80 is already in use on your machine, check which port was assigned:</p><pre><code>kubectl get services -n languages-portfolio
+
+# Look at the PORT(S) column for frontend-service
+# e.g. 80:31234/TCP means you can also use http://localhost:31234</code></pre><p><strong>Test the API through the frontend’s Nginx proxy:</strong></p><pre><code>curl http://localhost/api/health</code></pre><p><strong>For Linux/Minikube users:</strong></p><pre><code>minikube service frontend-service -n languages-portfolio</code></pre><h3>Step 09: See Kubernetes Self-Healing in Action</h3><p>his is the magic. Let’s kill a pod and watch Kubernetes bring it back:</p><pre><code># List the backend pods
+kubectl get pods -n languages-portfolio -l app=backend
+
+# Delete one of them (copy a pod name from above)
+kubectl delete pod &lt;pod-name&gt; -n languages-portfolio
+
+# Immediately watch what happens
+kubectl get pods -n languages-portfolio -l app=backend -w
+
+# You'll see:
+# 1. The pod enters "Terminating" state
+# 2. A NEW pod is created automatically
+# 3. The new pod goes from "ContainerCreating" → "Running"
+# 4. Your website never went down because the other pod was still serving traffic!</code></pre><p>This is why Kubernetes is powerful. You told it “I want 2 backend pods” and it will always maintain that, no matter what.</p><h3>Step 10: Scale Your Application</h3><p><strong>Manual scaling:</strong></p><pre><code># Scale frontend to 4 pods
+kubectl scale deployment frontend --replicas=4 -n languages-portfolio
+
+# Watch the new pods appear
+kubectl get pods -n languages-portfolio -l app=frontend -w
+
+# Scale back down
+kubectl scale deployment frontend --replicas=2 -n languages-portfolio</code></pre><p><strong>The autoscaler (HPA) does this automatically for the backend.</strong> Check its status:</p><pre><code>kubectl get hpa -n languages-portfolio
+
+# Output:
+# NAME          REFERENCE            TARGETS   MINPODS   MAXPODS   REPLICAS
+# backend-hpa   Deployment/backend   10%/70%   2         6         2</code></pre><p>When CPU usage goes above 70%, Kubernetes automatically adds more backend pods. When traffic drops, it removes them. You pay for what you use.</p><h3>Step 11: The One-Command Deploy Script</h3><p>Instead of running each kubectl apply manually, use the deploy script:</p><pre><code>#!/bin/bash
+# deploy.sh — Deploy the LanguagesPortfolio to Kubernetes
+# Usage: ./scripts/deploy.sh
+
+set -e   # Stop on any error
+
+echo ""
+echo "=========================================="
+echo "  LanguagesPortfolio — K8s Deployment"
+echo "=========================================="
+echo ""
+
+# ------------------------------------------
+# Step 1: Build Docker images
+# ------------------------------------------
+echo "📦 Building Docker images..."
+
+echo "  → Building frontend image..."
+docker build -t languages-portfolio-frontend:latest ./frontend
+
+echo "  → Building backend image..."
+docker build -t languages-portfolio-backend:latest ./backend
+
+echo "  ✅ Images built successfully"
+echo ""
+
+# ------------------------------------------
+# Step 2: Load images into Minikube (local only)
+# ------------------------------------------
+if command -v minikube &amp;&gt; /dev/null; then
+    echo "📤 Loading images into Minikube..."
+    minikube image load languages-portfolio-frontend:latest
+    minikube image load languages-portfolio-backend:latest
+    echo "  ✅ Images loaded into Minikube"
+    echo ""
+fi
+
+# ------------------------------------------
+# Step 3: Apply Kubernetes manifests (order matters!)
+# ------------------------------------------
+echo "🚀 Applying Kubernetes manifests..."
+
+echo "  → Creating namespace..."
+kubectl apply -f k8s/namespace.yaml
+
+echo "  → Creating secrets..."
+kubectl apply -f k8s/secrets.yaml
+
+echo "  → Deploying MySQL database..."
+kubectl apply -f k8s/mysql.yaml
+
+echo "  → Waiting for MySQL to be ready..."
+kubectl wait --for=condition=available --timeout=120s deployment/mysql -n languages-portfolio
+
+echo "  → Deploying backend API..."
+kubectl apply -f k8s/backend.yaml
+
+echo "  → Deploying frontend..."
+kubectl apply -f k8s/frontend.yaml
+
+echo "  → Applying autoscaler..."
+kubectl apply -f k8s/hpa.yaml
+
+echo ""
+
+# ------------------------------------------
+# Step 4: Wait for everything to be ready
+# ------------------------------------------
+echo "⏳ Waiting for all deployments to be ready..."
+kubectl wait --for=condition=available --timeout=120s deployment/backend -n languages-portfolio
+kubectl wait --for=condition=available --timeout=120s deployment/frontend -n languages-portfolio
+
+echo ""
+
+# ------------------------------------------
+# Step 5: Show status
+# ------------------------------------------
+echo "=========================================="
+echo "  ✅ Deployment Complete!"
+echo "=========================================="
+echo ""
+echo "📋 Pods:"
+kubectl get pods -n languages-portfolio
+echo ""
+echo "🌐 Services:"
+kubectl get services -n languages-portfolio
+echo ""
+
+# If using Minikube, show the URL
+if command -v minikube &amp;&gt; /dev/null; then
+    echo "🔗 To open the portfolio in your browser, run:"
+    echo "   minikube service frontend-service -n languages-portfolio"
+fi
+# Make it executable (Linux/macOS)
+chmod +x scripts/deploy.sh
+
+# Run it
+./scripts/deploy.sh</code></pre><p>This script (LanguagesPortfolio/scripts/deploy.sh) does everything in order:</p><ol><li>Builds both Docker images</li><li>Loads them into Minikube (skipped on Docker Desktop)</li><li>Applies all Kubernetes manifests in the correct order</li><li>Waits for everything to be ready</li><li>Shows you the final status</li></ol><h3>⛔ End of Building Tutorial⛔</h3><h2>10 | Useful Commands for Troubleshooting</h2><p>When things don’t work (and they will, that’s normal), here’s how to debug:</p><pre><code># See what's happening with a pod
+kubectl describe pod &lt;pod-name&gt; -n languages-portfolio
+
+# Read a pod's logs (like reading console.log or print statements)
+kubectl logs &lt;pod-name&gt; -n languages-portfolio
+
+# Follow logs in real-time (like tail -f)
+kubectl logs -f &lt;pod-name&gt; -n languages-portfolio
+
+# Open a shell inside a running pod (like SSH-ing into a server)
+kubectl exec -it &lt;pod-name&gt; -n languages-portfolio -- /bin/sh
+
+# See events (Kubernetes tells you what it's doing)
+kubectl get events -n languages-portfolio --sort-by=.metadata.creationTimestamp
+
+# Check resource usage
+kubectl top pods -n languages-portfolio</code></pre><h3><strong>Common Issues And Fixes:</strong></h3><ol><li>If a pod is stuck in <strong>Pending</strong>, use kubectl describe pod &lt;name&gt; and check whether Docker Desktop needs more CPU or memory.</li><li>If a pod is in <strong>CrashLoopBackOff</strong>, run kubectl logs &lt;name&gt; to find application errors such as a Python traceback.</li><li>If a pod shows <strong>ImagePullBackOff</strong>, use kubectl describe pod &lt;name&gt; and rebuild or load the missing Docker image.</li><li>If a <strong>Service has no endpoints</strong>, run kubectl get endpoints &lt;svc&gt; and check that its selector matches the pod labels.</li><li>If the application <strong>cannot connect to the database</strong>, check the backend and MySQL pod logs to determine whether MySQL is ready</li></ol><h2>11 | Clean Up Protocol</h2><p>Since Kubernetes is basically roadkill for a Portfolio Project, so when you’re done experimenting:</p><pre><code># Delete everything in the namespace
+kubectl delete namespace languages-portfolio</code></pre><h3><strong>Docker Desktop</strong></h3><p>Kubernetes keeps running in the background. To disable it, go to Docker Desktop → Settings → Kubernetes → uncheck “Enable Kubernetes”.</p><h3><strong>Minikube (Linux)</strong></h3><pre><code>minikube stop     # Pause the cluster (saves resources)
+minikube delete   # Remove the cluster entirel</code></pre><h2>12 | CI/CD Integration (Optional Bonus)</h2><h3>GitHub Actions for Kubernetes Deployment</h3><pre><code># .github/workflows/deploy.yml
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Backend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend:${{ github.sha }}
+
+    - name: Build and push Frontend
+      uses: docker/build-push-action@v4
+      with:
+        context: ./frontend
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ github.sha }}    - name: Configure kubectl
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+    - name: Deploy to Kubernetes
+      run: |
+        # Update image tags
+        sed -i "s|IMAGE_TAG|${{ github.sha }}|g" k8s/*.yaml
+
+        # Apply manifests
+        kubectl apply -f k8s/
+
+        # Wait for rollout
+        kubectl rollout status deployment/backend -n portfolio
+        kubectl rollout status deployment/frontend -n portfolio</code></pre><h3>Rolling Updates (Zero Downtime)</h3><pre><code># deployment-strategy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # One extra pod during update
+      maxUnavailable: 0  # Never reduce below desired count
+  # ... rest of deployment
+
+# Trigger a rolling update
+kubectl set image deployment/backend backend=your-registry/backend:v2
+
+# Watch the rollout
+kubectl rollout status deployment/backend
+
+# Rollback if something goes wrong
+kubectl rollout undo deployment/backend
+
+# View rollout history
+kubectl rollout history deployment/backend</code></pre><h3>Final Thoughts</h3><h2>You’ve Achieved Cloud-Native Status</h2><p>Think about what you’ve accomplished:</p><p>Before Kubernetes, your portfolio was a single server: fragile, limited, manual. One crash, one traffic spike, one update = downtime.</p><p>Now your portfolio is <strong>cloud-native</strong>:</p><ul><li><strong>High Availability</strong>: Multiple replicas across nodes</li><li><strong>Auto-Scaling</strong>: Handles traffic spikes automatically</li><li><strong>Self-Healing</strong>: Crashed containers restart instantly</li><li><strong>Zero-Downtime Deploys</strong>: Updates roll out seamlessly</li><li><strong>Infrastructure as Code</strong>: Everything defined in YAML</li></ul><h2>Concluding Remarks</h2><p>Kubernetes gives your application superpowers: automatic scaling, self-healing, and zero-downtime deployments. But there’s one more critical skill you need: <strong>Java</strong>.</p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*hEuZBgN_WLS92jBrJcjeiQ.png" alt="" loading="lazy"><figcaption>Kubernetes — The Container Orchestrator</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>✅ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>✅ <strong>09 — SQL:</strong> Cloud Data Management</p><p>✅ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>⬜ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><h2>Additional Resources</h2><h3><a href="https://kubernetes.io/docs/home/"><strong>Kubernetes Documentation</strong></a></h3><blockquote>Kubernetes is an open source container orchestration engine for automating deployment, scaling, and management of containerized applications. The open source project is hosted by the Cloud Native Computing Foundation (<a href="https://www.cncf.io/about">CNCF</a>).</blockquote><h3><a href="https://docs.aws.amazon.com/eks/"><strong>AWS EKS Documentation</strong></a></h3><blockquote>Amazon Elastic Kubernetes Service (Amazon EKS) is a managed service that makes it easy for you to run Kubernetes on AWS without needing to install and operate your own Kubernetes clusters.</blockquote><h3><a href="https://cloud.google.com/kubernetes-engine/docs"><strong>Google GKE Documentation</strong></a></h3><blockquote>Deploy, manage, and scale containerized applications on Kubernetes, powered by Google Cloud.</blockquote><h3><a href="https://docs.microsoft.com/en-us/azure/aks/"><strong>Azure AKS Documentation</strong></a></h3><blockquote>AKS allows you to quickly deploy a production ready Kubernetes cluster in Azure. Learn how to use AKS with these quickstarts, tutorials, and samples.</blockquote>

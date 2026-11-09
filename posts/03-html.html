@@ -1,0 +1,554 @@
+<!-- Imported from https://ntombizakhona.medium.com/html-in-the-cloud-dc23a04bfe51 by tools/import_medium.py. Re-run it to update this file. -->
+<h1>HTML in the Cloud</h1>
+<h2>The Markup Language</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/800/1*BvhjASEweYusS9UoqCorGA@2x.jpeg" alt="" loading="lazy"></figure><p><strong>HTML</strong> (<em>HyperText Markup Language</em>) is the skeleton of every website you’ve ever visited. Think of it like building a house:</p><ul><li><strong>HTML: </strong><em>The frame and walls </em>(structure)</li><li><strong>CSS:</strong> <em>The paint and decorations</em> (we’ll learn this next)</li><li><strong>JavaScript:</strong> <em>The electricity and plumbing</em> (functionality)</li></ul><p>You can’t paint walls that don’t exist, and you can’t add electricity to a house without rooms. That’s why we start with <strong>HTML.</strong></p><h2>Why HTML Matters in Cloud Computing</h2><p><strong><em>“Wait, I thought cloud computing was about servers and AWS?”</em></strong></p><p>Yes! But here’s the reality:</p><ul><li><strong>AWS Console? </strong><em>Built with HTML</em></li><li><strong>Cloud documentation you read? </strong><em>HTML</em></li><li><strong>Monitoring dashboards?</strong> <em>HTML + JavaScript</em></li><li><strong>Your portfolio to get hired?</strong> <em>HTML, CSS, JavaScript</em></li></ul><p>Even as a Cloud Engineer, you’ll build internal tools, dashboards, and documentation sites. HTML is unavoidable and essential.</p><hr><h2>Topics</h2><ol><li>HTML Document Structure And Syntax</li><li>Essential HTML Elements And Attributes</li><li>Semantic HTML For Better Accessibility</li><li>Portfolio Page</li><li>HTML In The Browser</li></ol><hr><h2>1 | Understanding HTML Fundamentals</h2><h3>What Exactly is HTML?</h3><p>HTML is a <strong>markup</strong> language, not a <em>programming</em> language. The difference:</p><p><strong>Programming Languages</strong> <em>(JavaScript, Python)</em>:</p><ul><li>Give instructions: “If user clicks button, do this”</li><li>Make decisions: “If password is wrong, show error”</li><li>Perform calculations: “Add these numbers”</li></ul><p><strong>Markup Languages</strong> <em>(HTML)</em>:</p><ul><li>Describe structure: “This is a heading”</li><li>Define content: “This is a paragraph”</li><li>Create relationships: “This link goes to that page”</li></ul><h3>The Basic HTML Pattern</h3><p>Every HTML document follows the same structure. Let’s break it down:</p><pre><code>html
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Page Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Your content goes here --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><p><strong>Let’s decode this like a letter:</strong></p><pre><code>&lt;!DOCTYPE html&gt;              ← "This envelope contains HTML"
+&lt;html lang="en"&gt;             ← "Written in English"
+&lt;head&gt;                       ← The envelope (metadata)
+    &lt;meta charset="UTF-8"&gt;   ← "Use all international characters"
+    &lt;title&gt;Page Title&lt;/title&gt;← "Letter subject line" (browser tab)
+&lt;/head&gt;
+&lt;body&gt;                       ← The actual letter content
+    &lt;!-- Content here --&gt;    ← Your message
+&lt;/body&gt;
+&lt;/html&gt;                      ← "End of letter"</code></pre><h3>Understanding Tags</h3><p>HTML uses tags to mark up content. Most tags come in pairs:</p><pre><code>&lt;tagname&gt;Content goes here&lt;/tagname&gt;
+   ↑                          ↑
+Opening tag            Closing tag</code></pre><p><strong>Examples:</strong></p><pre><code>&lt;h1&gt;This is a heading&lt;/h1&gt;
+&lt;p&gt;This is a paragraph.&lt;/p&gt;
+&lt;a href="url"&gt;This is a link&lt;/a&gt;</code></pre><p><strong>Self-closing tags (no content inside):</strong></p><pre><code>&lt;img src="photo.jpg" alt="Description"&gt;
+&lt;br&gt;  &lt;!-- Line break --&gt;
+&lt;hr&gt;  &lt;!-- Horizontal rule/line --&gt;</code></pre><hr><h2>2 | Essential HTML Elements</h2><h3>Headings</h3><p><strong>The Hierarchy</strong></p><p>Headings create structure, like chapter titles in a book:</p><pre><code>&lt;h1&gt;Main Title (Use only ONE per page)&lt;/h1&gt;
+&lt;h2&gt;Major Section&lt;/h2&gt;
+&lt;h3&gt;Subsection&lt;/h3&gt;
+&lt;h4&gt;Sub-subsection&lt;/h4&gt;
+&lt;h5&gt;Rarely used&lt;/h5&gt;
+&lt;h6&gt;Very rarely used&lt;/h6&gt;</code></pre><p><strong>Example:</strong></p><pre><code>&lt;h1&gt;My Cloud Portfolio&lt;/h1&gt;
+    &lt;h2&gt;About Me&lt;/h2&gt;
+        &lt;h3&gt;My Background&lt;/h3&gt;
+        &lt;h3&gt;My Goals&lt;/h3&gt;
+    &lt;h2&gt;Skills&lt;/h2&gt;
+        &lt;h3&gt;Cloud Platforms&lt;/h3&gt;
+        &lt;h3&gt;Programming Languages&lt;/h3&gt;</code></pre><p><strong><em>Think of headings like an outline. Don’t skip levels (don’t go from h1 to h3 without an h2 in between).</em></strong></p><h3>Paragraphs and Text</h3><pre><code>&lt;!-- Paragraphs --&gt;
+&lt;p&gt;This is a paragraph. It's the most common text container.&lt;/p&gt;
+&lt;p&gt;Each paragraph tag creates a new block of text with spacing.&lt;/p&gt;
+
+&lt;!-- Line break within a paragraph --&gt;
+&lt;p&gt;First line&lt;br&gt;Second line (same paragraph)&lt;/p&gt;
+
+&lt;!-- Bold and italic --&gt;
+&lt;strong&gt;This text is important (bold)&lt;/strong&gt;
+&lt;em&gt;This text is emphasized (italic)&lt;/em&gt;
+
+&lt;!-- Code snippets --&gt;
+&lt;code&gt;const greeting = "Hello World";&lt;/code&gt;
+
+&lt;!-- Highlighted text --&gt;
+&lt;mark&gt;This text is highlighted&lt;/mark&gt;</code></pre><hr><h3>Links</h3><p><strong>Connecting Pages</strong></p><p>Links are how the web became a “<em>web</em>”:</p><pre><code>&lt;!-- External link (opens another website) --&gt;
+&lt;a href="https://aws.amazon.com"&gt;Visit AWS&lt;/a&gt;
+
+&lt;!-- Internal link (jumps to section on same page) --&gt;
+&lt;a href="#contact"&gt;Jump to Contact Section&lt;/a&gt;
+
+&lt;!-- Email link --&gt;
+&lt;a href="mailto:you@example.com"&gt;Email Me&lt;/a&gt;
+
+&lt;!-- Open in new tab --&gt;
+&lt;a href="https://github.com" target="_blank"&gt;My GitHub&lt;/a&gt;</code></pre><p><strong>Anatomy of a link:</strong></p><pre><code>&lt;a href="destination" target="_blank" title="Tooltip text"&gt;
+   Link text that user clicks
+&lt;/a&gt;
+
+href = "hypertext reference" (where it goes)
+target = where to open (same tab or new tab)
+title = tooltip on hover</code></pre><h3>Images</h3><p><strong>Visual Content</strong></p><pre><code>&lt;!-- Basic image --&gt;
+&lt;img src="profile-photo.jpg" alt="My professional headshot"&gt;\
+
+&lt;!-- Image with dimensions --&gt;
+&lt;img src="logo.png" alt="Company logo" width="200" height="100"&gt;
+
+&lt;!-- Image as a link --&gt;
+&lt;a href="https://linkedin.com/in/yourname"&gt;
+    &lt;img src="linkedin-icon.png" alt="LinkedIn profile"&gt;
+&lt;/a&gt;</code></pre><p><strong>Always include alt text:</strong></p><ul><li>Screen readers use it for visually impaired users</li><li>Shows if image fails to load</li><li>Helps search engines understand your images</li></ul><h3>Lists</h3><p><strong>Organizing Information</strong></p><p>Unordered lists (bullet points)</p><pre><code>&lt;ul&gt;
+    &lt;li&gt;AWS&lt;/li&gt;
+    &lt;li&gt;Azure&lt;/li&gt;
+    &lt;li&gt;Google Cloud&lt;/li&gt;
+&lt;/ul&gt;</code></pre><p>Ordered lists (numbered):</p><pre><code>&lt;ol&gt;
+    &lt;li&gt;Set up AWS account&lt;/li&gt;
+    &lt;li&gt;Create S3 bucket&lt;/li&gt;
+    &lt;li&gt;Upload website files&lt;/li&gt;
+    &lt;li&gt;Enable static hosting&lt;/li&gt;
+&lt;/ol&gt;</code></pre><p>Nested lists:</p><pre><code>&lt;ul&gt;
+    &lt;li&gt;Cloud Platforms
+        &lt;ul&gt;
+            &lt;li&gt;AWS - Intermediate&lt;/li&gt;
+            &lt;li&gt;Azure - Beginner&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;Programming
+        &lt;ul&gt;
+            &lt;li&gt;HTML - Advanced&lt;/li&gt;
+            &lt;li&gt;CSS - Learning&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;</code></pre><h3>Containers</h3><p><strong>Grouping Content</strong></p><p>Generic container:</p><pre><code>&lt;div class="skills-section"&gt;
+    &lt;h2&gt;My Skills&lt;/h2&gt;
+    &lt;p&gt;I'm learning cloud computing...&lt;/p&gt;
+&lt;/div&gt;</code></pre><p>Semantic containers (better for accessibility and SEO):</p><pre><code>&lt;header&gt;Top of page navigation&lt;/header&gt;
+&lt;nav&gt;Navigation menu&lt;/nav&gt;
+&lt;main&gt;Primary page content&lt;/main&gt;
+&lt;section&gt;Thematic grouping&lt;/section&gt;
+&lt;article&gt;Self-contained content&lt;/article&gt;
+&lt;aside&gt;Sidebar or tangential content&lt;/aside&gt;
+&lt;footer&gt;Bottom of page info&lt;/footer&gt;</code></pre><hr><h2>3 | Semantic HTML</h2><h3>What is Semantic HTML?</h3><p>Non-semantic (bad):</p><pre><code>&lt;div id="header"&gt;
+    &lt;div id="menu"&gt;
+        &lt;div class="menu-item"&gt;Home&lt;/div&gt;
+        &lt;div class="menu-item"&gt;About&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="content"&gt;
+    &lt;div class="post"&gt;Blog post content&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="footer"&gt;Copyright info&lt;/div&gt;</code></pre><p>Semantic (good):</p><pre><code>&lt;header&gt;
+    &lt;nav&gt;
+        &lt;a href="/"&gt;Home&lt;/a&gt;
+        &lt;a href="/about"&gt;About&lt;/a&gt;
+    &lt;/nav&gt;
+&lt;/header&gt;
+&lt;main&gt;
+    &lt;article&gt;Blog post content&lt;/article&gt;
+&lt;/main&gt;
+&lt;footer&gt;Copyright info&lt;/footer&gt;</code></pre><h3>Why Semantic HTML Matters</h3><p>Benefits:</p><ol><li><strong>Accessibility:</strong> Screen readers understand page structure</li><li><strong>SEO:</strong> Search engines rank semantic HTML higher</li><li><strong>Maintainability:</strong> Other developers understand your code faster</li><li><strong>Future-proof: </strong>Works better with new technologies</li></ol><p>Real-world impact:</p><ul><li>Google favors semantic HTML in search rankings</li><li>15% of the world has some form of disability that benefits from semantic markup</li><li>Hiring managers look for semantic HTML in portfolio code</li></ul><hr><h2>4 | Forms</h2><h3>Basic Form Structure</h3><pre><code>&lt;form action="/submit" method="POST"&gt;
+    
+    &lt;!-- Text input --&gt;
+    &lt;label for="username"&gt;Username:&lt;/label&gt;
+    &lt;input type="text" id="username" name="username" required&gt;
+    
+    &lt;!-- Email input --&gt;
+    &lt;label for="email"&gt;Email:&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required&gt;
+    
+    &lt;!-- Password input --&gt;
+    &lt;label for="password"&gt;Password:&lt;/label&gt;
+    &lt;input type="password" id="password" name="password" required&gt;
+    
+    &lt;!-- Textarea for longer text --&gt;
+    &lt;label for="message"&gt;Message:&lt;/label&gt;
+    &lt;textarea id="message" name="message" rows="4"&gt;&lt;/textarea&gt;
+    
+    &lt;!-- Checkbox --&gt;
+    &lt;input type="checkbox" id="subscribe" name="subscribe"&gt;
+    &lt;label for="subscribe"&gt;Subscribe to newsletter&lt;/label&gt;
+    
+    &lt;!-- Radio buttons --&gt;
+    &lt;input type="radio" id="aws" name="cloud" value="aws"&gt;
+    &lt;label for="aws"&gt;AWS&lt;/label&gt;
+    
+    &lt;input type="radio" id="azure" name="cloud" value="azure"&gt;
+    &lt;label for="azure"&gt;Azure&lt;/label&gt;
+    
+    &lt;!-- Submit button --&gt;
+    &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre><h3>Input Types</h3><pre><code>&lt;input type="text"&gt;       &lt;!-- Plain text --&gt;
+&lt;input type="email"&gt;      &lt;!-- Validates email format --&gt;
+&lt;input type="password"&gt;   &lt;!-- Hides characters --&gt;
+&lt;input type="number"&gt;     &lt;!-- Number input --&gt;
+&lt;input type="date"&gt;       &lt;!-- Date picker --&gt;
+&lt;input type="tel"&gt;        &lt;!-- Phone number --&gt;
+&lt;input type="url"&gt;        &lt;!-- Website URL --&gt;
+&lt;input type="file"&gt;       &lt;!-- File upload --&gt;</code></pre><hr><h3>🏗️ Let’s Build</h3><h2>5 | Build Your Portfolio</h2><h3>Step 01: Set Up Your Project Directory</h3><p>Create this folder structure on your computer:</p><pre><code>portfolio-project/
+├── index.html
+├── about.html (optional second page)
+├── styles/
+│   └── main.css (we'll create this in the next post)
+├── scripts/
+│   └── main.js (we'll create this later)
+├── assets/
+│   └── images/
+│       ├── profile.jpg
+│       └── projects/</code></pre><p><strong>How to Quickly create this with Windows:</strong></p><pre><code>cmd
+mkdir portfolio-project
+cd portfolio-project
+mkdir styles scripts assets\images assets\images\projects</code></pre><p>Mac/Linux:</p><pre><code>bash
+mkdir -p portfolio-project/{styles,scripts,assets/images/projects}
+cd portfolio-project</code></pre><h3>Step 02: Create Your Portfolio HTML</h3><p>Create a file called index.html and paste this complete portfolio structure:</p><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Your Name - Cloud Developer Portfolio&lt;/title&gt;
+    &lt;meta name="description" content="Portfolio showcasing my journey learning cloud computing and essential programming languages"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    
+    &lt;!-- Navigation Header --&gt;
+    &lt;header&gt;
+        &lt;nav&gt;
+            &lt;h1&gt;Your Name&lt;/h1&gt;
+            &lt;p&gt;Cloud Developer in Training&lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li&gt;&lt;a href="#about"&gt;About&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#skills"&gt;Skills&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#projects"&gt;Projects&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href="#contact"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/nav&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Main Content --&gt;
+    &lt;main&gt;
+        
+        &lt;!-- Hero Section --&gt;
+        &lt;section id="hero"&gt;
+            &lt;h1&gt;Building Cloud Expertise, One Language at a Time&lt;/h1&gt;
+            &lt;p&gt;Follow my journey from beginner to cloud-ready developer&lt;/p&gt;
+            &lt;a href="#contact"&gt;Get In Touch&lt;/a&gt;
+        &lt;/section&gt;
+
+        &lt;!-- About Section --&gt;
+        &lt;section id="about"&gt;
+            &lt;h2&gt;About My Journey&lt;/h2&gt;
+            &lt;img src="assets/images/profile.jpg" alt="Your Name - Profile Photo" width="200"&gt;
+            &lt;p&gt;
+                I'm on a structured learning path to master the essential languages and tools for cloud computing. 
+                This portfolio documents my progress through &lt;strong&gt;11 fundamental skills&lt;/strong&gt;: English, 
+                Mathematics, HTML, CSS, JavaScript, Python, Java, Linux, SQL, Kubernetes, and Git.
+            &lt;/p&gt;
+            &lt;p&gt;
+                My goal is to become a &lt;strong&gt;cloud engineer&lt;/strong&gt; capable of designing, building, and 
+                deploying scalable applications on platforms like AWS, Azure, and Google Cloud.
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Skills Section --&gt;
+        &lt;section id="skills"&gt;
+            &lt;h2&gt;Skills Progress Tracker&lt;/h2&gt;
+            &lt;p&gt;Tracking my learning journey across 11 essential languages and tools:&lt;/p&gt;
+            
+            &lt;div class="skill-list"&gt;
+                
+                &lt;!-- Skill 1: English --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;1. English - Technical Communication&lt;/h3&gt;
+                    &lt;p&gt;Writing clear documentation, README files, and technical explanations&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 100%"&gt;100%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; ✅ Completed&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 2: Mathematics --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;2. Mathematics - Logic &amp; Problem Solving&lt;/h3&gt;
+                    &lt;p&gt;Boolean logic, algorithms, problem decomposition, pattern recognition&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 100%"&gt;100%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; ✅ Completed&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 3: HTML --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;3. HTML - Web Structure&lt;/h3&gt;
+                    &lt;p&gt;Semantic markup, forms, accessibility, document structure&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 100%"&gt;100%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; ✅ Completed (This page!)&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 4: CSS --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;4. CSS - Styling &amp; Layout&lt;/h3&gt;
+                    &lt;p&gt;Responsive design, flexbox, grid, animations&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; ⏳ Coming Next&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 5: JavaScript --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;5. JavaScript - Interactivity&lt;/h3&gt;
+                    &lt;p&gt;DOM manipulation, events, async programming, APIs&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 6: Python --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;6. Python - Automation &amp; Backend&lt;/h3&gt;
+                    &lt;p&gt;Scripting, data processing, cloud automation, AWS Lambda&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 7: Java --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;7. Java - Enterprise Applications&lt;/h3&gt;
+                    &lt;p&gt;OOP principles, Spring Boot, microservices&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 8: Linux --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;8. Linux - Command Line &amp; Systems&lt;/h3&gt;
+                    &lt;p&gt;Bash scripting, file system, process management, SSH&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 9: SQL --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;9. SQL - Database Management&lt;/h3&gt;
+                    &lt;p&gt;Queries, joins, database design, optimization&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 10: Kubernetes --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;10. Kubernetes - Container Orchestration&lt;/h3&gt;
+                    &lt;p&gt;Pods, services, deployments, scaling&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Skill 11: Git --&gt;
+                &lt;article class="skill-item"&gt;
+                    &lt;h3&gt;11. Git - Version Control&lt;/h3&gt;
+                    &lt;p&gt;Branching, merging, collaboration, GitHub workflows&lt;/p&gt;
+                    &lt;div class="progress-bar"&gt;
+                        &lt;div class="progress" style="width: 0%"&gt;0%&lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Upcoming&lt;/p&gt;
+                &lt;/article&gt;
+                
+            &lt;/div&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Projects Section --&gt;
+        &lt;section id="projects"&gt;
+            &lt;h2&gt;Learning Projects&lt;/h2&gt;
+            &lt;p&gt;Real projects I'm building while learning each language:&lt;/p&gt;
+            
+            &lt;div class="project-list"&gt;
+                
+                &lt;!-- Project 1 --&gt;
+                &lt;article class="project"&gt;
+                    &lt;h3&gt;Portfolio Website (This Site!)&lt;/h3&gt;
+                    &lt;p&gt;
+                        A fully responsive portfolio website built from scratch, showcasing my learning journey. 
+                        Each skill I learn gets integrated into this living project.
+                    &lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Technologies:&lt;/strong&gt; HTML, CSS (next), JavaScript (coming)&lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 🚧 In Progress&lt;/p&gt;
+                    &lt;ul&gt;
+                        &lt;li&gt;✅ HTML structure complete&lt;/li&gt;
+                        &lt;li&gt;⏳ CSS styling (next post)&lt;/li&gt;
+                        &lt;li&gt;📅 JavaScript interactivity (upcoming)&lt;/li&gt;
+                        &lt;li&gt;📅 Deployment to AWS S3 (upcoming)&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Project 2 (Placeholder) --&gt;
+                &lt;article class="project"&gt;
+                    &lt;h3&gt;AWS Cost Calculator&lt;/h3&gt;
+                    &lt;p&gt;
+                        A web tool to calculate estimated AWS costs for common services. 
+                        Applies mathematical formulas learned in Post 2.
+                    &lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Technologies:&lt;/strong&gt; HTML, CSS, JavaScript, Math&lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Planned&lt;/p&gt;
+                &lt;/article&gt;
+                
+                &lt;!-- Project 3 (Placeholder) --&gt;
+                &lt;article class="project"&gt;
+                    &lt;h3&gt;Cloud Deployment Automation Script&lt;/h3&gt;
+                    &lt;p&gt;
+                        Python script to automate website deployment to AWS S3 with one command.
+                    &lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Technologies:&lt;/strong&gt; Python, AWS CLI, Bash&lt;/p&gt;
+                    &lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; 📅 Planned&lt;/p&gt;
+                &lt;/article&gt;
+                
+            &lt;/div&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Contact Section --&gt;
+        &lt;section id="contact"&gt;
+            &lt;h2&gt;Get In Touch&lt;/h2&gt;
+            &lt;p&gt;
+                Interested in following my learning journey? Have advice or opportunities? 
+                I'd love to hear from you!
+            &lt;/p&gt;
+            
+            &lt;form action="#" method="POST"&gt;
+                
+                &lt;div class="form-group"&gt;
+                    &lt;label for="name"&gt;Your Name:&lt;/label&gt;
+                    &lt;input type="text" id="name" name="name" placeholder="John Doe" required&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="form-group"&gt;
+                    &lt;label for="email"&gt;Your Email:&lt;/label&gt;
+                    &lt;input type="email" id="email" name="email" placeholder="john@example.com" required&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="form-group"&gt;
+                    &lt;label for="subject"&gt;Subject:&lt;/label&gt;
+                    &lt;input type="text" id="subject" name="subject" placeholder="Regarding your portfolio"&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="form-group"&gt;
+                    &lt;label for="message"&gt;Message:&lt;/label&gt;
+                    &lt;textarea id="message" name="message" rows="6" placeholder="Your message here..." required&gt;&lt;/textarea&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="form-group"&gt;
+                    &lt;input type="checkbox" id="newsletter" name="newsletter"&gt;
+                    &lt;label for="newsletter"&gt;Send me updates about your learning journey&lt;/label&gt;
+                &lt;/div&gt;
+                
+                &lt;button type="submit"&gt;Send Message&lt;/button&gt;
+                &lt;p&gt;&lt;em&gt;Note: Form will be functional after we add backend processing (Python/JavaScript)&lt;/em&gt;&lt;/p&gt;
+            &lt;/form&gt;
+            
+            &lt;div class="contact-info"&gt;
+                &lt;h3&gt;Other Ways to Connect:&lt;/h3&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;📧 Email: &lt;a href="mailto:your.email@example.com"&gt;your.email@example.com&lt;/a&gt;&lt;/li&gt;
+                    &lt;li&gt;💼 LinkedIn: &lt;a href="https://linkedin.com/in/yourprofile" target="_blank"&gt;linkedin.com/in/yourprofile&lt;/a&gt;&lt;/li&gt;
+                    &lt;li&gt;💻 GitHub: &lt;a href="https://github.com/yourusername" target="_blank"&gt;github.com/yourusername&lt;/a&gt;&lt;/li&gt;
+                    &lt;li&gt;🐦 Twitter: &lt;a href="https://twitter.com/yourhandle" target="_blank"&gt;@yourhandle&lt;/a&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+        &lt;/section&gt;
+    &lt;/main&gt;
+
+    &lt;!-- Footer --&gt;
+    &lt;footer&gt;
+        &lt;p&gt;&amp;copy; 2026 Your Name. Built while learning cloud computing languages.&lt;/p&gt;
+        &lt;p&gt;
+            &lt;a href="#about"&gt;About&lt;/a&gt; | 
+            &lt;a href="#skills"&gt;Skills&lt;/a&gt; | 
+            &lt;a href="#projects"&gt;Projects&lt;/a&gt; | 
+            &lt;a href="#contact"&gt;Contact&lt;/a&gt;
+        &lt;/p&gt;
+        &lt;p&gt;&lt;small&gt;This portfolio is a work in progress. Last updated: Day 3 of 60&lt;/small&gt;&lt;/p&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre><h3>Step 03: Open Your Portfolio in a Browser</h3><p><strong>Method 1: Directly open the file</strong></p><ol><li>Navigate to your portfolio-project folder</li><li>Right-click index.html</li><li>Select “Open with” → Your browser (Chrome, Firefox, Safari, Edge)</li></ol><p><strong>Method 2: Drag and drop</strong></p><ol><li>Open your web browser</li><li>Drag index.html into the browser window</li></ol><p>What you should see:</p><ul><li>✅ Navigation menu with links</li><li>✅ Hero section with your headline</li><li>✅ About section (placeholder for your photo)</li><li>✅ Skills progress tracker (showing 3/11 complete)</li><li>✅ Projects section with portfolio description</li><li>✅ Contact form (not functional yet, but visible)</li><li>✅ Footer with copyright</li></ul><p>What it looks like:<br><strong>Plain, unstyled HTML, and that’s perfect!</strong></p><p><em>We’ll add beautiful styling with CSS in the next post.</em></p><h3>Step 04: Test Your Navigation Links</h3><p>Click each link in your navigation menu:</p><ul><li><strong>About</strong> → Should jump to About section</li><li><strong>Skills</strong> → Should jump to Skills section</li><li><strong>Projects</strong> → Should jump to Projects section</li><li><strong>Contact</strong> → Should jump to Contact section</li></ul><p>These are called <strong><em>anchor links</em></strong>, they jump to sections with matching id attributes</p><pre><code>&lt;a href="#skills"&gt;Skills&lt;/a&gt;  ← Link
+&lt;section id="skills"&gt;         ← Destination</code></pre><hr><h3>Step 05: Validate Your HTML</h3><p>Professional developers always validate their code. Use the W3C HTML Validator:</p><ol><li>Go to: <a href="https://validator.w3.org/">https://validator.w3.org/</a></li><li>Click <strong>Validate by File Upload</strong></li><li>Upload your index.html</li><li>Fix any errors shown</li></ol><p><strong>Green Banner: Document checking completed. No errors or warnings to show.</strong></p><p>Common Beginner Errors:</p><ul><li><strong>Unclosed tags:</strong> &lt;p&gt;Text (missing &lt;/p&gt;)</li><li><strong>Mismatched tags</strong>: &lt;strong&gt;&lt;em&gt;Text&lt;/strong&gt;&lt;/em&gt; (wrong order)</li><li><strong>Missing required attributes:</strong> &lt;img src=”photo.jpg”&gt; (missing alt)</li></ul><h3>⛔ End of Building Tutorial⛔</h3><hr><h2>6 | Understanding What You Built</h2><h3>The Document Structure (Tree Model)</h3><p>Your HTML creates a tree structure:</p><pre><code>html
+├── head
+│   ├── meta (charset)
+│   ├── meta (viewport)
+│   ├── title
+│   └── meta (description)
+└── body
+    ├── header
+    │   └── nav
+    │       ├── h1
+    │       ├── p
+    │       └── ul
+    │           ├── li → a
+    │           ├── li → a
+    │           ├── li → a
+    │           └── li → a
+    ├── main
+    │   ├── section (hero)
+    │   ├── section (about)
+    │   ├── section (skills)
+    │   │   └── article (× 11 skills)
+    │   ├── section (projects)
+    │   │   └── article (× 3 projects)
+    │   └── section (contact)
+    │       └── form
+    └── footer</code></pre><p>This is called the <strong>DOM</strong> (<em>Document Object Model)</em>. Understanding this tree structure is crucial for:</p><ul><li>CSS styling (next post)</li><li>JavaScript manipulation (later)</li><li>Debugging issues</li></ul><h3>Semantic Choices We Made</h3><p><strong>Why we used these specific tags:</strong></p><pre><code>&lt;header&gt;    ← Top of page (navigation)
+&lt;nav&gt;       ← Navigation links
+&lt;main&gt;      ← Primary content (only one per page)
+&lt;section&gt;   ← Thematic content groupings
+&lt;article&gt;   ← Self-contained pieces (skills, projects)
+&lt;footer&gt;    ← Bottom of page (copyright, links)</code></pre><p><strong>Non-semantic alternative (avoid this):</strong></p><pre><code>&lt;div class="header"&gt;
+&lt;div class="nav"&gt;
+&lt;div class="main"&gt;
+&lt;div class="section"&gt;
+&lt;div class="article"&gt;
+&lt;div class="footer"&gt;</code></pre><p>Both work visually, but semantic HTML is:</p><ul><li>Better for <strong>accessibility:</strong> <em>screen readers</em></li><li>Better for <strong>SEO:</strong> <em>search engines</em></li><li>Better for <strong>maintainability: </strong><em>other developers</em></li></ul><hr><h2>7 | Common HTML Mistakes And How to Avoid Them</h2><h3>Mistake 01: Not Closing Tags</h3><pre><code>&lt;!-- ❌ Wrong --&gt;
+&lt;p&gt;This is a paragraph
+&lt;p&gt;This is another paragraph
+
+&lt;!-- ✅ Correct --&gt;
+&lt;p&gt;This is a paragraph&lt;/p&gt;
+&lt;p&gt;This is another paragraph&lt;/p&gt;</code></pre><h3>Mistake 02: Nesting Tags Incorrectly</h3><pre><code>&lt;!-- ❌ Wrong --&gt;
+&lt;strong&gt;&lt;em&gt;Bold and italic&lt;/strong&gt;&lt;/em&gt;
+
+&lt;!-- ✅ Correct --&gt;
+&lt;strong&gt;&lt;em&gt;Bold and italic&lt;/em&gt;&lt;/strong&gt;</code></pre><p><strong>Rule: </strong><em>Last opened, first closed (like Russian nesting dolls)</em></p><h3>Mistake 03: Using Multiple H1 Tags</h3><pre><code>&lt;!-- ❌ Wrong --&gt;
+&lt;h1&gt;My Portfolio&lt;/h1&gt;
+&lt;h1&gt;About Me&lt;/h1&gt;
+&lt;h1&gt;Projects&lt;/h1&gt;
+
+&lt;!-- ✅ Correct --&gt;
+&lt;h1&gt;My Portfolio&lt;/h1&gt;
+&lt;h2&gt;About Me&lt;/h2&gt;
+&lt;h2&gt;Projects&lt;/h2&gt;</code></pre><p><strong>Rule:</strong> <em>Only ONE &lt;h1&gt; per page (your main page title)</em></p><h3>Mistake 04: Forgetting Alt Text on Images</h3><pre><code>&lt;!-- ❌ Wrong --&gt;
+&lt;img src="profile.jpg"&gt;
+
+&lt;!-- ✅ Correct --&gt;
+&lt;img src="profile.jpg" alt="Professional headshot of Your Name"&gt;</code></pre><h3>Mistake 05: Using Divs for Everything</h3><pre><code>&lt;!-- ❌ Wrong (div soup) --&gt;
+&lt;div class="navigation"&gt;...&lt;/div&gt;
+&lt;div class="main-content"&gt;...&lt;/div&gt;
+&lt;div class="bottom"&gt;...&lt;/div&gt;
+
+&lt;!-- ✅ Correct (semantic) --&gt;
+&lt;nav&gt;...&lt;/nav&gt;
+&lt;main&gt;...&lt;/main&gt;
+&lt;footer&gt;...&lt;/footer&gt;</code></pre><hr><h2>9 | Practice Exercises</h2><h3>Exercise 01: Add Your Personal Information</h3><p>Task: Customize the portfolio with your real information</p><ol><li>Replace “Your Name” with your actual name</li><li>Add a real email address in the contact section</li><li>Write a unique bio in the About section (3–4 sentences)</li><li>If you have them, add your LinkedIn, GitHub, Twitter links</li></ol><h3>Exercise 02: Add a New Section</h3><p>Task: Create a “Blog” section</p><pre><code>&lt;section id="blog"&gt;
+    &lt;h2&gt;Learning Blog&lt;/h2&gt;
+    &lt;p&gt;Documenting my daily progress:&lt;/p&gt;
+    
+    &lt;article class="blog-post"&gt;
+        &lt;h3&gt;Day 3: Built My First Website!&lt;/h3&gt;
+        &lt;p&gt;&lt;time datetime="2026-01-15"&gt;January 15, 2026&lt;/time&gt;&lt;/p&gt;
+        &lt;p&gt;
+            Today I created the HTML structure for my portfolio. 
+            It's unstyled, but it works! Next up: CSS styling.
+        &lt;/p&gt;
+    &lt;/article&gt;
+&lt;/section&gt;</code></pre><p><em>Add this between your Projects and Contact sections.</em></p><h3>Exercise 03: Create a Second Page</h3><p>Task: Create an about.html page with more detailed information</p><ol><li>Create a new file: about.html</li><li>Copy the basic HTML structure from index.html</li><li>Create a detailed About page with:</li></ol><ul><li>Your background</li><li>Why you’re learning cloud computing</li><li>Your learning methodology</li><li>Your career goals</li></ul><p>Link to it from your navigation:</p><pre><code>&lt;li&gt;&lt;a href="about.html"&gt;About&lt;/a&gt;&lt;/li&gt;</code></pre><hr><h2>10 | Troubleshooting Common Issues</h2><h3>Issue 01: Images Not Showing</h3><p>Problem: <strong>&lt;img src=”profile.jpg” alt=”My photo”&gt;</strong> shows broken image</p><p>Solutions:</p><pre><code>&lt;!-- ✅ Check file path is correct --&gt;
+&lt;img src="assets/images/profile.jpg" alt="My photo"&gt;
+
+&lt;!-- ✅ Ensure image file exists in that location --&gt;
+
+&lt;!-- ✅ Check file extension matches (jpg vs jpeg vs png) --&gt;
+&lt;img src="assets/images/profile.png" alt="My photo"&gt;</code></pre><h3>Issue 02: Links Not Working</h3><p>Problem: Clicking navigation links doesn’t jump to sections</p><p>Solution: Make sure href matches id:</p><pre><code>&lt;!-- ❌ Won't work --&gt;
+&lt;a href="#contact"&gt;Contact&lt;/a&gt;
+&lt;section id="contact-section"&gt;
+
+&lt;!-- ✅ Works --&gt;
+&lt;a href="#contact"&gt;Contact&lt;/a&gt;
+&lt;section id="contact"&gt;</code></pre><h3>Issue 03: Form Submits But Nothing Happens</h3><p>This is normal! Forms need backend processing:</p><ul><li><strong>JavaScript</strong> (to handle on the page)</li><li>Or server-side language (Python, PHP, Node.js)</li></ul><p>We’ll add this functionality in later posts.</p><p>For now, prevent form submission with:</p><pre><code>&lt;form onsubmit="return false;"&gt;</code></pre><hr><h3>Final Thoughts</h3><ol><li><strong>HTML is structure, not style: </strong>It describes what something is, not how it looks</li><li><strong>Semantic HTML matters: </strong>Use meaningful tags (nav, main, article) instead of divs</li><li><strong>Validation catches errors: </strong>Always validate your HTML with W3C</li><li><strong>Accessibility is essential: </strong>Alt text, proper hierarchy, semantic structure help everyone</li><li><strong>DOM is a tree: </strong>Understanding parent/child relationships is crucial for CSS and JavaScript</li></ol><h2>Concluding Remarks</h2><p>You’ve just built your first real website! Yes, it’s plain right now, but:</p><p>✅ It’s properly structured</p><p>✅ It’s semantic and accessible</p><p>✅ It’s validated and error-free</p><p>✅ It’s ready for professional styling</p><p>You’re not just learning HTML, you’re building a real portfolio that will help you get hired in cloud computing.</p><p>Take a moment to appreciate what you’ve accomplished. Three days ago, you started with zero knowledge. Now you have a working website structure.</p><p><strong>Next up: </strong>We’ll make it beautiful with CSS. Get ready to see your portfolio transform! 🚀</p><hr><figure><img src="https://cdn-images-1.medium.com/max/800/1*JVw6gXzNYpnvlkyqXWdaNA.png" alt="" loading="lazy"><figcaption>HTML — The Markup Language</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>⬜ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>⬜ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>⬜ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>⬜ <strong>07 — Git: </strong>Version Control And Deployment</p><p>⬜ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>⬜ <strong>09 — SQL:</strong> Cloud Data Management</p><p>⬜ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>⬜ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>⬜ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><hr><h2>Additional Resources</h2><h3><a href="https://ntombizakhona.medium.com/list/cloud-glossary-528956a3c181">Cloud Glossary</a></h3><blockquote>Cloud Computing Simplified: A Cloud Glossary For Beginners</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34703">Cloud Practitioner Exam Guide</a></h3><blockquote>In a world where nearly every industry is moving toward cloud-first strategies, having a baseline understanding of these principles is no longer optional but essential.</blockquote><h3><a href="https://dev.to/ntombizakhona/series/34979">AI Practitioner Exam Guide</a></h3><blockquote>Whether you’re an Executive, Developer, Engineer, or Project Manager, having a baseline understanding of AI principles is no longer a <em>nice to have</em>, it’s <strong>absolutely essential.</strong></blockquote><h3><a href="https://developer.mozilla.org/en-US/docs/Learn/HTML">MDN HTML Tutorial</a></h3><blockquote>The gold standard reference</blockquote><h3><a href="https://www.w3schools.com/html/">W3Schools HTML</a></h3><blockquote>Interactive examples</blockquote><h3><a href="https://validator.w3.org/">HTML Validator</a></h3><blockquote>Check your code</blockquote>
+

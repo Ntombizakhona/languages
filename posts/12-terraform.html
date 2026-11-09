@@ -1,0 +1,349 @@
+<!-- Imported from https://ntombizakhona.medium.com/terraform-in-the-cloud-337b9bdbbc0b by tools/import_medium.py. Re-run it to update this file. -->
+<h1>Terraform in the Cloud</h1>
+<h2>Infrastructure as Code</h2>
+<figure><img src="https://cdn-images-1.medium.com/max/1024/1*4xDyIV9Wt2kp2tgIknZgmg.png" alt="" loading="lazy"><figcaption>Terraform in the Cloud</figcaption></figure><p>You’ve containerised your portfolio, orchestrated it with Kubernetes, and added a Java service next to your Python API.</p><p>But here’s the thing: <strong>who created the cloud infrastructure your app runs on?</strong></p><p><strong>Think about it:</strong></p><ul><li><em>The server?</em> → <strong>You clicked through the AWS console to create it</strong></li><li><em>The firewall rules (security groups)?</em> → <strong>Configured by hand</strong></li><li><em>The database instance?</em> → <strong>Point-and-click</strong></li><li>Load balancers, DNS, SSL certificates? → <strong>More clicking</strong></li></ul><blockquote><strong><em>Your application is automated. Your infrastructure is not.</em></strong></blockquote><p>And that’s a problem:</p><ul><li><em>What if you need to recreate everything in a new region?</em> → <strong>Click through it all again</strong></li><li><em>What if someone accidentally deletes a firewall rule? </em>→ <strong>Hope you remember the settings</strong></li><li><em>What if you need the same setup for staging AND production?</em> → <strong>Double the clicking</strong></li><li><em>What if an auditor asks “what changed last Tuesday?”</em> → <strong>¯_(ツ)_/¯</strong></li></ul><p><strong>This is where Terraform comes in.</strong></p><p>Terraform, from HashiCorp (now part of IBM), is an Infrastructure as Code (IaC) tool. Instead of clicking through cloud consoles, you write code that describes your infrastructure and Terraform builds it for you. Automatically. Repeatably. Every single time.</p><ul><li><strong>Declarative</strong>: You describe WHAT you want, not HOW to build it</li><li><strong>Cloud-Agnostic</strong>: Works with AWS, Azure, GCP, and thousands of other providers</li><li><strong>Version Controlled</strong>: Your infrastructure lives in Git, just like your app code</li><li><strong>Collaborative</strong>: Teams can review infrastructure changes via pull requests</li><li><strong>Industry Standard</strong>: Used by companies from startups to Fortune 500</li></ul><p><em>If Kubernetes is the operating system of the cloud, Terraform is the architect that designs and builds the data center.</em></p><h2>Topics</h2><ol><li>The ClickOps Problem</li><li>Why Infrastructure as Code?</li><li>How Terraform Works</li><li>Install Terraform</li><li>Local Deployment</li><li>HCL Fundamentals</li><li>Rebuild The Server as Code</li><li>Deploy Your Portfolio on The Server</li><li>Drift, Replacement, and Destroy</li><li>State: Terraform’s Memory</li><li>Modules: Reusable Infrastructure</li><li>Best Practices and Troubleshooting</li></ol><h2>1 | The Clickops Problem</h2><pre><code>┌─────────────────────────────────────────────────────────────────────────┐
+│                    THE CLICKOPS NIGHTMARE                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Without Terraform (ClickOps):                                         │
+│   ─────────────────────────────                                         │
+│                                                                         │
+│   Developer: "I need a Kubernetes cluster with a database"              │
+│                                                                         │
+│   Step 1:  Log into AWS Console                                         │
+│   Step 2:  Create VPC... click click click (15 minutes)                 │
+│   Step 3:  Create subnets... click click click (10 minutes)             │
+│   Step 4:  Configure security groups... click click (10 minutes)        │
+│   Step 5:  Create EKS cluster... click click click (20 minutes)         │
+│   Step 6:  Create RDS database... click click click (15 minutes)        │
+│   Step 7:  Configure IAM roles... click click click (20 minutes)        │
+│   Step 8:  Set up load balancer... click click (10 minutes)             │
+│   Step 9:  Configure DNS... click click (5 minutes)                     │
+│   Step 10: Document everything you did... (never happens 😅)            │
+│                                                                         │
+│   Total: ~2 hours of clicking, zero documentation, zero repeatability   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                                    ▼
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      WITH TERRAFORM                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   Developer: "I need a Kubernetes cluster with a database"              │
+│                                                                         │
+│   Step 1: Write infrastructure code (main.tf)                           │
+│   Step 2: terraform plan  → "Here's what I'll create..."                │
+│   Step 3: terraform apply → Infrastructure created automatically        │
+│                                                                         │
+│   ✓ Fully documented (the code IS the documentation)                    │
+│   ✓ Version controlled in Git                                           │
+│   ✓ Repeatable across environments                                      │
+│   ✓ Reviewable via pull requests                                        │
+│   ✓ Destroyable with one command: terraform destroy                     │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘</code></pre><h2>2 | Why Infrastructure as Code?</h2><h3>Declarative vs. Imperative</h3><pre><code>IMPERATIVE (a script of steps)          DECLARATIVE (Terraform)
+──────────────────────────────          ───────────────────────
+1. Create security group "web"          "A security group named web should
+2. Open port 80 to everyone              exist, with port 80 open to everyone."
+
+Run it twice → error: "web" already     Run it twice → "No changes."
+exists, or a duplicate group</code></pre><p>Terraform compares what you declared with what actually exists and only does the difference. Running the same code twice is safe, because the second run changes nothing.</p><p>This property is called <strong>idempotence</strong>, and it’s what makes infrastructure code repeatable.</p><h3>IaC in the Cloud Ecosystem</h3><ol><li><strong>Terraform</strong> was created by HashiCorp (now part of IBM) and utilizes a declarative approach with HashiCorp Configuration Language (HCL) to offer multi-cloud support across AWS, Azure, GCP, and thousands of other providers.</li><li><strong>OpenTofu</strong> is hosted by the Linux Foundation as an open-source, multi-cloud fork of Terraform that also relies on a declarative approach using HCL.</li><li><strong>CloudFormation</strong> is a declarative tool created by AWS that uses YAML or JSON configurations and exclusively supports the AWS cloud platform.</li><li><strong>Bicep</strong> is a declarative domain-specific language developed by Microsoft designed specifically for provisioning resources within Azure.</li><li><strong>Pulumi</strong> is a multi-cloud provisioning platform created by Pulumi that enables infrastructure management using general-purpose programming languages like TypeScript, Python, and Go.</li><li><strong>CDK</strong> (Cloud Development Kit) was developed by AWS to allow infrastructure provisioning through general-purpose languages, focusing primarily on AWS support.</li></ol><h3>The Terraform Advantage</h3><p><strong>Terraform’s main advantage is reach: </strong>one tool and one language cover every major cloud, plus services such as GitHub, Cloudflare, and Kubernetes.</p><p>Since 2023 Terraform has used the Business Source License rather than an open-source license, which is why the community created OpenTofu.</p><p>Both use the same language, so almost everything in this post also works with OpenTofu’s tofu command.</p><p><strong>What about Ansible?</strong> Ansible mainly configures servers that already exist: installing packages, editing config files, restarting services. Terraform creates the infrastructure itself. Many teams use both. In this post, a small cloud-init file does Ansible’s job.</p><h2>3 | How Terraform Works</h2><h3>The Terraform Workflow</h3><pre><code>┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│    WRITE     │ ──▶      PLAN       ──▶       APPLY      ──▶    DESTROY   
+│  .tf files   │     │   Preview    │     │    Create    │     │  Tear down   │
+│              │     │   changes    │     │    infra     │     │    infra     │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
+   terraform            terraform            terraform            terraform
+     init                 plan                 apply               destroy</code></pre><p>Terraform itself doesn’t know how to talk to AWS.</p><p><strong>Providers</strong> do: plugins that translate your code into API calls for one platform (aws, azurerm, google, github, kubernetes, and many more).</p><p>Every terraform plan does three things:</p><ol><li><strong>Reads your </strong><strong>.tf files.</strong> This is the <em>desired state</em>: what you want to exist.</li><li><strong>Refreshes the state.</strong> For each resource in its state file, Terraform asks the provider what exists in the cloud right now. This is the <em>actual state</em>.</li><li><strong>Computes the difference</strong> and shows it as a plan: what it would create, change, or destroy to make reality match your code.</li></ol><p>terraform apply does the same, asks you to confirm, and then makes the changes.</p><h3>Key Concepts</h3><ul><li>A <strong>Provider</strong> is a plugin that communicates with a specific platform’s API, with common examples including aws, azurerm, and google.</li><li>A <strong>Resource</strong> represents an individual piece of infrastructure created and managed by Terraform, such as an aws_instance or an aws_security_group.</li><li>A <strong>Data Source</strong> allows Terraform to read external information without modifying it, such as looking up the latest available Ubuntu image.</li><li>A <strong>Variable</strong> serves as an input parameter to customise configurations, often used to define things like instance types or regions.</li><li>An <strong>Output</strong> is a value printed to the terminal after a successful deployment, such as the newly created server’s IP address.</li><li>A <strong>Module</strong> functions as a reusable group of configured resources designed to package a standard pattern, like a pre-built web server stack.</li><li>The <strong>State</strong> file (terraform.tfstate) serves as the official record of what infrastructure Terraform is actively managing.</li><li>The <strong>Lock file</strong> (.terraform.lock.hcl) locks down the exact provider versions and checksums to ensure consistency across environments.</li></ul><h2>4 | Install Terraform</h2><p><strong>Windows:</strong></p><pre><code>winget install Hashicorp.Terraform</code></pre><p>Close and reopen your terminal, then check:</p><pre><code>terraform -version</code></pre><p>If you don’t have winget, download the Windows zip from <a href="https://developer.hashicorp.com/terraform/install">developer.hashicorp.com/terraform/install</a>, extract terraform.exe into a folder such as C:\Tools\terraform, and add that folder to your PATH. Chocolatey users can run choco install terraform.</p><p><strong>macOS:</strong> brew tap hashicorp/tap then brew install hashicorp/tap/terraform.</p><p><strong>Linux:</strong> follow the APT or RPM instructions on the same install page.</p><p>Also install the <strong>HashiCorp Terraform</strong> extension in VS Code or Kiro for syntax highlighting, autocompletion, and format-on-save.</p><h2>5 | Local Deployment</h2><p>Learn the workflow with the local provider first. Its resources are files on your own computer, so mistakes cost nothing.</p><p>Create a folder called terraform-hello anywhere outside your portfolio, and add main.tf:</p><pre><code>terraform {
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "~&gt; 2.0"
+    }
+  }
+}
+variable "learner" {
+  type    = string
+  default = "Cloud Learner"
+}
+resource "local_file" "greeting" {
+  filename = "${path.module}/greeting.txt"
+  content  = "Hello, ${var.learner}! Terraform created this file."
+}</code></pre><p><strong>Now run the whole workflow:</strong></p><pre><code>terraform init      # download the "local" provider
+terraform plan      # preview: "Plan: 1 to add, 0 to change, 0 to destroy."
+terraform apply     # type "yes" to create greeting.txt
+Get-Content greeting.txt</code></pre><ul><li><strong>init</strong> downloads the provider into a hidden .terraform folder and writes .terraform.lock.hcl, which pins the exact provider version so everyone on a team gets the same plugin.</li><li><strong>plan</strong> shows + resource "local_file" "greeting". Nothing has happened yet. Values marked (known after apply) only exist once the resource is created.</li><li><strong>apply</strong> creates the file and writes terraform.tfstate. Open it: it's JSON recording every resource Terraform created. That's how Terraform remembers what it owns.</li></ul><p>Run terraform apply again. Terraform replies No changes. Your infrastructure matches the configuration. That's idempotence.</p><p>Now experiment:</p><pre><code># 1. Change an input
+terraform apply -var="learner=YourName"
+
+# 2. Change reality behind Terraform's back
+Remove-Item greeting.txt
+terraform plan
+
+# 3. Clean up
+terraform destroy</code></pre><ol><li>The plan says local_file.greeting must be replaced and marks content with # forces replacement. This provider can't edit a file in place, so it deletes it and creates a new one. Cloud resources behave the same way: some settings change in place, others force a replacement. A replaced database loses its data, so <strong>always read the plan before typing </strong><strong>yes.</strong></li><li>Terraform notices the file is gone and plans to create it again. A change made outside Terraform is called <strong>drift</strong>, and plan is how you find it.</li><li>destroy deletes everything recorded in the state.</li></ol><pre><code>
+| Plan Symbol | Meaning                              |
+|-------------|--------------------------------------|
+| +           | Create                               |
+| ~           | Update in place                      |
+| -/+         | Destroy, then create a replacement   |
+| -           | Destroy                              |</code></pre><h2>6 | HCL Fundamentals</h2><p>Terraform code is written in <strong>HCL</strong>. Everything is a <strong>block</strong>:</p><pre><code>resource "local_file" "greeting" {
+│         │            └── Name: your label, unique for this type
+│         └── Type: provider ("local") + resource kind ("file")
+└── Block type: terraform, provider, resource, data, variable, output, locals, module
+  filename = "./greeting.txt"    ← Argument
+}</code></pre><p>You refer to a resource’s attributes as TYPE.NAME.ATTRIBUTE, for example aws_key_pair.portfolio.key_name.</p><p>Variables are var.NAME, data sources are data.TYPE.NAME.ATTRIBUTE, and module outputs are module.NAME.OUTPUT.</p><p><strong>References define the order.</strong> If the server refers to the key pair, Terraform knows the key pair must exist first. It reads every reference, builds a <strong>dependency graph</strong>, and creates resources in the right order, running independent ones in parallel. You never write “step 1, step 2”.</p><p><strong>Folders matter, file names don’t.</strong> Terraform loads every .tf file in a folder as one configuration. main.tf, variables.tf, and outputs.tf are just a convention. Each folder is a separate configuration with its own state.</p><pre><code># HCL quick reference
+name     = "my-resource"                         # string
+count    = 3                                     # number
+enabled  = true                                  # boolean
+ports    = [80, 443]                             # list
+tags     = { Name = "web", Env = "dev" }         # map
+label    = "${var.project_name}-web"             # string interpolation
+size     = var.env == "prod" ? "t3.small" : "t3.micro"   # conditional
+key      = file(pathexpand("~/.ssh/key.pub"))    # built-in functions
+for_each = { http = 80, https = 443 }            # one resource per map entry</code></pre><h3>🏗️ Let’s Build</h3><h2>7 | Rebuild The Server as Code</h2><p>We launched an EC2 server by clicking through the AWS console. Here’s how each click becomes code:</p><ul><li>Instead of manually <strong>choosing an Ubuntu image</strong> in the console, you use a data "aws_ami" "ubuntu" block to automatically find the newest Ubuntu LTS image.</li><li>Instead of <strong>creating a key pair and downloading a .pem file</strong>, the aws_key_pair resource uploads a public key that you generate yourself securely.</li><li>Instead of clicking through settings to configure a <strong>security group with SSH, port 80, 443, and 5000</strong>, you define an aws_security_group resource alongside individual rules for each port.</li><li>Instead of walking through the wizard steps to <strong>launch a t2.micro instance</strong>, you simply declare an aws_instance resource in your configuration.</li><li>Instead of <strong>manually SSHing into the server to install Docker</strong>, you pass a cloud-init script directly into the user_data argument to handle installation automatically on first boot.</li></ul><h3>What We’re Building</h3><pre><code>Your laptop                          AWS (us-west-2)
+───────────                          ───────────────
+terraform apply  ──────────────►     Default VPC
+ssh, browser     ──────────────►       └── Security group "languages-portfolio-web"
+                                             inbound: 22 (your IP only), 80, 443
+                                             └── EC2: Ubuntu 24.04 LTS, t3.micro, Docker
+                                                   ├── frontend (Nginx, port 80)
+                                                   └── backend-service (Flask, port 5000)</code></pre><p>Every AWS account has a <strong>default VPC</strong> in each region: a ready-made network with public subnets.</p><p>Using it keeps this build to seven resources that take a couple of minutes to create. Production setups usually add a custom VPC, a managed Kubernetes cluster (EKS), and a managed database (RDS).</p><p>Those are more resource blocks of the same kind, but they bill by the hour, so we start with one server.</p><p>We use Ubuntu 24.04 LTS, the newer long-term-support release.</p><h3>Prerequisites</h3><p><strong>1. </strong><a href="https://ntombizakhona.medium.com/amazon-web-services-a8e57a9c6084"><strong>An AWS user for Terraform.</strong></a> Use an IAM user, never your root account. Attach the AmazonEC2FullAccess policy and AmazonS3FullAccess then create an access key for the CLI.</p><p><strong>2. The AWS CLI</strong>, which stores credentials where Terraform can find them:</p><pre><code>winget install Amazon.AWSCLI
+# Reopen the terminal, then:
+aws configure                  # access key, secret, region us-west-2, output json
+aws sts get-caller-identity    # proves the credentials work</code></pre><p>The credentials are saved in $HOME\.aws\credentials, and Terraform's AWS provider reads that same file. <strong>No keys ever go in your Terraform code.</strong></p><p><strong>3. An SSH key pair:</strong></p><pre><code>New-Item -ItemType Directory -Force "$HOME\.ssh" | Out-Null
+ssh-keygen -t ed25519 -f "$HOME\.ssh\portfolio-key" -C "languages-portfolio"</code></pre><p>This creates portfolio-key (private, stays on your laptop) and portfolio-key.pub (public, goes to AWS).</p><p><strong>4. Your public IP address</strong>, so only you can SSH in:</p><pre><code>(Invoke-RestMethod https://checkip.amazonaws.com).Trim()</code></pre><blockquote><strong><em>💰 Cost:</em></strong><em> This build runs one small EC2 instance with a 20 GB disk and a public IPv4 address. Depending on your account’s Free Tier, that’s free or a few cents per hour. everything.</em></blockquote><blockquote><strong><em>An AWS Budgets alert is a good habit too.</em></strong></blockquote><h3>Step 01: Create the Folder</h3><p>Infrastructure code lives next to the application it serves, in the same Git repository:</p><pre><code>LanguagesPortfolio/
+├── backend/
+├── frontend/
+├── k8s/
+└── terraform/              ← NEW
+    ├── providers.tf        ← Terraform version, AWS provider, default tags
+    ├── variables.tf        ← Inputs
+    ├── main.tf             ← The server, its firewall, and its key
+    ├── cloud-init.yaml     ← First-boot setup
+    ├── outputs.tf          ← Values printed after apply
+    └── terraform.tfvars    ← Your personal values (not committed)</code></pre><h3>Step 02: providers.tf</h3><pre><code>terraform {
+  required_version = "&gt;= 1.11"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~&gt; 6.0"
+    }
+  }
+}
+provider "aws" {
+  region = var.aws_region
+  # Added to every resource this configuration creates
+  default_tags {
+    tags = {
+      Project   = var.project_name
+      ManagedBy = "terraform"
+    }
+  }
+}</code></pre><ul><li><strong>required_version</strong> stops older Terraform versions from running this code. 1.11 is the minimum for the state locking in Section 9.</li><li><strong>~&gt; 6.0</strong> allows any 6.x release of the AWS provider, but never 7.0. Major versions can contain breaking changes, so you upgrade on purpose, not by accident.</li><li><strong>default_tags</strong> labels everything. In the console and on your bill, you can see at a glance what Terraform created.</li></ul><h3>Step 03: variables.tf</h3><pre><code>variable "aws_region" {
+  description = "AWS region to build in"
+  type        = string
+  default     = "us-west-2"
+}
+variable "project_name" {
+  description = "Prefix for resource names, and the Project tag"
+  type        = string
+  default     = "languages-portfolio"
+}
+variable "instance_type" {
+  description = "EC2 size. x86 types (t3, t2) only; ARM types like t4g need an arm64 image."
+  type        = string
+  default     = "t3.micro"
+}
+variable "ssh_allowed_cidr" {
+  description = "Your public IP in CIDR form, such as 203.0.113.25/32"
+  type        = string
+  validation {
+    condition     = can(cidrhost(var.ssh_allowed_cidr, 0)) &amp;&amp; var.ssh_allowed_cidr != "0.0.0.0/0"
+    error_message = "Set ssh_allowed_cidr to your own IP address as a CIDR block, such as 203.0.113.25/32."
+  }
+}
+variable "public_key_path" {
+  description = "SSH public key to install on the server"
+  type        = string
+  default     = "~/.ssh/portfolio-key.pub"
+}</code></pre><ul><li>A variable with a default is optional. ssh_allowed_cidr has none, so it's required, and Terraform asks for it if you don't supply it.</li><li>The <strong>validation</strong> block checks the value before Terraform calls AWS. cidrhost fails on anything that isn't a CIDR block, and can turns that failure into false. The second check refuses 0.0.0.0/0, which would open SSH to the entire internet.</li><li>Post 8 used t2.micro. t3.micro is the newer generation with the same 1 GiB of memory. If your account's Free Tier covers different types, change the default. The EC2 console labels the eligible ones.</li></ul><h3>Step 04: main.tf</h3><pre><code># Find the newest Ubuntu 24.04 LTS image published by Canonical
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical's AWS account
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd*/ubuntu-noble-24.04-amd64-server-*"]
+  }
+}
+# Upload your public key. The private key stays on your laptop.
+resource "aws_key_pair" "portfolio" {
+  key_name   = "${var.project_name}-key"
+  public_key = file(pathexpand(var.public_key_path))
+}
+# The cloud firewall around the server
+resource "aws_security_group" "web" {
+  name        = "${var.project_name}-web"
+  description = "Portfolio web server"
+}
+resource "aws_vpc_security_group_ingress_rule" "ssh" {
+  security_group_id = aws_security_group.web.id
+  description       = "SSH from my IP only"
+  cidr_ipv4         = var.ssh_allowed_cidr
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+}
+resource "aws_vpc_security_group_ingress_rule" "web" {
+  for_each = { http = 80, https = 443 }
+  security_group_id = aws_security_group.web.id
+  description       = upper(each.key)
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = each.value
+  to_port           = each.value
+}
+resource "aws_vpc_security_group_egress_rule" "all" {
+  security_group_id = aws_security_group.web.id
+  description       = "All outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # all protocols and ports
+}</code></pre><p>The server goes at the bottom of the same file:</p><pre><code>resource "aws_instance" "portfolio" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.portfolio.key_name
+  vpc_security_group_ids = [aws_security_group.web.id]
+  # First-boot setup, applied by cloud-init on the server
+  user_data                   = file("${path.module}/cloud-init.yaml")
+  user_data_replace_on_change = true
+  root_block_device {
+    volume_size = 20 # GB; the default 8 GB fills up fast with Docker images
+    volume_type = "gp3"
+    encrypted   = true
+  }
+  metadata_options {
+    http_tokens = "required" # only allow the more secure IMDSv2
+  }
+  tags = {
+    Name = "${var.project_name}-server"
+  }
+}</code></pre><p>What each part does:</p><ul><li><strong>data "aws_ami" "ubuntu"</strong> searches for images whose names match the pattern and picks the newest. owners restricts the search to Canonical, the company behind Ubuntu, so you can't pick up a look-alike image someone else published. Image IDs differ in every region, and the data source finds the right one for yours.</li><li><strong>aws_key_pair</strong> reads your public key. pathexpand turns ~ into your home folder, and file reads the contents.</li><li><strong>The security group and its rules.</strong> Each rule is a separate resource. for_each creates one rule per map entry, addressed as aws_vpc_security_group_ingress_rule.web["http"] and web["https"]. When Terraform creates a security group, it removes the allow-all outbound rule AWS normally adds, so the egress rule puts it back. Without it, the server couldn't download Docker.</li><li><strong>No VPC or subnet is specified,</strong> so AWS uses your default VPC, and its default subnets give the server a public IP address.</li><li><strong>user_data</strong> hands a setup file to cloud-init, the first-boot tool built into Ubuntu cloud images. path.module is the folder containing this .tf file, so Terraform still finds cloud-init.yaml when this code becomes a module in Section 10. The setup only runs on first boot, so user_data_replace_on_change tells Terraform to build a new server whenever you change it.</li><li><strong>metadata_options</strong> requires session tokens for the instance metadata service (IMDSv2). This blocks a common attack where a vulnerable web app is tricked into fetching the server's metadata, which can include credentials.</li><li><strong>encrypted = true</strong> encrypts the disk at rest at no extra cost.</li></ul><h3>Step 05: cloud-init.yaml</h3><pre><code>#cloud-config
+# cloud-init applies this once, the first time the server boots.
+package_update: true    # apt-get update
+packages:               # apt-get install
+  - git
+  - docker.io
+runcmd:
+  # Let the ubuntu user run docker without sudo
+  - usermod -aG docker ubuntu</code></pre><p>The first line must be exactly #cloud-config, which tells cloud-init this is configuration rather than a script.</p><p>Like Terraform, it's declarative: you list the packages you want and cloud-init installs them.</p><p>In Post 8 you used Docker's convenience script. Here we use Ubuntu's own docker.io package.</p><p>Terraform's job ends when AWS reports the server is running, and cloud-init keeps working in the background for a few more minutes.</p><h3>Step 06: outputs.tf</h3><pre><code>output "public_ip" {
+  value = aws_instance.portfolio.public_ip
+}
+output "ssh_command" {
+  description = "Paste this to connect (assumes the default key path)"
+  value       = "ssh -i $HOME/.ssh/portfolio-key ubuntu@${aws_instance.portfolio.public_ip}"
+}
+output "website_url" {
+  value = "http://${aws_instance.portfolio.public_ip}"
+}</code></pre><p>${...} inserts a value into a string. $HOME has no braces, so Terraform leaves it alone, and PowerShell or Bash expands it to your home folder when you paste the command.</p><h3>Step 07: terraform.tfvars</h3><pre><code>ssh_allowed_cidr = "203.0.113.25/32" # your IP from "Before You Start", plus /32</code></pre><p>Terraform loads terraform.tfvars automatically. /32 means "exactly this one address". The file holds personal details, so it stays out of Git.</p><h3>Step 08: Plan and Apply</h3><pre><code># In LanguagesPortfolio\terraform
+terraform init       # download the AWS provider, write the lock file
+terraform fmt        # rewrite files in the standard style
+terraform validate   # check syntax and references without calling AWS
+terraform plan</code></pre><p>validate prints <strong>Success! The configuration is valid</strong>.</p><p>Then plan reads the Ubuntu image and lists seven resources to create: the key pair, the security group, four rules (SSH, HTTP, HTTPS, outbound), and the instance.</p><pre><code>data.aws_ami.ubuntu: Read complete after 1s [id=ami-0123456789abcdef0]
+...
+Plan: 7 to add, 0 to change, 0 to destroy.</code></pre><p>If the plan looks right, apply it:</p><pre><code>terraform apply
+aws_key_pair.portfolio: Creating...
+aws_security_group.web: Creating...
+aws_security_group.web: Creation complete after 3s
+aws_vpc_security_group_ingress_rule.ssh: Creating...
+aws_instance.portfolio: Creating...
+...
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+Outputs:
+public_ip = "54.x.x.x"
+ssh_command = "ssh -i $HOME/.ssh/portfolio-key ubuntu@54.x.x.x"
+website_url = "http://54.x.x.x"</code></pre><p>The key pair and security group start together because neither depends on the other. The rules and the instance wait for the security group. That’s the dependency graph at work.</p><blockquote><strong><em>Your server exists. You can run the same command next month, in another region, or in another account and get an identical result.</em></strong></blockquote><h2>8 | Deploy Your Portfolio onto the Server</h2><p>Terraform built the infrastructure. Now deploy the application.</p><pre><code>  terraform output -raw ssh_command
+  # Copy the command it prints, paste it, and press Enter.</code></pre><p>Type yes the first time to trust the server's fingerprint. Then wait for cloud-init to finish:</p><pre><code>cloud-init status --wait     # prints "status: done" when setup is complete
+exit</code></pre><p>SSH in again, because your new membership in the docker group only applies to new logins. Then clone your repository from and start the containers:</p><pre><code>git clone https://github.com/YOUR-USERNAME/LanguagesPortfolio.git
+cd LanguagesPortfolio
+# A private network where containers find each other by name
+docker network create portfolio
+# Backend first: Nginx looks up its name when it starts
+docker build -t portfolio-backend ./backend
+docker run -d --name backend-service --network portfolio --restart unless-stopped portfolio-backend
+# Frontend, published on port 80
+docker build -t portfolio-frontend ./frontend
+docker run -d --name frontend --network portfolio --restart unless-stopped -p 80:80 portfolio-frontend
+curl http://localhost/api/health</code></pre><p>Why these names and this order:</p><ul><li>frontend/nginx.conf forwards /api/ to http://backend-service:5000, the Kubernetes Service name from Post 10. On a Docker network, containers reach each other by container name, so naming the backend container backend-service makes the same config work here. Docker's built-in DNS does the job Kubernetes DNS did in Post 10.</li><li>Nginx looks up backend-service when it starts and exits if the name doesn't exist yet, so the backend must start first.</li><li>--restart unless-stopped brings both containers back after a reboot.</li><li>Only the frontend publishes a port. Flask is reachable only through Nginx, which is why port 5000 is closed.</li></ul><p>Back on your laptop, in the terraform folder:</p><pre><code>curl.exe "$(terraform output -raw website_url)/api/health"
+Start-Process (terraform output -raw website_url)</code></pre><p>Your portfolio is live on a server Terraform built. Port 443 is already open for when you add an HTTPS certificate until then the site uses plain HTTP. If your repository is private, git clone needs a GitHub personal access token instead of your password.</p><p><strong>💡Notice the split: Terraform built the server, and you deployed the app.</strong> Real teams split the work the same way. Terraform manages infrastructure, and a CI/CD pipeline, like the GitHub Actions workflow in your repository’s .github/workflows folder, deploys the application.</p><h2>9 | Drift, Replacement, and Destroy</h2><h3>Drift: Someone Changes Things by Hand</h3><p>In the EC2 console, select languages-portfolio-server and rename it on the <strong>Tags</strong> tab. Then run terraform plan:</p><pre><code># aws_instance.portfolio will be updated in-place
+  ~ resource "aws_instance" "portfolio" {
+      ~ tags = {
+          ~ "Name" = "renamed-in-console" -&gt; "languages-portfolio-server"
+        }
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.</code></pre><p>Terraform found the difference and plans to put it back. Run terraform apply to undo the manual change.</p><p>This is why teams change infrastructure only through code: the code stays the single source of truth, and plan exposes anything that doesn't match it.</p><h3>Replacement: Some Changes Need a New Server</h3><p>Add a package to cloud-init.yaml, such as - htop under packages, and run terraform plan:</p><pre><code># aws_instance.portfolio must be replaced
+-/+ resource "aws_instance" "portfolio" {
+      ~ id        = "i-0abc123def4567890" -&gt; (known after apply)
+      ~ public_ip = "54.x.x.x" -&gt; (known after apply)
+      ~ user_data = "..." -&gt; "..." # forces replacement
+    }
+
+Plan: 1 to add, 0 to change, 1 to destroy</code></pre><p>The setup file only runs on first boot, so changing it on a running server would do nothing.</p><p>Because of user_data_replace_on_change, Terraform plans a new server instead.</p><p>The new server gets a new IP address and starts without your containers, so you'd repeat Section 7 after applying.</p><blockquote><strong><em>That's the mindset IaC encourages: servers are replaceable, because the code can rebuild them at any time.</em></strong></blockquote><p>⚠️<strong>Undo the edit before continuing unless you want to try it.</strong></p><h3>Destroy: Pay Only for What You Use</h3><pre><code>terraform destroy
+Plan: 0 to add, 0 to change, 7 to destroy.
+...
+Destroy complete! Resources: 7 destroyed.</code></pre><p>The instance, security group, and key pair are gone. The Ubuntu image is untouched, because a data source only reads.</p><p>When you want the server back, run terraform apply and repeat previous steps. Your whole server is now a few files in Git that you can rebuild in minutes.</p><h2>10 | State: Terraform’s Memory</h2><p>The state file maps each resource in your code to a real object in AWS:</p><ul><li><strong>In your code</strong>, the resource aws_instance.portfolio corresponds to the ID i-0abc123def4567890 <strong>in the state file</strong> and represents <strong>The EC2 instance</strong> <strong>in AWS</strong>.</li><li><strong>In your code</strong>, the resource aws_security_group.web corresponds to the ID sg-0123abcd4567ef890 <strong>in the state file</strong> and represents <strong>The security group</strong> <strong>in AWS</strong>.</li><li><strong>In your code</strong>, the resource aws_key_pair.portfolio corresponds to the ID languages-portfolio-key <strong>in the state file</strong> and represents <strong>The key pair</strong> <strong>in AWS</strong>.</li></ul><p>Without it, Terraform couldn’t tell “the server I created” from “a server someone else created”. Three rules:</p><ol><li><strong>Never edit it by hand.</strong> Use terraform state list and terraform state show aws_instance.portfolio to inspect it.</li></ol><p><strong>2. Never commit it to Git.</strong> State stores every attribute in plain text, including passwords for resources such as databases. sensitive = true hides a value in plan output, but not in state.</p><p><strong>3. Don’t lose it.</strong> Without state, Terraform forgets what it created. The next apply tries to create everything again and fails with "already exists" errors, while the old resources keep running and billing you.</p><p>Renaming a resource in code (say, portfolio to web) looks to Terraform like deleting one server and creating another. A moved block updates the state instead:</p><pre><code>moved {
+  from = aws_instance.portfolio
+  to   = aws_instance.web
+}</code></pre><p>To bring something you created by hand under Terraform’s control, write a matching resource block and run terraform import. For example, you could import your original Post 8 security group instead of creating a new one.</p><h3>Remote State for Teams</h3><p>Local state works for one person on one laptop. Teams and CI pipelines need state in a shared place, with <strong>locking</strong> so two people running apply at once can't corrupt it. On AWS, the standard is an S3 bucket. Create it once. Bucket names are global across all AWS accounts, so include your name:</p><pre><code>$bucket = "yourname-portfolio-tfstate"
+aws s3api create-bucket --bucket $bucket --region us-west-2 --create-bucket-configuration LocationConstraint=us-west-2
+aws s3api put-bucket-versioning --bucket $bucket --versioning-configuration Status=Enabled</code></pre><p>New S3 buckets block public access and encrypt objects by default. Versioning keeps every earlier copy of the state, so you can recover from a bad apply. (In us-east-1, leave out --create-bucket-configuration.)</p><p>Add a backend block inside the terraform block in providers.tf:</p><pre><code>terraform {
+  required_version = "&gt;= 1.11"
+
+  backend "s3" {
+    bucket       = "yourname-portfolio-tfstate"
+    key          = "languages-portfolio/terraform.tfstate"
+    region       = "us-west-2"
+    encrypt      = true
+    use_lockfile = true # S3-native state locking
+  }
+
+  required_providers {
+    # ...unchanged
+  }
+}</code></pre><p>Then move your state into it. This works whether or not your server is running:</p><pre><code>terraform init -migrate-state</code></pre><p>Answer yes when Terraform asks to copy the existing state. From now on, every plan and apply reads and writes state in S3.</p><p>During a run, Terraform keeps a lock file ending in .tflock next to the state, and a second run at the same time stops with Error acquiring the state lock instead of corrupting anything.</p><p>Two details trip people up:</p><ul><li><strong>The backend block can’t use variables.</strong> Terraform reads it before anything else, so the values must be written out.</li><li><strong>This configuration doesn’t manage its own bucket.</strong> Terraform needs somewhere to store state before it can create anything, so the bucket is created once, separately.</li></ul><p>Older tutorials lock state with a DynamoDB table. That option is deprecated now that S3 can lock state by itself, which is why required_version is 1.11. To delete the bucket later, choose <strong>Empty</strong> in the S3 console (this removes every version), then delete it.</p><h2>11 | Modules: Reusable Infrastructure</h2><p>Every folder of .tf files is a <strong>module</strong>, and the folder you've been working in is the <strong>root module</strong>.</p><p>Modules work like functions: variables are the inputs, resources are the body, and outputs are the return values.</p><p>To get identical staging and production servers, move main.tf, outputs.tf, and cloud-init.yaml into modules/web-server/, give that folder a variables.tf with a name input (replacing var.project_name), and call it twice from the root:</p><pre><code># terraform/main.tf
+module "staging" {
+  source           = "./modules/web-server"
+  name             = "portfolio-staging"
+  instance_type    = "t3.micro"
+  ssh_allowed_cidr = var.ssh_allowed_cidr
+  public_key_path  = var.public_key_path
+}
+
+module "production" {
+  source           = "./modules/web-server"
+  name             = "portfolio-prod"
+  instance_type    = "t3.small"
+  ssh_allowed_cidr = var.ssh_allowed_cidr
+  public_key_path  = var.public_key_path
+}
+
+output "staging_url" {
+  value = module.staging.website_url
+}</code></pre><p>This is where path.module pays off: inside the module, it points to modules/web-server/, so each copy finds its own cloud-init.yaml.</p><p>Moving resources into a module changes their addresses (aws_instance.portfolio becomes module.staging.aws_instance.portfolio), so add moved blocks if you want to keep a server that's already running.</p><p>You don’t need modules for one server. They pay off when you repeat a pattern. The <a href="https://registry.terraform.io/browse/modules">Terraform Registry</a> also has community modules for common building blocks, such as a complete VPC with public and private subnets.</p><h3>⛔ End of Building Tutorial⛔</h3><h2>12 | Best Practices and Troubleshooting</h2><h3>Do’s and Don’ts</h3><ul><li>Always <strong>store team state remotely</strong> (using S3 with use_lockfile) instead of keeping team state on a single laptop.</li><li>Make sure to <strong>read the </strong><strong>terraform plan before every </strong><strong>apply</strong> rather than applying changes blindly.</li><li><strong>Commit </strong><strong>.terraform.lock.hcl and pin provider versions</strong> so you don't let each machine pick its own random versions.</li><li><strong>Use variables for anything that differs between environments</strong> instead of hardcoding values directly.</li><li><strong>Keep your credentials in the AWS CLI config or environment variables</strong> and never put sensitive access keys in your .tf files.</li><li>Remember to <strong>run </strong><strong>terraform fmt and </strong><strong>terraform validate before committing</strong> rather than committing unchecked code to your repository.</li><li><strong>Tag every resource</strong> using features like default_tags instead of leaving resources untagged.</li><li><strong>Change your infrastructure only through code</strong> rather than fixing things manually in the AWS console and forgetting about them.</li><li>Remember to <strong>run </strong><strong>terraform destroy on learning environments</strong> so you don't leave test servers running and incurring costs.</li></ul><h3>.gitignore for Terraform</h3><p>Add these lines to LanguagesPortfolio/.gitignore:</p><pre><code># Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!example.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json</code></pre><p>Don’t ignore .terraform.lock.hcl. It belongs in Git so everyone uses the same provider versions.</p><h3>Separate Environments</h3><p>Calling a module twice from one folder, keeps staging and production in one state file. As projects grow, each environment gets its own folder and its own state, built from the same modules, so a mistake in staging can never touch production:</p><pre><code>terraform/
+├── modules/
+│   └── web-server/
+└── environments/
+    ├── staging/        ← main.tf + terraform.tfvars, own state
+    └── production/     ← same module, production settings, own state</code></pre><h3>Troubleshooting</h3><p><strong>Installation &amp; Authentication Errors</strong></p><ul><li>If the terminal reports <strong>terraform is not recognised</strong>, the likely cause is that the terminal was opened before installation was complete. You can fix this by opening a new terminal and checking the status with Get-Command terraform.</li><li>When you see <strong>No valid credential sources found</strong>, it means Terraform cannot locate your AWS credentials. To resolve this, run aws configure followed by aws sts get-caller-identity.</li><li>If you receive an <strong>UnauthorizedOperation</strong> error, your IAM user lacks the necessary permissions. Fix this by attaching AmazonEC2FullAccess to the user in the AWS console.</li></ul><p><strong>Resource &amp; Network Configuration</strong></p><ul><li>When an <strong>Invalid value for variable (</strong><strong>ssh_allowed_cidr)</strong> error occurs, you are likely missing the /32 suffix or have incorrectly set it to 0.0.0.0/0. The fix is to use your exact IP address followed by /32.</li><li>Seeing <strong>VPCIdNotSpecified: No default VPC for this user</strong> indicates that the default VPC for that specific region was deleted. You can fix it by recreating it using aws ec2 create-default-vpc --region us-west-2.</li><li>If you run into <strong>InvalidKeyPair.Duplicate or </strong><strong>InvalidGroup.Duplicate</strong>, a key pair or security group with that exact name already exists (which often happens after losing a state file). You can resolve this by deleting the old resource in the AWS console or by changing the project_name variable in your code.</li><li>Getting <strong>an error saying the instance type isn’t Free Tier eligible</strong> means your account’s Free Tier benefits cover other types. To fix this, change your instance_type to a type that the EC2 console explicitly marks as eligible.</li></ul><p><strong>SSH &amp; Server Access</strong></p><ul><li>If your <strong>SSH hangs and then times out</strong>, your public IP has likely changed. You can fix this by updating ssh_allowed_cidr in your terraform.tfvars file and running terraform apply.</li><li>Receiving a <strong>Permission denied (publickey)</strong> error means you are using the wrong user or the wrong key. Resolve this by logging in as the ubuntu user and ensuring you pass the private key (not the .pub file) to the -i flag.</li></ul><p><strong>Docker &amp; Container Operations</strong></p><ul><li>If you see <strong>docker: command not found on the server</strong>, cloud-init hasn't finished execution or has failed entirely. Troubleshoot this by running cloud-init status --long and checking the logs in /var/log/cloud-init-output.log.</li><li>A <strong>permission denied error on </strong><strong>docker.sock</strong> happens because the SSH session started before your user was successfully joined to the docker group. Simply log out and SSH back in to fix it.</li><li>When the <strong>frontend container keeps restarting</strong>, Nginx cannot locate the backend-service. You can fix this by checking docker logs frontend and ensuring that backend-service is running on the portfolio network.</li></ul><p><strong>Terraform State Management</strong></p><ul><li>Experiencing an <strong>Error acquiring the state lock</strong> means another Terraform run is currently in progress, or a previously crashed run left a stray lock behind. You should wait for it to finish, or if you are completely certain nothing else is running, use terraform force-unlock with the lock ID provided in the error message.</li></ul><h3>Final Thoughts</h3><p>Terraform closes a critical gap in your cloud journey. Before Terraform, you could build and deploy applications. But the infrastructure underneath was manual, undocumented, and fragile.</p><p>In this post, the server you clicked together became a handful of files. Terraform reads them, works out how reality differs, and makes it match. You can review those files in a pull request, rebuild the server in minutes, and delete it with one command.</p><p>Now your entire stack is code:</p><ul><li><strong>Application code</strong> → Git</li><li><strong>Container definitions</strong> → Dockerfiles</li><li><strong>Orchestration</strong> → Kubernetes YAML</li><li><strong>Infrastructure</strong> → Terraform HCL</li></ul><p>This is the modern cloud workflow:</p><ol><li>Everything is code.</li><li>Everything is versioned.</li><li>Everything is automated.</li></ol><h2>Concluding Remarks</h2><p>You’ve now written every layer of a cloud application, from the content and logic to the containers and the infrastructure underneath. In the final post, we look at <strong>Agentic IDEs</strong>: AI assistants that read, write, and run this kind of code alongside you!</p><p><strong>So, are you ready for the final frontier?</strong></p><figure><img src="https://cdn-images-1.medium.com/max/1024/1*jF19y8Qypljbj69KuEMAQA.png" alt="" loading="lazy"><figcaption>Terraform — Infrastructure As Code</figcaption></figure><h2>Languages Portfolio Progress</h2><p>✅ <strong>01 — English</strong>: Technical Communication And Prompt Engineering</p><p>✅ <strong>02 — Mathematics:</strong> Logic And Problem-Solving Fundamentals</p><p>✅ <strong>03 — HTML:</strong> Web Structure And Semantic Markup</p><p>✅ <strong>04 — CSS: </strong>Styling And Responsive Design</p><p>✅ <strong>05 — JavaScript:</strong> Interactive Web Development</p><p>✅ <strong>06 — Python: </strong>Backend Logic And Cloud Automation</p><p>✅ <strong>07 — Git: </strong>Version Control And Deployment</p><p>✅ <strong>08 — Linux:</strong> The Cloud Operating System</p><p>✅ <strong>09 — SQL:</strong> Cloud Data Management</p><p>✅ <strong>10 — Kubernetes:</strong> Container Orchestration At Scale</p><p>✅ <strong>11 — Java:</strong> Enterprise Cloud Development</p><p>✅ <strong>12 — Terraform:</strong> Infrastructure as Code</p><p>⬜ <strong>Bonus — Agentic IDEs:</strong> AI-Powered Cloud Development</p><h2>Additional Resources</h2><h3><a href="https://developer.hashicorp.com/terraform/docs">Terraform Documentation</a></h3><blockquote>Terraform is an infrastructure as code tool that lets you build, change, and version infrastructure safely and efficiently. This includes low-level components like compute instances, storage, and networking, as well as high-level components like DNS entries and SaaS features.</blockquote><h3><a href="https://docs.cloud-init.io/en/latest/">Cloud-init documentation</a></h3><blockquote>Cloud-init is the <em>industry standard</em> multi-distribution method for cross-platform cloud instance initialization. It is supported across all major public cloud providers, provisioning systems for private cloud infrastructure, and bare-metal installations.</blockquote>
